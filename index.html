@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="bg" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>д-р Адем Зейнев | Официално Академично & Педагогическо Портфолио</title>
+    
+    <!-- Open Graph / Social Media Card Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://azeynev.github.io/">
+    <meta property="og:title" content="д-р Адем Ибушев Зейнев | PhD in Mathematics & Senior Teacher">
+    <meta property="og:description" content="Официално атестационно и академично портфолио (Наредба № 15 на МОН | ХТМУ – София, Катедра „Математика“ | 25+ г. стаж | 11 научни публикации).">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3.5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-6px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Bilingual visibility logic */
+        .lang-en { display: none; }
+        .lang-bg { display: block; }
+        body.en-mode .lang-en { display: block !important; }
+        body.en-mode .lang-bg { display: none !important; }
+        
+        .lang-inline-en { display: none; }
+        .lang-inline-bg { display: inline; }
+        body.en-mode .lang-inline-en { display: inline !important; }
+        body.en-mode .lang-inline-bg { display: none !important; }
+
+        /* Reveal Animations */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-on-scroll.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hover Cards */
+        .glow-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glow-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 28px -6px rgba(79, 70, 229, 0.2);
+        }
+
+        /* Print / PDF Optimization */
+        @media print {
+            header, #progress-bar, #scroll-top-btn, .no-print { display: none !important; }
+            body { background: #ffffff !important; color: #0f172a !important; font-size: 11pt; }
+            section { padding-top: 8px !important; padding-bottom: 8px !important; break-inside: avoid; }
+            .shadow-sm, .shadow-xl, .shadow-2xl { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+            .bg-gradient-to-r { background: #312e81 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen font-sans transition-colors duration-300 relative">
+
+    <!-- READING PROGRESS BAR -->
+    <div id="progress-bar" class="fixed top-0 left-0 h-1 bg-gradient-to-r from-brand-500 via-purple-500 to-pink-500 z-50 transition-all duration-150 w-0"></div>
+
+    <!-- TOP STICKY NAVIGATION -->
+    <header class="sticky top-0 z-40 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-purple-600 flex items-center justify-center text-white shadow-md animate-float">
+                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-sm sm:text-base leading-tight block">
+                        <span class="lang-inline-bg">д-р Адем Ибушев Зейнев</span>
+                        <span class="lang-inline-en">Adem ZEINEV, PhD</span>
+                    </span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 block">
+                        <span class="lang-inline-bg">Официално Атестационно & Научно Портфолио</span>
+                        <span class="lang-inline-en">Official Attestation & Academic Portfolio</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- ACTION CONTROLS -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- Print / PDF Export -->
+                <button onclick="window.print()" class="hidden sm:flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl transition">
+                    <i class="fa-solid fa-file-pdf text-rose-500"></i>
+                    <span class="lang-inline-bg">Печат / PDF</span>
+                    <span class="lang-inline-en">Print / PDF</span>
+                </button>
+
+                <!-- Language Switcher -->
+                <button id="lang-toggle-btn" class="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-indigo-500/30 transition-all duration-200 active:scale-95">
+                    <i class="fa-solid fa-language text-sm"></i>
+                    <span id="lang-label">EN / БГ</span>
+                </button>
+
+                <!-- Dark/Light Theme Switcher -->
+                <button id="theme-toggle" class="p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition" aria-label="Toggle Theme">
+                    <i class="fa-solid fa-moon text-base dark:hidden"></i>
+                    <i class="fa-solid fa-sun text-base hidden dark:block text-amber-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO BANNER -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 reveal-on-scroll active">
+        <div class="bg-gradient-to-r from-brand-700 via-indigo-700 to-purple-800 rounded-3xl p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-12 -top-12 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none animate-pulse-slow"></div>
+            <div class="absolute right-1/4 -bottom-16 w-56 h-56 bg-purple-400/20 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+                <div class="max-w-3xl">
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 text-xs font-semibold backdrop-blur-md border border-white/20">
+                            <i class="fa-solid fa-certificate text-amber-300"></i>
+                            <span class="lang-inline-bg">Наредба № 15 на МОН</span>
+                            <span class="lang-inline-en">MON Ordinance No. 15</span>
+                        </span>
+                        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-100 text-xs font-semibold backdrop-blur-md border border-emerald-400/30">
+                            <i class="fa-solid fa-building-columns"></i>
+                            <span class="lang-inline-bg">ХТМУ – София · Катедра „Математика“</span>
+                            <span class="lang-inline-en">UCTM Sofia · Dept. of Mathematics</span>
+                        </span>
+                    </div>
+
+                    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+                        <span class="lang-inline-bg">д-р Адем Ибушев Зейнев</span>
+                        <span class="lang-inline-en">Adem ZEINEV, PhD</span>
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-brand-100 font-normal mb-6 leading-relaxed">
+                        <span class="lang-bg">Старши учител по Математика, Информатика и ИТ в СУ „Св. Паисий Хилендарски“ – с. Абланица (общ. Хаджидимово) | Доктор по математическо моделиране и приложение на математиката</span>
+                        <span class="lang-en">Senior Teacher in Mathematics, Computer Science & IT at St. Paisii Hilendarski Secondary School – Ablanitsa | PhD in Mathematical Modeling and Applications of Mathematics</span>
+                    </p>
+
+                    <div class="flex flex-wrap gap-3 no-print">
+                        <a href="https://orcid.org/0000-0002-0607-2262" target="_blank" class="px-4 py-2.5 bg-white/15 hover:bg-white/25 backdrop-blur-md rounded-xl text-xs font-semibold border border-white/20 transition flex items-center gap-2 hover:scale-105">
+                            <i class="fa-brands fa-orcid text-emerald-300 text-base"></i> ORCID: 0000-0002-0607-2262
+                        </a>
+                        <a href="https://scholar.google.com/scholar?hl=bg&as_sdt=0%2C5&q=adem+zeinev&btnG=" target="_blank" class="px-4 py-2.5 bg-white/15 hover:bg-white/25 backdrop-blur-md rounded-xl text-xs font-semibold border border-white/20 transition flex items-center gap-2 hover:scale-105">
+                            <i class="fa-solid fa-graduation-cap text-sky-300 text-base"></i> Google Scholar
+                        </a>
+                        <a href="https://azeynev.netlify.app" target="_blank" class="px-4 py-2.5 bg-amber-400/20 hover:bg-amber-400/30 backdrop-blur-md rounded-xl text-xs font-semibold border border-amber-300/30 transition flex items-center gap-2 hover:scale-105">
+                            <i class="fa-solid fa-chart-line text-amber-300 text-base"></i>
+                            <span class="lang-inline-bg">Училищен Барометър (Live App)</span>
+                            <span class="lang-inline-en">School Barometer (Live App)</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Academic Monogram / QR Verification Card -->
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-center shrink-0 hidden md:block">
+                    <div class="w-24 h-24 mx-auto rounded-2xl bg-white text-brand-700 flex flex-col items-center justify-center shadow-lg mb-3">
+                        <span class="text-2xl font-black tracking-tighter">AZ</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-500">PhD · Math</span>
+                    </div>
+                    <div class="text-xs font-semibold text-white">azeynev.github.io</div>
+                    <div class="text-[11px] text-brand-200 mt-0.5">
+                        <span class="lang-inline-bg">Верифициран профил</span>
+                        <span class="lang-inline-en">Verified Profile</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTEGRATED KEY METRICS -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 reveal-on-scroll">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-center glow-hover">
+                <div class="text-3xl font-extrabold text-brand-600 dark:text-brand-400 mb-1">25+</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    <span class="lang-inline-bg">Години педагогически стаж</span>
+                    <span class="lang-inline-en">Years Teaching Experience</span>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-center glow-hover">
+                <div class="text-3xl font-extrabold text-purple-600 dark:text-purple-400 mb-1">PhD</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    <span class="lang-inline-bg">ОНС „Доктор“ (ХТМУ)</span>
+                    <span class="lang-inline-en">PhD in Mathematics (UCTM)</span>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-center glow-hover">
+                <div class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mb-1">11</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    <span class="lang-inline-bg">Научни публикации</span>
+                    <span class="lang-inline-en">Scientific Publications</span>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-center glow-hover">
+                <div class="text-3xl font-extrabold text-amber-600 dark:text-amber-400 mb-1">7</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    <span class="lang-inline-bg">Международни доклада</span>
+                    <span class="lang-inline-en">Conference Presentations</span>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-center col-span-2 md:col-span-1 glow-hover">
+                <div class="text-3xl font-extrabold text-sky-600 dark:text-sky-400 mb-1">100%</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    <span class="lang-inline-bg">Облачна STEM интеграция</span>
+                    <span class="lang-inline-en">Cloud STEM Integration</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 1 & 2. GENERAL INFO & QUALIFICATIONS -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 reveal-on-scroll">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- General Information -->
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm glow-hover">
+                <h2 class="text-lg sm:text-xl font-bold mb-5 flex items-center gap-3 text-brand-600 dark:text-brand-400">
+                    <span class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-900/40 flex items-center justify-center"><i class="fa-solid fa-address-card"></i></span>
+                    <span class="lang-inline-bg">1. Обща информация и педагогически статус</span>
+                    <span class="lang-inline-en">1. General Information & Status</span>
+                </h2>
+                <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-school text-brand-500 mt-1"></i>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-100">
+                                <span class="lang-inline-bg">Институция:</span>
+                                <span class="lang-inline-en">Institution:</span>
+                            </strong>
+                            <span class="lang-inline-bg">СУ „Св. Паисий Хилендарски“, ул. „Христо Ботев“ №1, с. Абланица (2932), общ. Хаджидимово, обл. Благоевград</span>
+                            <span class="lang-inline-en">St. Paisii Hilendarski Secondary School, 1 Hristo Botev Str., Ablanitsa (2932), Hadzhidimovo Municipality, Bulgaria</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-chalkboard-user text-brand-500 mt-1"></i>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-100">
+                                <span class="lang-inline-bg">Длъжност:</span>
+                                <span class="lang-inline-en">Position:</span>
+                            </strong>
+                            <span class="lang-inline-bg">Старши учител по Математика, Информатика и Информационни технологии</span>
+                            <span class="lang-inline-en">Senior Teacher in Mathematics, Computer Science & Information Technology</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-network-wired text-brand-500 mt-1"></i>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-100">
+                                <span class="lang-inline-bg">Институционална роля:</span>
+                                <span class="lang-inline-en">Institutional Role:</span>
+                            </strong>
+                            <span class="lang-inline-bg">Ръководител направление „Информационни и комуникационни технологии“ (ИКТ)</span>
+                            <span class="lang-inline-en">Head of Information and Communication Technologies (ICT) Department</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-clock-rotate-left text-brand-500 mt-1"></i>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-100">
+                                <span class="lang-inline-bg">Трудов стаж:</span>
+                                <span class="lang-inline-en">Tenure:</span>
+                            </strong>
+                            <span class="lang-inline-bg">Непрекъснат педагогически стаж от 2000 г. до днес (над 25 години)</span>
+                            <span class="lang-inline-en">Continuous teaching tenure since 2000 (over 25 years)</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <i class="fa-solid fa-flask text-brand-500 mt-1"></i>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-100">
+                                <span class="lang-inline-bg">Научна афилиация:</span>
+                                <span class="lang-inline-en">Research Affiliation:</span>
+                            </strong>
+                            <span>Department of Mathematics, University of Chemical Technology and Metallurgy, Sofia (UCTM)</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Academic Qualifications -->
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm glow-hover">
+                <h2 class="text-lg sm:text-xl font-bold mb-5 flex items-center gap-3 text-purple-600 dark:text-purple-400">
+                    <span class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/40 flex items-center justify-center"><i class="fa-solid fa-user-graduate"></i></span>
+                    <span class="lang-inline-bg">2. Академична подготовка и степени</span>
+                    <span class="lang-inline-en">2. Academic Degrees & Qualifications</span>
+                </h2>
+                <div class="space-y-4 text-sm text-slate-600 dark:text-slate-300">
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/70">
+                        <div class="font-bold text-slate-800 dark:text-slate-100 mb-1">
+                            🎓 <span class="lang-inline-bg">Образователно-научна степен „Доктор“ (PhD in Mathematics)</span>
+                            <span class="lang-inline-en">Doctor of Philosophy (PhD in Mathematics)</span>
+                        </div>
+                        <p class="text-xs leading-relaxed">
+                            <span class="lang-inline-bg">Химикотехнологичен и металургичен университет (ХТМУ) – София, Катедра „Математика“. Специалност: <em>„Математическо моделиране и приложение на математиката“</em> (числено моделиране, еволюционни уравнения и хидродинамика).</span>
+                            <span class="lang-inline-en">University of Chemical Technology and Metallurgy (UCTM), Sofia — Department of Mathematics. Field: <em>"Mathematical Modeling and Applications of Mathematics"</em> (numerical modeling, evolutionary PDEs, and fluid dynamics).</span>
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/70">
+                        <div class="font-bold text-slate-800 dark:text-slate-100 mb-1">
+                            🎓 <span class="lang-inline-bg">Висше образование — Магистър (M.Sc.)</span>
+                            <span class="lang-inline-en">Master of Science (M.Sc.)</span>
+                        </div>
+                        <p class="text-xs leading-relaxed">
+                            <span class="lang-inline-bg">Югозападен университет „Неофит Рилски“ – гр. Благоевград, специалност <em>„Математика и Информатика“</em>.</span>
+                            <span class="lang-inline-en">South-West University "Neofit Rilski", Blagoevgrad — Major in <em>Mathematics and Computer Science</em>.</span>
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700/70">
+                        <div class="font-bold text-slate-800 dark:text-slate-100 mb-1">
+                            📜 <span class="lang-inline-bg">Професионално-квалификационна степен (ПКС)</span>
+                            <span class="lang-inline-en">Professional Qualification Degree (PQD)</span>
+                        </div>
+                        <p class="text-xs leading-relaxed">
+                            <span class="lang-inline-bg">Придобита ПКС и длъжност „Старши учител“ съгласно държавните изисквания на МОН.</span>
+                            <span class="lang-inline-en">Awarded Senior Teacher status and Professional Qualification Degree under Ministry of Education standards.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. MON COMPETENCY MATRIX -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 reveal-on-scroll">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <h2 class="text-lg sm:text-xl font-bold mb-6 flex items-center gap-3 text-brand-600 dark:text-brand-400">
+                <span class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-900/40 flex items-center justify-center"><i class="fa-solid fa-list-check"></i></span>
+                <span class="lang-inline-bg">3. Атестационна матрица на компетенциите (Наредба № 15 на МОН)</span>
+                <span class="lang-inline-en">3. Attestation Competency Matrix (MON Ordinance No. 15)</span>
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60">
+                            <th class="p-3.5 font-bold text-slate-700 dark:text-slate-200 w-1/3">
+                                <span class="lang-inline-bg">Професионална компетентност</span>
+                                <span class="lang-inline-en">Professional Competency</span>
+                            </th>
+                            <th class="p-3.5 font-bold text-slate-700 dark:text-slate-200">
+                                <span class="lang-inline-bg">Приложение в учебния процес и проверими доказателства</span>
+                                <span class="lang-inline-en">Practical Application & Verifiable Evidence</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700/70">
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition">
+                            <td class="p-3.5 font-semibold text-brand-600 dark:text-brand-400">
+                                <span class="lang-inline-bg">1. Академична компетентност</span>
+                                <span class="lang-inline-en">1. Academic Competency</span>
+                            </td>
+                            <td class="p-3.5 text-slate-600 dark:text-slate-300">
+                                <span class="lang-inline-bg">Задълбочено владеене на алгебра, геометрия, висша математика, алгоритми, програмиране и математическо моделиране (ОНС „Доктор“).</span>
+                                <span class="lang-inline-en">Advanced mastery of algebra, geometry, calculus, algorithms, programming, and mathematical modeling (PhD degree).</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition">
+                            <td class="p-3.5 font-semibold text-brand-600 dark:text-brand-400">
+                                <span class="lang-inline-bg">2. Дидактическа и методическа</span>
+                                <span class="lang-inline-en">2. Didactic & Methodological</span>
+                            </td>
+                            <td class="p-3.5 text-slate-600 dark:text-slate-300">
+                                <span class="lang-inline-bg">Прилагане на практико-приложни задачи, визуализация чрез GeoGebra/Desmos, интерактивни тестове и проектно-базирано обучение (PBL).</span>
+                                <span class="lang-inline-en">Application of real-world problem solving, GeoGebra/Desmos visualization, interactive quizzes, and Project-Based Learning (PBL).</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition">
+                            <td class="p-3.5 font-semibold text-brand-600 dark:text-brand-400">
+                                <span class="lang-inline-bg">3. Диагностична и аналитична</span>
+                                <span class="lang-inline-en">3. Diagnostic & Analytical</span>
+                            </td>
+                            <td class="p-3.5 text-slate-600 dark:text-slate-300">
+                                <span class="lang-inline-bg">Авторско разработване и внедряване на уеб системата <strong>„Училищен Барометър“</strong> за количествен анализ на успеваемостта.</span>
+                                <span class="lang-inline-en">Original design and deployment of the <strong>"School Barometer"</strong> web application for quantitative performance analytics.</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition">
+                            <td class="p-3.5 font-semibold text-brand-600 dark:text-brand-400">
+                                <span class="lang-inline-bg">4. Организационна и лидерска</span>
+                                <span class="lang-inline-en">4. Organizational & Leadership</span>
+                            </td>
+                            <td class="p-3.5 text-slate-600 dark:text-slate-300">
+                                <span class="lang-inline-bg">Управление на компютърната мрежа, облачната среда и дигиталните дневници като Ръководител направление ИКТ; организатор на олимпиади.</span>
+                                <span class="lang-inline-en">Management of school IT network, cloud infrastructure, and e-registers as Head of ICT; organizer of regional math/IT olympiads.</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition">
+                            <td class="p-3.5 font-semibold text-brand-600 dark:text-brand-400">
+                                <span class="lang-inline-bg">5. Дигитална (STEM & Cloud)</span>
+                                <span class="lang-inline-en">5. Digital (STEM & Cloud)</span>
+                            </td>
+                            <td class="p-3.5 text-slate-600 dark:text-slate-300">
+                                <span class="lang-inline-bg">100% интеграция на Google Workspace for Education, Smart Classroom, Code Studio и електронни учебни помагала.</span>
+                                <span class="lang-inline-en">100% integration of Google Workspace for Education, Smart Classroom, Code Studio, and interactive digital workbooks.</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. RESEARCH, PUBLICATIONS & CONFERENCES -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 reveal-on-scroll">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <h2 class="text-lg sm:text-xl font-bold flex items-center gap-3 text-brand-600 dark:text-brand-400">
+                    <span class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-900/40 flex items-center justify-center"><i class="fa-solid fa-microscope"></i></span>
+                    <span class="lang-inline-bg">4. Научно-изследователска дейност и публикации</span>
+                    <span class="lang-inline-en">4. Research Activity, Publications & Conferences</span>
+                </h2>
+                <a href="https://scholar.google.com/scholar?hl=bg&as_sdt=0%2C5&q=adem+zeinev&btnG=" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 transition no-print">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span class="lang-inline-bg">Провери цитиранията в Google Scholar</span>
+                    <span class="lang-inline-en">Verify Citations on Google Scholar</span>
+                </a>
+            </div>
+
+            <!-- Research Tech Pillars -->
+            <div class="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/70 dark:border-slate-700/70">
+                    <div class="font-bold text-xs uppercase tracking-wider text-brand-600 dark:text-brand-400 mb-1">📐 Applied Math</div>
+                    <p class="text-xs text-slate-600 dark:text-slate-400">Differential equations, numerical methods, and mathematical modeling of physical processes.</p>
+                </div>
+                <div class="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/70 dark:border-slate-700/70">
+                    <div class="font-bold text-xs uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-1">⚙️ ANSYS Suite</div>
+                    <p class="text-xs text-slate-600 dark:text-slate-400">ANSYS Multiphysics, Workbench & CFX (computational fluid dynamics & simulations).</p>
+                </div>
+                <div class="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/70 dark:border-slate-700/70">
+                    <div class="font-bold text-xs uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1">🧮 MAPLE CAS</div>
+                    <p class="text-xs text-slate-600 dark:text-slate-400">Computer Algebra Systems for symbolic computations, algebraic modeling & visualization.</p>
+                </div>
+                <div class="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/70 dark:border-slate-700/70">
+                    <div class="font-bold text-xs uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">🛠️ 3D Validation</div>
+                    <p class="text-xs text-slate-600 dark:text-slate-400">Engineering simulations, verification and validation of mathematical models.</p>
+                </div>
+            </div>
+
+            <!-- 11 Scientific Publications -->
+            <h3 class="font-bold text-base mb-4 text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-book-open text-brand-600"></i>
+                <span class="lang-inline-bg">Научни публикации в реферирани издания (11):</span>
+                <span class="lang-inline-en">Peer-Reviewed Scientific Publications (11):</span>
+            </h3>
+            <ol class="list-decimal list-inside space-y-2.5 text-sm text-slate-600 dark:text-slate-300 mb-8 pl-1">
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>A. Ahmad, K. Haidar, N. Javad, A. Zeinev</strong>, <em>A criterion to uniform stability for functional perturbed differential equations</em>, International Journal of Pure and Applied Mathematics, Volume 108, №1, (2016), 107–122.</li>
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>A. Zeinev, N. Kitanov</strong>, <em>Estimates for Functional Partial Differential Equations</em>, The Journal of Macro Trends in Technology and Innovation, Volume 2, Issue 1, (2014), 17–29.</li>
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>A. Ahmad, N. Javaid, M. Rafaqat, A. Zeinev</strong>, <em>On the stability of the solutions for a delay differential equations with discontinuity</em>, International Journal of Pure and Applied Mathematics, (2017).</li>
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>A. Zeinev, V. Radeva, D. Kolev, V. Todorov, N. Kitanov</strong>, <em>A class of functional differential equations with "maxima"</em>.</li>
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>T. Donchev, D. Kolev, A. Lazi, A. Nosheen, M. Rafaqat, A. Zeinev</strong>, <em>Numerical methods for delayed differential equations with discontinuities</em>.</li>
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>V. Radeva, V. Todorov, D. Kolev, A. Zeinev, N. Kitanov</strong>, <em>Integrability of Fluid Dynamics Models</em>, Metallurgy (UCTM), (2013).</li>
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>D. Kolev, V. Todorov, A. Zeinev</strong>, <em>Charged Particles Through Electromagnetic Fields</em>.</li>
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>T. Donchev, D. Kolev, A. Lazi, A. Nosheen, M. Rafaqat, A. Zeinev</strong>, <em>Caratheodory Differential Equations On Cones</em>.</li>
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>R. Ivanov, A. Zeinev</strong>, <em>Elementary Proof of the John’s Theorem for Nonsmooth Functions</em>.</li>
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>L. Peychev, K. Panovska, A. Tatsis, A. Zeinev</strong>, <em>Understanding educational quality in informatics in secondary school</em>.</li>
+                <li class="p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition"><strong>S. Bilal, T. Donchev, A. Raza, A. Zeinev, N. Kitanov</strong>, <em>Reachable Set for Functional Differential Inclusions</em>.</li>
+            </ol>
+
+            <!-- 7 Conference Presentations -->
+            <h3 class="font-bold text-base mb-4 text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-microphone-lines text-purple-600"></i>
+                <span class="lang-inline-bg">Доклади и участия в научни конференции (7):</span>
+                <span class="lang-inline-en">International Conference Presentations & Posters (7):</span>
+            </h3>
+            <ol class="list-decimal list-inside space-y-2 text-sm text-slate-600 dark:text-slate-300 pl-1">
+                <li class="p-1.5"><strong>Presentation:</strong> <em>Scientific Conference with International Participation on the occasion of 60 years UCTM (Sofia)</em>.</li>
+                <li class="p-1.5"><strong>Presentation:</strong> <em>International Conference on Business and Social Science Research / The Macro Journals Conference on Medicine, Science, and Technology</em> – Dubrovnik.</li>
+                <li class="p-1.5"><strong>Presentation:</strong> <em>International Conference "New Trends in the Applications of Differential Equations in Sciences"</em>, Bulgarian Academy of Sciences (BAS), Sofia.</li>
+                <li class="p-1.5"><strong>Poster Session (May 2012):</strong> <em>"Charged particles through electromagnetic fields"</em> — Dimitar Kolev, Valeri Todorov, Adem Zeinev.</li>
+                <li class="p-1.5"><strong>UCTM Poster Session (May 2013):</strong> <em>"Parabolic partial differential equations with maxima"</em> & <em>"Geometry of simple states to a model of gas-dynamics"</em>.</li>
+                <li class="p-1.5"><strong>7th International Academic Macro Thematic Conference (Dubrovnik 2018):</strong> <em>"On the solution set of evolution inclusions"</em>.</li>
+                <li class="p-1.5"><strong>7th International Academic Macro Thematic Conference (Dubrovnik 2018):</strong> <em>"Some Scheme for Averaging of Impulsive Optimal Control Problems"</em>.</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 5. TEACHING CURRICULUM -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 reveal-on-scroll">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <h2 class="text-lg sm:text-xl font-bold mb-6 flex items-center gap-3 text-brand-600 dark:text-brand-400">
+                <span class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-900/40 flex items-center justify-center"><i class="fa-solid fa-chalkboard-user"></i></span>
+                <span class="lang-inline-bg">5. Преподавателска заетост и учебни програми</span>
+                <span class="lang-inline-en">5. Teaching Curriculum & Academic Subjects</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/70 dark:border-slate-700/70 glow-hover">
+                    <h3 class="font-bold text-base mb-3 text-brand-600 dark:text-brand-400">
+                        📐 <span class="lang-inline-bg">Математика (5. – 12. клас)</span>
+                        <span class="lang-inline-en">Mathematics (Grades 5 – 12)</span>
+                    </h3>
+                    <ul class="text-xs space-y-2.5 text-slate-600 dark:text-slate-300 leading-relaxed">
+                        <li>• <strong><span class="lang-inline-bg">5. – 7. клас:</span><span class="lang-inline-en">Grades 5 – 7:</span></strong> <span class="lang-inline-bg">Алгебра, геометрия, логическо мислене и подготовка за НВО 7. клас.</span><span class="lang-inline-en">Algebra, geometry, logical reasoning, National External Assessment (Grade 7).</span></li>
+                        <li>• <strong><span class="lang-inline-bg">8. – 10. клас:</span><span class="lang-inline-en">Grades 8 – 10:</span></strong> <span class="lang-inline-bg">Функции, уравнения, неравенства, стереометрия и тригонометрия.</span><span class="lang-inline-en">Functions, equations, inequalities, stereometry, and trigonometry.</span></li>
+                        <li>• <strong><span class="lang-inline-bg">11. – 12. клас:</span><span class="lang-inline-en">Grades 11 – 12:</span></strong> <span class="lang-inline-bg">Профилирана подготовка, математически анализ, статистика и ДЗИ.</span><span class="lang-inline-en">Advanced mathematics, calculus, probability & statistics, State Matriculation (DZI).</span></li>
+                    </ul>
+                </div>
+
+                <div class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/70 dark:border-slate-700/70 glow-hover">
+                    <h3 class="font-bold text-base mb-3 text-purple-600 dark:text-purple-400">
+                        💻 <span class="lang-inline-bg">Информатика (9. – 12. клас)</span>
+                        <span class="lang-inline-en">Computer Science (Grades 9 – 12)</span>
+                    </h3>
+                    <ul class="text-xs space-y-2.5 text-slate-600 dark:text-slate-300 leading-relaxed">
+                        <li>• <span class="lang-inline-bg">Основи на информатиката и алгоритмичното мислене.</span><span class="lang-inline-en">Fundamentals of computer science and algorithmic thinking.</span></li>
+                        <li>• <span class="lang-inline-bg">Типове данни, управляващи структури, масиви, алгоритми за търсене и сортиране.</span><span class="lang-inline-en">Data structures, control flow, arrays, searching and sorting algorithms.</span></li>
+                        <li>• <span class="lang-inline-bg">Обектно-ориентирано програмиране (ООП) и софтуерно инженерство.</span><span class="lang-inline-en">Object-Oriented Programming (OOP) and software engineering principles.</span></li>
+                    </ul>
+                </div>
+
+                <div class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/70 dark:border-slate-700/70 glow-hover">
+                    <h3 class="font-bold text-base mb-3 text-emerald-600 dark:text-emerald-400">
+                        🖥️ <span class="lang-inline-bg">Информационни технологии (5. – 12. клас)</span>
+                        <span class="lang-inline-en">Information Technology (Grades 5 – 12)</span>
+                    </h3>
+                    <ul class="text-xs space-y-2.5 text-slate-600 dark:text-slate-300 leading-relaxed">
+                        <li>• <strong><span class="lang-inline-bg">5. – 8. клас:</span><span class="lang-inline-en">Grades 5 – 8:</span></strong> <span class="lang-inline-bg">Компютърни системи, текстообработка, електронни таблици, презентации, киберсигурност.</span><span class="lang-inline-en">Computer systems, office productivity suites, digital presentations, cybersecurity.</span></li>
+                        <li>• <strong><span class="lang-inline-bg">9. – 12. клас:</span><span class="lang-inline-en">Grades 9 – 12:</span></strong> <span class="lang-inline-bg">Бази данни, компютърни мрежи, графичен дизайн и уеб разработка.</span><span class="lang-inline-en">Relational databases, computer networks, graphic design, and web development.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6 & 7. DIGITAL LAB & CUSTOM SOFTWARE -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 reveal-on-scroll">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Custom Educational Software -->
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm glow-hover">
+                <h2 class="text-lg sm:text-xl font-bold mb-5 flex items-center gap-3 text-brand-600 dark:text-brand-400">
+                    <span class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-900/40 flex items-center justify-center"><i class="fa-solid fa-code"></i></span>
+                    <span class="lang-inline-bg">6. Авторски образователен софтуер</span>
+                    <span class="lang-inline-en">6. Custom Educational Software</span>
+                </h2>
+                <div class="space-y-4">
+                    <div class="p-5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-slate-900/80 rounded-2xl border border-indigo-200/70 dark:border-slate-700">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-base text-brand-700 dark:text-brand-400">📊 School Barometer (Professional Edition)</h3>
+                            <a href="https://azeynev.netlify.app" target="_blank" class="px-3 py-1 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition no-print">
+                                <span class="lang-inline-bg">Отвори Live</span>
+                                <span class="lang-inline-en">Launch App</span> <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
+                            </a>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
+                            <span class="lang-inline-bg">Уеб система за количествен анализ на училищните резултати, изчисляване на интегрални индикатори по випуски и методически обединения с автоматичен експорт към DOCX и JSON.</span>
+                            <span class="lang-inline-en">Web application for quantitative analysis of school academic results, calculating integral indicators across cohorts with automated DOCX and JSON export.</span>
+                        </p>
+                        <div class="flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-500">
+                            <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">JavaScript ES6+</span>
+                            <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">HTML5 / CSS3</span>
+                            <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">DOCX Generator</span>
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200/70 dark:border-slate-700">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-base text-purple-700 dark:text-purple-400">📝 Teacher Form Module (Google Forms Wrapper)</h3>
+                            <a href="https://github.com/azeynev" target="_blank" class="px-3 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition no-print">
+                                GitHub <i class="fa-brands fa-github ml-1"></i>
+                            </a>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <span class="lang-inline-bg">Адаптивен уеб модул с Focus Mode, индикатор за прогрес и тъмен режим за събиране на училищни и методически данни.</span>
+                            <span class="lang-inline-en">Responsive web wrapper featuring Focus Mode, progress tracking, and Dark Mode for institutional data collection.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Digital Lab & Results -->
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm glow-hover flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold mb-5 flex items-center gap-3 text-emerald-600 dark:text-emerald-400">
+                        <span class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 flex items-center justify-center"><i class="fa-solid fa-laptop-code"></i></span>
+                        <span class="lang-inline-bg">7. Дигитална лаборатория и резултати</span>
+                        <span class="lang-inline-en">7. Digital Lab & Student Outcomes</span>
+                    </h2>
+
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <a href="https://www.daskalo.com/adem1970" target="_blank" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700 hover:border-brand-500 transition">
+                            <div class="font-bold text-xs text-slate-800 dark:text-slate-100">🧠 Smart Classroom</div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">Интерактивни уроци и тестове</div>
+                        </a>
+                        <a href="https://studio.code.org" target="_blank" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700 hover:border-brand-500 transition">
+                            <div class="font-bold text-xs text-slate-800 dark:text-slate-100">🧩 Code Studio</div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">Блоково и текстово кодиране</div>
+                        </a>
+                        <a href="https://www.geogebra.org" target="_blank" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700 hover:border-brand-500 transition">
+                            <div class="font-bold text-xs text-slate-800 dark:text-slate-100">📐 GeoGebra & Desmos</div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">Динамична визуализация</div>
+                        </a>
+                        <a href="https://portfolio.e-learning-suablanica.com" target="_blank" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-700 hover:border-brand-500 transition">
+                            <div class="font-bold text-xs text-slate-800 dark:text-slate-100">🏫 E-Learning Portal</div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">Училищна платформа</div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/40">
+                    <h3 class="font-bold text-xs uppercase tracking-wider text-emerald-700 dark:text-emerald-400 mb-2">
+                        📈 <span class="lang-inline-bg">Измерими педагогически постижения</span>
+                        <span class="lang-inline-en">Measurable Educational Outcomes</span>
+                    </h3>
+                    <ul class="text-xs space-y-1.5 text-slate-700 dark:text-slate-300">
+                        <li>✓ <span class="lang-inline-bg">Устойчиво висока успеваемост на учениците на НВО по Математика в 7. клас.</span><span class="lang-inline-en">Consistently high student performance on Grade 7 National External Assessment in Mathematics.</span></li>
+                        <li>✓ <span class="lang-inline-bg">Отлични резултати на ДЗИ (12. клас) и призови участия в олимпиади по Математика и ИТ.</span><span class="lang-inline-en">Strong Grade 12 State Matriculation outcomes and regional Olympiad distinctions in Math & IT.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. CONTACTS & VERIFIED LINKS -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 reveal-on-scroll">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <h2 class="text-lg sm:text-xl font-bold mb-5 flex items-center gap-3 text-brand-600 dark:text-brand-400">
+                <span class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-900/40 flex items-center justify-center"><i class="fa-solid fa-globe"></i></span>
+                <span class="lang-inline-bg">8. Официални академични и институционални връзки</span>
+                <span class="lang-inline-en">8. Official Academic & Institutional Links</span>
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                <a href="https://orcid.org/0000-0002-0607-2262" target="_blank" class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition">
+                    <i class="fa-brands fa-orcid text-2xl text-emerald-500"></i>
+                    <div>
+                        <div class="font-bold text-slate-800 dark:text-slate-100">ORCID iD</div>
+                        <div class="text-slate-500">0000-0002-0607-2262</div>
+                    </div>
+                </a>
+                <a href="https://scholar.google.com/scholar?hl=bg&as_sdt=0%2C5&q=adem+zeinev&btnG=" target="_blank" class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-blue-500 transition">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-blue-500"></i>
+                    <div>
+                        <div class="font-bold text-slate-800 dark:text-slate-100">Google Scholar</div>
+                        <div class="text-slate-500">Adem Zeinev Publications</div>
+                    </div>
+                </a>
+                <a href="https://www.daskalo.com/adem1970" target="_blank" class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-amber-500 transition">
+                    <i class="fa-solid fa-book-open-reader text-2xl text-amber-500"></i>
+                    <div>
+                        <div class="font-bold text-slate-800 dark:text-slate-100">Daskalo.com</div>
+                        <div class="text-slate-500">daskalo.com/adem1970</div>
+                    </div>
+                </a>
+                <a href="https://portfolio.e-learning-suablanica.com" target="_blank" class="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-purple-500 transition">
+                    <i class="fa-solid fa-school text-2xl text-purple-500"></i>
+                    <div>
+                        <div class="font-bold text-slate-800 dark:text-slate-100">School E-Portfolio</div>
+                        <div class="text-slate-500">СУ „Св. Паисий Хилендарски“</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-8 text-center text-xs text-slate-500">
+        <p class="font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            © 2026 д-р Адем Ибушев Зейнев / Adem ZEINEV, PhD
+        </p>
+        <p>
+            <span class="lang-inline-bg">СУ „Св. Паисий Хилендарски“ – с. Абланица · ХТМУ – София, Катедра „Математика“</span>
+            <span class="lang-inline-en">St. Paisii Hilendarski Secondary School – Ablanitsa · UCTM Sofia, Department of Mathematics</span>
+        </p>
+    </footer>
+
+    <!-- SCROLL TO TOP BUTTON -->
+    <button id="scroll-top-btn" class="fixed bottom-6 right-6 w-11 h-11 bg-brand-600 hover:bg-brand-700 text-white rounded-full shadow-xl flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 z-50 hover:scale-110 no-print" aria-label="Scroll to top">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script>
+        const langToggleBtn = document.getElementById('lang-toggle-btn');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const scrollTopBtn = document.getElementById('scroll-top-btn');
+        const progressBar = document.getElementById('progress-bar');
+
+        // Toggle Language (BG <-> EN)
+        langToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('en-mode');
+            const isEn = document.body.classList.contains('en-mode');
+            document.documentElement.lang = isEn ? 'en' : 'bg';
+        });
+
+        // Toggle Dark/Light Theme
+        themeToggleBtn.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        // Scroll Progress & Reveal Animations
+        function handleScroll() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+            progressBar.style.width = scrolled + '%';
+
+            if (winScroll > 250) {
+                scrollTopBtn.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                scrollTopBtn.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.92) {
+                    el.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('load', handleScroll);
+
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
