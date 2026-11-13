@@ -159,13 +159,13 @@
                     </span>
                 </div>
             </div>
-
-            <!-- Quick Section Jump Links (Desktop) -->
+                    <!-- Quick Section Jump Links (Desktop) -->
             <nav class="hidden xl:flex items-center space-x-5 text-xs font-semibold text-slate-600 dark:text-slate-300">
                 <a href="#sec-matrix" class="hover:text-brand-600 transition"><span class="lang-inline-bg">Наредба № 15</span><span class="lang-inline-en">Competencies</span></a>
                 <a href="#sec-research" class="hover:text-brand-600 transition"><span class="lang-inline-bg">Публикации (11)</span><span class="lang-inline-en">Research (11)</span></a>
                 <a href="#sec-software" class="hover:text-brand-600 transition"><span class="lang-inline-bg">Софтуер & Код</span><span class="lang-inline-en">Software & Code</span></a>
                 <a href="#sec-certificates" class="hover:text-brand-600 transition"><span class="lang-inline-bg">Квалификации</span><span class="lang-inline-en">Certificates</span></a>
+                <a href="#sec-updates" class="hover:text-brand-600 transition"><span class="lang-inline-bg">Актуалност</span><span class="lang-inline-en">Updates</span></a>
                 <a href="#sec-contacts" class="hover:text-brand-600 transition"><span class="lang-inline-bg">Контакти</span><span class="lang-inline-en">Contacts</span></a>
             </nav>
 
@@ -663,9 +663,9 @@
                         </ul>
                     </div>
                     <div class="flex flex-wrap gap-2 pt-3 border-t border-indigo-200/50 dark:border-slate-700 no-print">
-                        <a href="https://azeynev.github.io/barometer.html" target="_blank" rel="noopener" class="flex-1 text-center px-3 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition">
-                            <i class="fa-solid fa-play mr-1"></i> <span class="lang-inline-bg">Демо (Live)</span><span class="lang-inline-en">Live Demo</span>
-                        </a>
+                        <button onclick="openDemoModal('barometer')" class="flex-1 text-center px-3 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition">
+                            <i class="fa-solid fa-desktop mr-1"></i> <span class="lang-inline-bg">Интерактивен преглед</span><span class="lang-inline-en">Interactive Preview</span>
+                        </button>
                         <a href="https://github.com/azeynev/azeynev.github.io" target="_blank" rel="noopener" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold hover:border-brand-500 transition">
                             <i class="fa-brands fa-github mr-1"></i> Source Code
                         </a>
@@ -690,9 +690,9 @@
                         </ul>
                     </div>
                     <div class="flex flex-wrap gap-2 pt-3 border-t border-slate-200 dark:border-slate-700 no-print">
-                        <a href="https://azeynev.github.io/form_wrapper.html" target="_blank" rel="noopener" class="flex-1 text-center px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition">
-                            <i class="fa-solid fa-play mr-1"></i> <span class="lang-inline-bg">Демо (Live)</span><span class="lang-inline-en">Live Demo</span>
-                        </a>
+                        <button onclick="openDemoModal('form')" class="flex-1 text-center px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition">
+                            <i class="fa-solid fa-desktop mr-1"></i> <span class="lang-inline-bg">Интерактивен преглед</span><span class="lang-inline-en">Interactive Preview</span>
+                        </button>
                         <a href="https://github.com/azeynev/azeynev.github.io" target="_blank" rel="noopener" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold hover:border-purple-500 transition">
                             <i class="fa-brands fa-github mr-1"></i> Source Code
                         </a>
@@ -748,7 +748,9 @@
                             </div>
                             <p class="text-slate-500 mt-0.5">ХТМУ – София · Математическо моделиране и приложение на математиката</p>
                         </div>
-                        <span class="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold shrink-0">Верифициран</span>
+                        <button onclick="openDemoModal('cert-phd')" class="px-2.5 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold shrink-0 transition">
+                            <i class="fa-solid fa-eye mr-1"></i><span class="lang-inline-bg">Детайли</span><span class="lang-inline-en">Details</span>
+                        </button>
                     </div>
 
                     <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 flex items-start justify-between gap-3">
@@ -759,16 +761,18 @@
                             </div>
                             <p class="text-slate-500 mt-0.5">ДИУУ / ЮЗУ „Неофит Рилски“ · Наредба № 15 на МОН</p>
                         </div>
-                        <span class="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold shrink-0">Наредба № 15</span>
+                        <button onclick="openDemoModal('cert-pqd')" class="px-2.5 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold shrink-0 transition">
+                            <i class="fa-solid fa-eye mr-1"></i><span class="lang-inline-bg">Детайли</span><span class="lang-inline-en">Details</span>
+                        </button>
                     </div>
 
                     <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 flex items-start justify-between gap-3">
                         <div>
                             <div class="font-bold text-slate-800 dark:text-slate-100 text-sm">
-                                <span class="lang-inline-bg">Удостоверения за квалификационни кредити (ИКТ, STEM и AI в образованието)</span>
+                                <span class="lang-inline-bg">Удостоверения за квалификационни кредити (ИКТ, STEM и AI)</span>
                                 <span class="lang-inline-en">Qualification Credits (ICT, STEM & AI in Education)</span>
                             </div>
-                            <p class="text-slate-500 mt-0.5">Одобрени програми от Информационния регистър на МОН · Дигитални компетентности и облачни технологии</p>
+                            <p class="text-slate-500 mt-0.5">Одобрени програми от Информационния регистър на МОН</p>
                         </div>
                         <span class="px-2.5 py-1 rounded-lg bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 font-bold shrink-0">МОН Регистър</span>
                     </div>
@@ -776,7 +780,7 @@
                     <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 flex items-start justify-between gap-3">
                         <div>
                             <div class="font-bold text-slate-800 dark:text-slate-100 text-sm">
-                                <span class="lang-inline-bg">Международни научни сертификати (ANSYS, MAPLE & Диференциални уравнения)</span>
+                                <span class="lang-inline-bg">Международни научни сертификати (ANSYS, MAPLE & PDEs)</span>
                                 <span class="lang-inline-en">International Scientific Certificates (ANSYS, MAPLE & PDEs)</span>
                             </div>
                             <p class="text-slate-500 mt-0.5">БАН София, ХТМУ София, Dubrovnik International Academic Conferences</p>
@@ -826,16 +830,67 @@
         </div>
     </section>
 
-    <!-- 9. FULL CONTACTS & VERIFIED ACADEMIC HUB -->
+    <!-- 9. RECENT UPDATES & MILESTONES (2025–2026) -->
+    <section id="sec-updates" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 reveal-on-scroll">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <h2 class="text-lg sm:text-xl font-bold mb-6 flex items-center gap-3 text-brand-600 dark:text-brand-400">
+                <span class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-900/40 flex items-center justify-center"><i class="fa-solid fa-timeline"></i></span>
+                <span class="lang-inline-bg">9. Актуални дейности и постижения (2025 – 2026)</span>
+                <span class="lang-inline-en">9. Recent Milestones & Updates (2025 – 2026)</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border-l-4 border-brand-600">
+                    <div class="font-bold text-brand-600 dark:text-brand-400 mb-1">Ноември 2026</div>
+                    <div class="font-bold text-slate-800 dark:text-slate-100 text-sm mb-1">
+                        <span class="lang-inline-bg">Внедряване на „Училищен Барометър v2.0“</span>
+                        <span class="lang-inline-en">Deployment of School Barometer v2.0</span>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400">Автоматизиране на анализа по методически обединения с директен експорт към Word (DOCX) и статистика по випуски.</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border-l-4 border-emerald-500">
+                    <div class="font-bold text-emerald-600 dark:text-emerald-400 mb-1">Учебна 2025/2026 г.</div>
+                    <div class="font-bold text-slate-800 dark:text-slate-100 text-sm mb-1">
+                        <span class="lang-inline-bg">Успешно представяне на НВО и ДЗИ</span>
+                        <span class="lang-inline-en">National Exams & Olympiads Leadership</span>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400">Организиране и провеждане на училищните кръгове на олимпиадите по Математика, Информатика и ИТ.</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border-l-4 border-purple-500">
+                    <div class="font-bold text-purple-600 dark:text-purple-400 mb-1">2025 – 2026</div>
+                    <div class="font-bold text-slate-800 dark:text-slate-100 text-sm mb-1">
+                        <span class="lang-inline-bg">Модернизация на STEM & Облачната среда</span>
+                        <span class="lang-inline-en">STEM & Cloud Environment Upgrade</span>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400">Разширяване на дигиталните учебни ресурси и интеграция на AI инструменти в обучението по математика и ИТ.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. FULL CONTACTS & VERIFIED ACADEMIC HUB -->
     <section id="sec-contacts" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 reveal-on-scroll">
         <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
             <h2 class="text-lg sm:text-xl font-bold mb-6 flex items-center gap-3 text-brand-600 dark:text-brand-400">
                 <span class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-900/40 flex items-center justify-center"><i class="fa-solid fa-address-book"></i></span>
-                <span class="lang-inline-bg">9. Официални контакти и верифицирани академични профили</span>
-                <span class="lang-inline-en">9. Official Contacts & Verified Academic Profiles</span>
+                <span class="lang-inline-bg">10. Официални контакти и верифицирани академични профили</span>
+                <span class="lang-inline-en">10. Official Contacts & Verified Academic Profiles</span>
             </h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                <!-- Direct Email Contact -->
+                <div class="flex items-center justify-between gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <i class="fa-solid fa-envelope text-2xl text-brand-600 shrink-0"></i>
+                        <div class="truncate">
+                            <div class="font-bold text-slate-800 dark:text-slate-100">Официален имейл / Email</div>
+                            <a href="mailto:azeynev@gmail.com" class="text-brand-600 dark:text-brand-400 font-mono hover:underline">azeynev@gmail.com</a>
+                        </div>
+                    </div>
+                    <button onclick="copyEmail()" class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:text-brand-600 text-[11px] font-semibold shrink-0 no-print" title="Копирай имейл">
+                        <i class="fa-regular fa-copy"></i> <span id="copy-label">Copy</span>
+                    </button>
+                </div>
+
                 <!-- ORCID -->
                 <a href="https://orcid.org/0000-0002-0607-2262" target="_blank" rel="noopener" class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition">
                     <i class="fa-brands fa-orcid text-2xl text-emerald-500 shrink-0"></i>
@@ -872,26 +927,27 @@
                     </div>
                 </a>
 
-                <!-- School E-Portfolio -->
+                <!-- Institutional Address & E-Portfolio -->
                 <a href="https://portfolio.e-learning-suablanica.com" target="_blank" rel="noopener" class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-purple-500 transition">
                     <i class="fa-solid fa-school text-2xl text-purple-500 shrink-0"></i>
                     <div>
-                        <div class="font-bold text-slate-800 dark:text-slate-100">Училищно Е-Портфолио</div>
-                        <div class="text-slate-500">portfolio.e-learning-suablanica.com</div>
+                        <div class="font-bold text-slate-800 dark:text-slate-100">СУ „Св. Паисий Хилендарски“</div>
+                        <div class="text-slate-500">с. Абланица · portfolio.e-learning-suablanica.com</div>
                     </div>
                 </a>
-
-                <!-- Institutional Address & Direct Communication -->
-                <div class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
-                    <i class="fa-solid fa-location-dot text-2xl text-rose-500 shrink-0"></i>
-                    <div>
-                        <div class="font-bold text-slate-800 dark:text-slate-100">СУ „Св. Паисий Хилендарски“</div>
-                        <div class="text-slate-500">ул. „Христо Ботев“ №1, с. Абланица (2932)</div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
+
+    <!-- INTERACTIVE PREVIEW MODAL (SOFTWARE & CERTIFICATES) -->
+    <div id="preview-modal" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeDemoModal()">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-2xl relative">
+            <button onclick="closeDemoModal()" class="absolute top-5 right-5 w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-rose-500 hover:text-white transition flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modal-body" class="text-sm text-slate-700 dark:text-slate-200"></div>
+        </div>
+    </div>
 
     <!-- FOOTER -->
     <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-8 text-center text-xs text-slate-500">
@@ -988,6 +1044,73 @@
         scrollTopBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+
+        // One-Click Email Copy (iFrame-safe)
+        function copyEmail() {
+            const tempInput = document.createElement('input');
+            tempInput.value = 'azeynev@gmail.com';
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            const lbl = document.getElementById('copy-label');
+            lbl.textContent = 'Copied!';
+            setTimeout(() => { lbl.textContent = 'Copy'; }, 2000);
+        }
+
+        // Interactive Modal for Software Demos & Certificate Verification
+        const modalContentMap = {
+            'barometer': `
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center text-lg"><i class="fa-solid fa-chart-column"></i></span>
+                    <div>
+                        <h3 class="font-bold text-lg">Училищен Барометър — Multi-MO Edition</h3>
+                        <p class="text-xs text-slate-500">Архитектура и функционална демонстрация</p>
+                    </div>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mb-4 space-y-2 text-xs">
+                    <div class="flex justify-between py-1 border-b border-slate-200 dark:border-slate-800"><span><strong>Модул 1:</strong> Въвеждане на оценки (2–6) по випуски</span><span class="text-emerald-600 font-bold">Активен</span></div>
+                    <div class="flex justify-between py-1 border-b border-slate-200 dark:border-slate-800"><span><strong>Модул 2:</strong> Сравнителен анализ по Методически обединения (МО)</span><span class="text-emerald-600 font-bold">Активен</span></div>
+                    <div class="flex justify-between py-1"><span><strong>Модул 3:</strong> Автоматичен експорт в MS Word (.DOCX) & JSON</span><span class="text-emerald-600 font-bold">Активен</span></div>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300 mb-5">Системата е изградена като самостоятелно уеб приложение (Single-Page Application) без нужда от външен сървър, което гарантира 100% защита на ученическите данни (GDPR).</p>
+                <div class="flex justify-end gap-2">
+                    <a href="https://github.com/azeynev/azeynev.github.io" target="_blank" rel="noopener" class="px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 transition"><i class="fa-brands fa-github mr-1"></i> Отвори кода в GitHub</a>
+                </div>
+            `,
+            'form': `
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center text-lg"><i class="fa-solid fa-clipboard-check"></i></span>
+                    <div>
+                        <h3 class="font-bold text-lg">Teacher Form Wrapper — Google Forms Integration</h3>
+                        <p class="text-xs text-slate-500">Модул за събиране на данни от педагогическия екип</p>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">Специализирана обвивка за електронни формуляри с режим „Фокус“ (скриване на разсейващи елементи), автоматична синхронизация с Google Sheets и индикатор за напредък.</p>
+                <div class="flex justify-end gap-2">
+                    <a href="https://github.com/azeynev/azeynev.github.io" target="_blank" rel="noopener" class="px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition"><i class="fa-brands fa-github mr-1"></i> Отвори кода в GitHub</a>
+                </div>
+            `,
+            'cert-phd': `
+                <h3 class="font-bold text-lg mb-2">🎓 Диплома за ОНС „Доктор“ (PhD in Mathematics)</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-300 mb-3"><strong>Издадена от:</strong> Химикотехнологичен и металургичен университет (ХТМУ) – София, Катедра „Математика“.</p>
+                <p class="text-xs text-slate-600 dark:text-slate-300"><strong>Научна специалност:</strong> 01.01.13 „Математическо моделиране и приложение на математиката“. Верифицирана в националния регистър на НАЦИД и ORCID (0000-0002-0607-2262).</p>
+            `,
+            'cert-pqd': `
+                <h3 class="font-bold text-lg mb-2">📜 Професионално-квалификационна степен (ПКС)</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-300 mb-3"><strong>Нормативно основание:</strong> Наредба № 15 на МОН за статута и професионалното развитие на учителите, директорите и другите педагогически специалисти.</p>
+                <p class="text-xs text-slate-600 dark:text-slate-300">Оригиналът на свидетелството и удостоверенията за квалификационни кредити се съхраняват в личното трудово досие в СУ „Св. Паисий Хилендарски“ – с. Абланица.</p>
+            `
+        };
+
+        function openDemoModal(key) {
+            document.getElementById('modal-body').innerHTML = modalContentMap[key] || '';
+            document.getElementById('preview-modal').classList.remove('hidden');
+        }
+
+        function closeDemoModal() {
+            document.getElementById('preview-modal').classList.add('hidden');
+        }
     </script>
 </body>
 </html>
