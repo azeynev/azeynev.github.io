@@ -1027,69 +1027,127 @@
         <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
             <h2 class="text-lg sm:text-xl font-bold mb-6 flex items-center gap-3 text-brand-600 dark:text-brand-400">
                 <span class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-900/40 flex items-center justify-center"><i class="fa-solid fa-address-book"></i></span>
-                <span class="lang-inline-bg">10. Официални контакти и верифицирани академични профили</span>
-                <span class="lang-inline-en">10. Official Contacts & Verified Academic Profiles</span>
+                <span class="lang-inline-bg">10. Контакти и връзка с автора</span>
+                <span class="lang-inline-en">10. Contacts & Author Information</span>
             </h2>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-                <!-- Direct Email Contact -->
-                <div class="flex items-center justify-between gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition">
-                    <div class="flex items-center gap-3.5 min-w-0">
-                        <i class="fa-solid fa-envelope text-2xl text-brand-600 shrink-0"></i>
-                        <div class="truncate">
-                            <div class="font-bold text-slate-800 dark:text-slate-100">Официален имейл / Email</div>
-                            <a href="mailto:azeynev@gmail.com" class="text-brand-600 dark:text-brand-400 font-mono hover:underline">azeynev@gmail.com</a>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs mb-6">
+                <!-- Direct Email Contact (azeynev@abv.bg) -->
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-xl">📧</span>
+                                <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">
+                                    <span class="lang-inline-bg">Имейл</span>
+                                    <span class="lang-inline-en">Email</span>
+                                </h3>
+                            </div>
+                            <button onclick="copyEmail()" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:text-brand-600 text-[11px] font-semibold shrink-0 no-print" title="Копирай имейл">
+                                <i class="fa-regular fa-copy"></i> <span id="copy-label">Copy</span>
+                            </button>
                         </div>
+                        <p class="mb-2">
+                            <a href="mailto:azeynev@abv.bg" class="text-brand-600 dark:text-brand-400 font-mono text-sm font-bold hover:underline">azeynev@abv.bg</a>
+                        </p>
                     </div>
-                    <button onclick="copyEmail()" class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:text-brand-600 text-[11px] font-semibold shrink-0 no-print" title="Копирай имейл">
-                        <i class="fa-regular fa-copy"></i> <span id="copy-label">Copy</span>
-                    </button>
+                    <p class="text-slate-500 dark:text-slate-400 leading-relaxed">
+                        <span class="lang-inline-bg">Официален училищен/академичен имейл за кореспонденция.</span>
+                        <span class="lang-inline-en">Official school/academic email for correspondence.</span>
+                    </p>
                 </div>
 
-                <!-- ORCID -->
-                <a href="https://orcid.org/0000-0002-0607-2262" target="_blank" rel="noopener" class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition">
-                    <i class="fa-brands fa-orcid text-2xl text-emerald-500 shrink-0"></i>
+                <!-- Institutional Address -->
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-purple-500 transition flex flex-col justify-between">
                     <div>
-                        <div class="font-bold text-slate-800 dark:text-slate-100">ORCID iD (Verified Researcher)</div>
-                        <div class="text-slate-500 font-mono">0000-0002-0607-2262</div>
+                        <div class="flex items-center gap-2.5 mb-2">
+                            <span class="text-xl">🏫</span>
+                            <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">
+                                <span class="lang-inline-bg">Институционален адрес</span>
+                                <span class="lang-inline-en">Institutional Address</span>
+                            </h3>
+                        </div>
+                        <p class="text-slate-700 dark:text-slate-200 font-medium leading-relaxed">
+                            <span class="lang-bg">СУ „Св. Паисий Хилендарски“<br>ул. „Христо Ботев“ №1, с. Абланица (2932)<br>общ. Хаджидимово, обл. Благоевград, България</span>
+                            <span class="lang-en">St. Paisii Hilendarski Secondary School<br>1 Hristo Botev Str., Ablanitsa (2932)<br>Hadzhidimovo Municipality, Blagoevgrad Region, Bulgaria</span>
+                        </p>
                     </div>
+                </div>
+
+                <!-- Phone (GDPR Protected) -->
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-amber-500 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2.5 mb-2">
+                            <span class="text-xl">📞</span>
+                            <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">
+                                <span class="lang-inline-bg">Телефон</span>
+                                <span class="lang-inline-en">Phone</span>
+                            </h3>
+                        </div>
+                        <p class="font-bold text-slate-700 dark:text-slate-200 italic mb-2">
+                            <span class="lang-inline-bg">При поискване</span>
+                            <span class="lang-inline-en">Upon request</span>
+                        </p>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 leading-relaxed">
+                        <span class="lang-inline-bg">За защита на личните данни телефонът не се публикува публично.</span>
+                        <span class="lang-inline-en">For personal data protection, the phone number is not published publicly.</span>
+                    </p>
+                </div>
+
+                <!-- GitHub -->
+                <a href="https://github.com/azeynev" target="_blank" rel="noopener" class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-slate-500 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2.5 mb-2">
+                            <span class="text-xl">🔗</span>
+                            <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">GitHub</h3>
+                        </div>
+                        <p class="text-brand-600 dark:text-brand-400 font-bold mb-2">github.com/azeynev</p>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 leading-relaxed">
+                        <span class="lang-inline-bg">Всички авторски хранилища и образователен софтуер.</span>
+                        <span class="lang-inline-en">All custom repositories and educational software.</span>
+                    </p>
                 </a>
 
                 <!-- Google Scholar -->
-                <a href="https://scholar.google.com/scholar?hl=bg&as_sdt=0%2C5&q=adem+zeinev&btnG=" target="_blank" rel="noopener" class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-blue-500 transition">
-                    <i class="fa-solid fa-graduation-cap text-2xl text-blue-500 shrink-0"></i>
+                <a href="https://scholar.google.com/scholar?hl=bg&as_sdt=0%2C5&q=adem+zeinev&btnG=" target="_blank" rel="noopener" class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-blue-500 transition flex flex-col justify-between">
                     <div>
-                        <div class="font-bold text-slate-800 dark:text-slate-100">Google Scholar Profile</div>
-                        <div class="text-slate-500">Adem Zeinev · Publications & Citations</div>
+                        <div class="flex items-center gap-2.5 mb-2">
+                            <span class="text-xl">🎓</span>
+                            <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">Google Scholar</h3>
+                        </div>
+                        <p class="text-blue-600 dark:text-blue-400 font-bold mb-2">
+                            <span class="lang-inline-bg">Профил в Google Scholar</span>
+                            <span class="lang-inline-en">Google Scholar Profile</span>
+                        </p>
                     </div>
+                    <p class="text-slate-500 dark:text-slate-400 leading-relaxed">
+                        <span class="lang-inline-bg">Цитирания и научни публикации.</span>
+                        <span class="lang-inline-en">Citations and scientific publications.</span>
+                    </p>
                 </a>
 
-                <!-- GitHub -->
-                <a href="https://github.com/azeynev" target="_blank" rel="noopener" class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-slate-500 transition">
-                    <i class="fa-brands fa-github text-2xl text-slate-800 dark:text-white shrink-0"></i>
+                <!-- ORCID & Personal Site -->
+                <a href="https://orcid.org/0000-0002-0607-2262" target="_blank" rel="noopener" class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition flex flex-col justify-between">
                     <div>
-                        <div class="font-bold text-slate-800 dark:text-slate-100">GitHub Open Source</div>
-                        <div class="text-slate-500">github.com/azeynev</div>
+                        <div class="flex items-center gap-2.5 mb-2">
+                            <span class="text-xl">🆔</span>
+                            <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">ORCID iD</h3>
+                        </div>
+                        <p class="text-emerald-600 dark:text-emerald-400 font-mono font-bold mb-2">0000-0002-0607-2262</p>
                     </div>
+                    <p class="text-slate-500 dark:text-slate-400 leading-relaxed">
+                        <span class="lang-inline-bg">Международен идентификатор на изследовател · www.daskalo.com/adem1970</span>
+                        <span class="lang-inline-en">Verified Researcher Identifier · www.daskalo.com/adem1970</span>
+                    </p>
                 </a>
+            </div>
 
-                <!-- Personal Teaching Website -->
-                <a href="https://www.daskalo.com/adem1970" target="_blank" rel="noopener" class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-amber-500 transition">
-                    <i class="fa-solid fa-book-open-reader text-2xl text-amber-500 shrink-0"></i>
-                    <div>
-                        <div class="font-bold text-slate-800 dark:text-slate-100">Личен педагогически сайт</div>
-                        <div class="text-slate-500">www.daskalo.com/adem1970</div>
-                    </div>
-                </a>
-
-                <!-- Institutional Address & E-Portfolio -->
-                <a href="https://portfolio.e-learning-suablanica.com" target="_blank" rel="noopener" class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-purple-500 transition">
-                    <i class="fa-solid fa-school text-2xl text-purple-500 shrink-0"></i>
-                    <div>
-                        <div class="font-bold text-slate-800 dark:text-slate-100">СУ „Св. Паисий Хилендарски“</div>
-                        <div class="text-slate-500">с. Абланица · portfolio.e-learning-suablanica.com</div>
-                    </div>
-                </a>
+            <!-- Official Attestation Disclaimer -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-brand-50/70 dark:bg-brand-950/30 border border-brand-200/70 dark:border-brand-800/40 text-xs text-slate-600 dark:text-slate-300 leading-relaxed italic">
+                <span class="lang-bg">За целите на атестационна комисия, международни партньори или научни запитвания, моля свържете се с автора чрез посочения имейл (<strong>azeynev@abv.bg</strong>) или чрез институционалния адрес. Оригиналните документи (дипломи, сертификати, протоколи) се съхраняват в личното трудово досие в СУ „Св. Паисий Хилендарски“ – с. Абланица и са налични при поискване.</span>
+                <span class="lang-en">For attestation committee purposes, international partnerships, or academic inquiries, please contact the author via the provided email (<strong>azeynev@abv.bg</strong>) or institutional address. All original documents (diplomas, certificates, protocols) are archived in the official personnel file at St. Paisii Hilendarski Secondary School – Ablanitsa and are available upon request.</span>
             </div>
         </div>
     </section>
@@ -1203,7 +1261,7 @@
         // One-Click Email Copy (iFrame-safe)
         function copyEmail() {
             const tempInput = document.createElement('input');
-            tempInput.value = 'azeynev@gmail.com';
+            tempInput.value = 'azeynev@abv.bg';
             document.body.appendChild(tempInput);
             tempInput.select();
             document.execCommand('copy');
