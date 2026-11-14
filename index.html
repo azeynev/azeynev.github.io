@@ -1029,6 +1029,16 @@
 
             <!-- Diagnostic Result Banner (Hidden by default) -->
             <div id="cert-diagnostic-panel" class="hidden mb-6 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 text-xs no-print"></div>
+
+            <!-- Category Filter Pills -->
+            <div class="flex flex-wrap gap-2 mb-6 no-print" id="cert-category-filters">
+                <button data-cat="all" class="cert-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-brand-600 text-white shadow-sm transition">
+                    <span class="lang-inline-bg">Всички (39)</span><span class="lang-inline-en">All (39)</span>
+                </button>
+                <button data-cat="phd" class="cert-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
+                    🎓 <span class="lang-inline-bg">Диплома PhD (2)</span><span class="lang-inline-en">PhD Diploma (2)</span>
+                </button>
+                <button data-cat="udost" class="cert-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
                     📜 <span class="lang-inline-bg">Удостоверения МОН (7)</span><span class="lang-inline-en">MON Certificates (7)</span>
                 </button>
                 <button data-cat="cert" class="cert-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
@@ -1414,12 +1424,12 @@
             { file: "certs/Dubrovnik2.jpg", cat: "dubrovnik", tag: "Dubrovnik", titleBg: "Международна научна конференция – Дубровник (Сертификат № 2)", titleEn: "International Academic Conference – Dubrovnik (Certificate #2)" },
             { file: "certs/Dubrovnik3.jpg", cat: "dubrovnik", tag: "Dubrovnik", titleBg: "Международна научна конференция – Дубровник (Сертификат № 3)", titleEn: "International Academic Conference – Dubrovnik (Certificate #3)" },
 
-            // Microsoft & Badges (5)
-            { file: "certs/microsoft1.jpg", cat: "microsoft", tag: "Microsoft", titleBg: "Microsoft Educator / Cloud Сертификат № 1", titleEn: "Microsoft Educator / Cloud Certificate #1" },
-            { file: "certs/microsoft2.jpg", cat: "microsoft", tag: "Microsoft", titleBg: "Microsoft Educator / Cloud Сертификат № 2", titleEn: "Microsoft Educator / Cloud Certificate #2" },
-            { file: "certs/microsoft3.jpg", cat: "microsoft", tag: "Microsoft", titleBg: "Microsoft Educator / Cloud Сертификат № 3", titleEn: "Microsoft Educator / Cloud Certificate #3" },
-            { file: "certs/badge1.jpg", cat: "microsoft", tag: "Digital Badge", titleBg: "Дигитален бадж за иновативни ИКТ компетентности № 1", titleEn: "Innovative ICT Competencies Digital Badge #1" },
-            { file: "certs/badge2.jpg", cat: "microsoft", tag: "Digital Badge", titleBg: "Дигитален бадж за иновативни ИКТ компетентности № 2", titleEn: "Innovative ICT Competencies Digital Badge #2" },
+            // Microsoft & Badges (.png) (5)
+            { file: "certs/microsoft1.png", cat: "microsoft", tag: "Microsoft", titleBg: "Microsoft Educator / Cloud Сертификат № 1", titleEn: "Microsoft Educator / Cloud Certificate #1" },
+            { file: "certs/microsoft2.png", cat: "microsoft", tag: "Microsoft", titleBg: "Microsoft Educator / Cloud Сертификат № 2", titleEn: "Microsoft Educator / Cloud Certificate #2" },
+            { file: "certs/microsoft3.png", cat: "microsoft", tag: "Microsoft", titleBg: "Microsoft Educator / Cloud Сертификат № 3", titleEn: "Microsoft Educator / Cloud Certificate #3" },
+            { file: "certs/badge1.png", cat: "microsoft", tag: "Digital Badge", titleBg: "Дигитален бадж за иновативни ИКТ компетентности № 1", titleEn: "Innovative ICT Competencies Digital Badge #1" },
+            { file: "certs/badge2.png", cat: "microsoft", tag: "Digital Badge", titleBg: "Дигитален бадж за иновативни ИКТ компетентности № 2", titleEn: "Innovative ICT Competencies Digital Badge #2" },
 
             // DZZD1 - DZZD4 (4)
             { file: "certs/DZZD1.jpg", cat: "dzzd", tag: "Образователен проект", titleBg: "Сертификат по образователен проект / ДЗЗД № 1", titleEn: "Educational Project / Consortium Certificate #1" },
@@ -1550,7 +1560,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     ${navControls}
                     <a href="${item.file}" target="_blank" rel="noopener" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition">
-                        <i class="fa-solid fa-up-right-from-square mr-1"></i> Отвори в оригинален размер (.JPG)
+                        <i class="fa-solid fa-up-right-from-square mr-1"></i> Отвори в оригинален размер (${item.file.split('.').pop().toUpperCase()})
                     </a>
                 </div>
             `;
