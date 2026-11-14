@@ -864,29 +864,21 @@
                 </div>
             </div>
 
-            <!-- NETLIFY CLOUD DEPLOYMENTS SHOWCASE -->
-            <div class="p-6 rounded-2xl bg-gradient-to-r from-teal-50/80 to-cyan-50/80 dark:from-slate-900 dark:to-teal-950/30 border border-teal-200/80 dark:border-teal-800/50">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center text-sm shadow-sm">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                        </span>
-                        <div>
-                            <h3 class="font-bold text-sm sm:text-base text-slate-800 dark:text-slate-100">
-                                <span class="lang-inline-bg">Облачни уеб приложения в Netlify (Live Deployments)</span>
-                                <span class="lang-inline-en">Live Cloud Web Applications on Netlify</span>
-                            </h3>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">
-                                <span class="lang-inline-bg">Директен достъп до хостваните интерактивни системи и образователни инструменти</span>
-                                <span class="lang-inline-en">Direct access to hosted interactive systems and educational tools</span>
-                            </p>
-                        </div>
+            <!-- CSV CLIENT-SIDE PROCESSING & GDPR SECURITY NOTE -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50 flex items-start gap-3 text-xs">
+                <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </span>
+                <div class="text-slate-700 dark:text-slate-200 leading-relaxed">
+                    <div class="font-bold text-emerald-800 dark:text-emerald-300 mb-0.5">
+                        <span class="lang-inline-bg">Архитектура с локална обработка на CSV файлове (100% GDPR защита)</span>
+                        <span class="lang-inline-en">Local CSV Client-Side Processing Architecture (100% GDPR Compliant)</span>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-teal-600/10 text-teal-700 dark:text-teal-300 text-[11px] font-bold">
-                        <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span> Netlify CDN
-                    </span>
+                    <p class="text-slate-600 dark:text-slate-300">
+                        <span class="lang-inline-bg">И трите уеб приложения работят изцяло в браузъра на потребителя чрез импортиране на локални <strong>.CSV файлове</strong> (експортирани от електронния дневник). Данните се обработват единствено в оперативната памет на устройството без сървърно съхранение, което гарантира пълна защита на личните данни и безопасен публичен достъп за тестване.</span>
+                        <span class="lang-inline-en">All three web applications operate entirely client-side in the user's browser via local <strong>.CSV file imports</strong>. Data is processed exclusively in local device memory without server-side storage, ensuring complete GDPR compliance and safe public demonstration.</span>
+                    </p>
                 </div>
-                <div id="netlify-projects-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs"></div>
             </div>
         </div>
     </section>
@@ -1634,61 +1626,6 @@
         }
 
         renderCertificates();
-
-        // =========================================================================
-        // NETLIFY PROJECTS SHOWCASE
-        // =========================================================================
-        const NETLIFY_PROJECTS = [
-            {
-                titleBg: "1. Училищен Барометър (Анализ на успеха)",
-                titleEn: "1. School Barometer (Academic Success)",
-                descBg: "Обработва успеха в училище и генерира официален доклад",
-                descEn: "Processes school grades & generates official reports",
-                url: "https://idyllic-churros-6cb19f.netlify.app/",
-                badge: "Success & Reports"
-            },
-            {
-                titleBg: "2. График за контролни и класни работи",
-                titleEn: "2. Tests & Term Exams Scheduler",
-                descBg: "Планиране на датите и генериране на справки с графиците",
-                descEn: "Schedules tests/exams & generates schedule reports",
-                url: "https://shiny-profiterole-7f8e43.netlify.app/",
-                badge: "Schedules"
-            },
-            {
-                titleBg: "3. Анализ и отчет на отсъствията",
-                titleEn: "3. Student Absences Analytics",
-                descBg: "Обработва отсъствията по паралелки и генерира отчет",
-                descEn: "Processes student absences & generates term reports",
-                url: "https://zingy-hummingbird-723b72.netlify.app/",
-                badge: "Attendance"
-            }
-        ];
-
-        function renderNetlifyProjects() {
-            const container = document.getElementById('netlify-projects-grid');
-            if (!container) return;
-            container.innerHTML = NETLIFY_PROJECTS.map(p => `
-                <a href="${p.url}" target="_blank" rel="noopener" class="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 hover:border-teal-500 transition flex flex-col justify-between group shadow-sm">
-                    <div>
-                        <div class="flex items-center justify-between gap-2 mb-1.5">
-                            <span class="px-2 py-0.5 rounded-md bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-[10px] font-bold">${p.badge}</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square text-slate-400 group-hover:text-teal-600 transition"></i>
-                        </div>
-                        <div class="font-bold text-slate-800 dark:text-slate-100 mb-1">
-                            <span class="lang-inline-bg">${p.titleBg}</span>
-                            <span class="lang-inline-en">${p.titleEn}</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
-                            <span class="lang-inline-bg">${p.descBg}</span>
-                            <span class="lang-inline-en">${p.descEn}</span>
-                        </p>
-                    </div>
-                    <div class="text-[11px] font-mono text-teal-600 dark:text-teal-400 truncate">${p.url.replace('https://', '')}</div>
-                </a>
-            `).join('');
-        }
-        renderNetlifyProjects();
     </script>
 </body>
-</html>
+</html></selection-tag>
