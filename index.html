@@ -305,7 +305,7 @@
                     </div>
 
                     <!-- Portrait Photo Square (with automatic AZ fallback if profile.jpg is not uploaded yet) -->
-                    <div class="shrink-0">
+                    <div class="shrink-0 flex flex-col items-center">
                         <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-2xl bg-white/15 p-1.5 border border-white/30 shadow-xl backdrop-blur-sm overflow-hidden flex items-center justify-center">
                             <img src="profile.jpg" alt="д-р Адем Ибушев Зейнев" class="w-full h-full object-cover rounded-xl" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="hidden w-full h-full rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex-col items-center justify-center text-white">
@@ -313,6 +313,10 @@
                                 <span class="text-[11px] font-semibold text-indigo-100 mt-0.5">PhD · Math</span>
                             </div>
                         </div>
+                        <a href="https://orcid.org/0000-0002-0607-2262" target="_blank" rel="noopener" class="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 text-[11px] font-semibold text-white backdrop-blur-sm transition">
+                            <i class="fa-brands fa-orcid text-emerald-300"></i>
+                            <span>0000-0002-0607-2262</span>
+                        </a>
                     </div>
                 </div>
             </div>
