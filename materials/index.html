@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="bg" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дигитална учебна библиотека | д-р Адем Ибушев Зейнев (PhD)</title>
+    <meta name="description" content="Интерактивна дигитална библиотека с 31 авторски HTML5 симулации, визуализации и учебни лаборатории по Математика, Информатика, Физика и Биология — д-р Адем Ибушев Зейнев.">
+    <meta name="author" content="д-р Адем Ибушев Зейнев / Adem ZEINEV, PhD">
+    <meta name="theme-color" content="#4338ca">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome & Google Fonts (Inter) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Bilingual visibility logic matching main portfolio */
+        .lang-en { display: none; }
+        .lang-bg { display: block; }
+        body.en-mode .lang-en { display: block !important; }
+        body.en-mode .lang-bg { display: none !important; }
+
+        .lang-inline-en { display: none; }
+        .lang-inline-bg { display: inline; }
+        body.en-mode .lang-inline-en { display: inline !important; }
+        body.en-mode .lang-inline-bg { display: none !important; }
+
+        .glow-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glow-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 28px -6px rgba(79, 70, 229, 0.2);
+        }
+
+        @media print {
+            header, .no-print { display: none !important; }
+            body { background: #ffffff !important; color: #0f172a !important; }
+        }
+    </style>
+</head>
+<body id="top" class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen font-sans transition-colors duration-300">
+
+    <!-- TOP STICKY NAVIGATION -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+            <!-- Back to Main Portfolio + Brand Title -->
+            <div class="flex items-center gap-3 min-w-0">
+                <a href="../index.html" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-brand-50 dark:bg-slate-800 dark:hover:bg-brand-900/40 text-slate-700 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-300 text-xs font-bold border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 shrink-0">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="lang-inline-bg">Към портфолиото</span>
+                    <span class="lang-inline-en">Main Portfolio</span>
+                </a>
+                <div class="hidden sm:flex items-center gap-2.5 truncate">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-purple-600 flex items-center justify-center text-white shadow-sm shrink-0">
+                        <i class="fa-solid fa-book-open-reader text-sm"></i>
+                    </div>
+                    <div class="truncate">
+                        <span class="font-bold text-sm leading-tight block truncate">
+                            <span class="lang-inline-bg">Дигитална учебна библиотека</span>
+                            <span class="lang-inline-en">Digital Educational Library</span>
+                        </span>
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400 block truncate">
+                            <span class="lang-inline-bg">д-р Адем Ибушев Зейнев · СУ „Св. Паисий Хилендарски“</span>
+                            <span class="lang-inline-en">Dr. Adem Zeinev · St. Paisii Hilendarski Secondary School</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex items-center space-x-2 shrink-0 no-print">
+                <button id="lang-toggle-btn" class="px-3 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300 text-xs font-bold border border-brand-200 dark:border-brand-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-language text-sm"></i>
+                    <span class="lang-inline-bg">EN</span>
+                    <span class="lang-inline-en">BG</span>
+                </button>
+                <button onclick="window.print()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center gap-1.5" title="Печат / PDF">
+                    <i class="fa-solid fa-print"></i>
+                    <span class="hidden md:inline"><span class="lang-inline-bg">Печат</span><span class="lang-inline-en">Print</span></span>
+                </button>
+                <button id="theme-toggle" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center transition" aria-label="Превключи тема">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-amber-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 space-y-6">
+
+        <!-- HERO BANNER -->
+        <section class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div class="bg-gradient-to-r from-brand-900 via-brand-700 to-purple-800 rounded-2xl p-6 sm:p-8 text-white shadow-lg">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-xs font-semibold mb-3 backdrop-blur-sm">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>STEM & e-Learning Hub · azeynev.github.io/materials/</span>
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
+                            <span class="lang-inline-bg">Дигитална учебна библиотека с интерактивни HTML5 симулации</span>
+                            <span class="lang-inline-en">Digital Educational Library of Interactive HTML5 Simulations</span>
+                        </h1>
+                        <p class="text-indigo-100 text-xs sm:text-sm max-w-3xl leading-relaxed">
+                            <span class="lang-inline-bg">Авторски интерактивни лаборатории, математически модели, физични симулатори, дигитална схемотехника и STEM визуализации (5. – 12. клас). Работят директно в браузъра без инсталация.</span>
+                            <span class="lang-inline-en">Original interactive laboratories, mathematical models, physics simulators, digital logic circuits, and STEM visualizations (Grades 5 – 12). Runs directly in any browser without installation.</span>
+                        </p>
+                    </div>
+
+                    <!-- Quick Hub Stats -->
+                    <div class="grid grid-cols-3 gap-2.5 shrink-0 text-center">
+                        <div class="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm">
+                            <div id="stat-total-count" class="text-2xl font-extrabold text-white">31</div>
+                            <div class="text-[11px] text-indigo-100">
+                                <span class="lang-inline-bg">Разработки</span>
+                                <span class="lang-inline-en">Modules</span>
+                            </div>
+                        </div>
+                        <div class="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm">
+                            <div class="text-2xl font-extrabold text-emerald-300">5</div>
+                            <div class="text-[11px] text-indigo-100">
+                                <span class="lang-inline-bg">Направления</span>
+                                <span class="lang-inline-en">Subjects</span>
+                            </div>
+                        </div>
+                        <div class="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm">
+                            <div class="text-2xl font-extrabold text-amber-300">HTML5</div>
+                            <div class="text-[11px] text-indigo-100">
+                                <span class="lang-inline-bg">Без инсталация</span>
+                                <span class="lang-inline-en">Browser Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILTER BAR: CATEGORIES, GRADE DROPDOWN & SEARCH -->
+        <section class="bg-white dark:bg-slate-800 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 no-print">
+            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+                <!-- Category Tabs -->
+                <div class="flex flex-wrap gap-2" id="category-tabs">
+                    <button data-cat="all" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-600 text-white shadow-sm transition">
+                        <span class="lang-inline-bg">Всички (31)</span><span class="lang-inline-en">All (31)</span>
+                    </button>
+                    <button data-cat="math" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
+                        📐 <span class="lang-inline-bg">Математика (7)</span><span class="lang-inline-en">Mathematics (7)</span>
+                    </button>
+                    <button data-cat="informatics" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
+                        💻 <span class="lang-inline-bg">Информатика и Схемотехника (8)</span><span class="lang-inline-en">Informatics & Logic (8)</span>
+                    </button>
+                    <button data-cat="physics" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
+                        ⚡ <span class="lang-inline-bg">Физика и Техника (6)</span><span class="lang-inline-en">Physics & Tech (6)</span>
+                    </button>
+                    <button data-cat="biology" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
+                        🧬 <span class="lang-inline-bg">Биология и Химия (9)</span><span class="lang-inline-en">Biology & Chemistry (9)</span>
+                    </button>
+                    <button data-cat="tools" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
+                        🏫 <span class="lang-inline-bg">Училищни инструменти (1)</span><span class="lang-inline-en">School Tools (1)</span>
+                    </button>
+                </div>
+
+                <!-- Grade Filter & Search Box -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+                    <select id="grade-filter" aria-label="Филтър по клас" class="px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-brand-500">
+                        <option value="all">🎓 Всички класове (5. – 12. кл.)</option>
+                        <option value="5-7">5. – 7. клас (Прогимназия)</option>
+                        <option value="8-10">8. – 10. клас (Първи гимназиален)</option>
+                        <option value="11-12">11. – 12. клас (Профилирана / ВУЗ)</option>
+                    </select>
+
+                    <div class="relative sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input id="material-search" type="text" placeholder="Търси симулация, тема или файл..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Counter & Reset -->
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                <span>
+                    <span class="lang-inline-bg">Показани разработки:</span>
+                    <span class="lang-inline-en">Showing modules:</span>
+                    <strong id="visible-count" class="text-brand-600 dark:text-brand-400">31</strong>
+                </span>
+                <button onclick="resetAllFilters()" class="text-brand-600 dark:text-brand-400 hover:underline font-semibold">
+                    <i class="fa-solid fa-rotate-left mr-1"></i>
+                    <span class="lang-inline-bg">Нулирай филтрите</span>
+                    <span class="lang-inline-en">Reset filters</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- MATERIALS CARDS GRID -->
+        <section>
+            <div id="materials-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </section>
+
+    </main>
+
+    <!-- FULL-SCREEN INTERACTIVE PREVIEW MODAL -->
+    <div id="material-modal" class="fixed inset-0 z-50 hidden bg-slate-900/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-5 no-print" onclick="if(event.target===this) closeMaterialModal()">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-5xl w-full p-4 sm:p-6 border border-slate-200 dark:border-slate-700 shadow-2xl relative max-h-[92vh] flex flex-col">
+            <div class="flex flex-wrap items-center justify-between gap-2 pr-12 mb-3 shrink-0">
+                <div id="modal-header-info"></div>
+                <div class="flex items-center gap-2">
+                    <a id="modal-open-newtab" href="#" target="_blank" rel="noopener" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-up-right-from-square"></i>
+                        <span class="lang-inline-bg">На цял екран</span>
+                        <span class="lang-inline-en">Full Screen</span>
+                    </a>
+                </div>
+            </div>
+
+            <button onclick="closeMaterialModal()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-rose-500 hover:text-white transition flex items-center justify-center" aria-label="Затвори">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div id="preview-stage" class="flex-1 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-5 sm:p-6 overflow-y-auto">
+                <!-- Interactive Sandbox in Canvas OR Live Iframe on GitHub Pages -->
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-7 text-center text-xs text-slate-500">
+        <p class="font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            © 2026 д-р Адем Ибушев Зейнев / Adem ZEINEV, PhD
+        </p>
+        <p>
+            <span class="lang-inline-bg">Дигитална учебна библиотека · СУ „Св. Паисий Хилендарски“ – с. Абланица</span>
+            <span class="lang-inline-en">Digital Educational Library · St. Paisii Hilendarski Secondary School – Ablanitsa</span>
+        </p>
+    </footer>
+
+    <script>
+        // =========================================================================
+        // ПЪЛЕН КАТАЛОГ С ВСИЧКИ 31 АВТОРСКИ HTML5 УЧЕБНИ РЕСУРСА
+        // Имената на файловете (file) съвпадат точно с твоите оригинални файлове.
+        // =========================================================================
+        const MATERIALS_DATA = [
+            // --- МАТЕМАТИКА И ГЕОМЕТРИЯ (7) ---
+            {
+                file: "Pitagor_Theorema.html",
+                cat: "math",
+                grade: "5-7",
+                gradeLabel: "6. – 7. клас",
+                subjectBg: "Математика",
+                subjectEn: "Mathematics",
+                titleBg: "Питагорова теорема — геометрично доказателство",
+                titleEn: "Pythagorean Theorem — Visual Geometric Proof",
+                descBg: "Интерактивна 2D визуализация с квадрати върху катетите и хипотенузата, готови питагорови тройки и проверка в реално време.",
+                descEn: "Interactive 2D visualization with squares on the legs and hypotenuse, Pythagorean triples presets, and live verification.",
+                demoType: "pythagoras"
+            },
+            {
+                file: "Math_Geometry_Simulator_001.html",
+                cat: "math",
+                grade: "5-7",
+                gradeLabel: "5. – 7. клас",
+                subjectBg: "Математика",
+                subjectEn: "Mathematics",
+                titleBg: "Интерактивен симулатор по планиметрия",
+                titleEn: "Interactive Plane Geometry Simulator",
+                descBg: "Изчертаване на равнинни фигури (триъгълник, квадрат, правоъгълник, кръг, многоъгълници) с автоматично изчисляване на лице, периметър и ъгли.",
+                descEn: "Draw plane geometric shapes with automatic area, perimeter, and interior angle calculations.",
+                demoType: "geometry"
+            },
+            {
+                file: "Math_teach.html",
+                cat: "math",
+                grade: "5-7",
+                gradeLabel: "5. – 9. клас",
+                subjectBg: "Математика",
+                subjectEn: "Mathematics",
+                titleBg: "Geometry Universe — пълен справочник по планиметрия",
+                titleEn: "Geometry Universe — Complete Plane Geometry Guide",
+                descBg: "Интерактивен курс и справочник с LaTeX формули и визуализации за видовете триъгълници, четириъгълници, многоъгълници и кръг.",
+                descEn: "Interactive course and reference with LaTeX formulas and diagrams for triangles, quadrilaterals, polygons, and circles.",
+                demoType: "geometry"
+            },
+            {
+                file: "Golden_ratio_001.html",
+                cat: "math",
+                grade: "8-10",
+                gradeLabel: "8. – 12. клас",
+                subjectBg: "Математика",
+                subjectEn: "Mathematics",
+                titleBg: "Златното сечение (Φ) и Златният ъгъл (137.5°)",
+                titleEn: "Golden Ratio (Φ) & Golden Angle (137.5°) Explorer",
+                descBg: "Симулация на филотаксис, спиралата на Фибоначи и разпределение на частици при промяна на златния ъгъл.",
+                descEn: "Simulation of phyllotaxis, Fibonacci spiral, and particle distribution by varying the golden angle.",
+                demoType: "golden"
+            },
+            {
+                file: "Fractal_SImulator.html",
+                cat: "math",
+                grade: "8-10",
+                gradeLabel: "9. – 12. клас",
+                subjectBg: "Математика",
+                subjectEn: "Mathematics",
+                titleBg: "Фрактална лаборатория — 6 вида фрактали",
+                titleEn: "Fractal Laboratory — 6 Fractal Generators",
+                descBg: "Изследване на множествата на Манделброт и Жулиа, Кохова снежинка, триъгълник на Сиерпински, фрактално дърво и папрат на Барнзли.",
+                descEn: "Explore Mandelbrot and Julia sets, Koch snowflake, Sierpinski triangle, fractal tree, and Barnsley fern.",
+                demoType: "fractal"
+            },
+            {
+                file: "Totalizator_generator.html",
+                cat: "math",
+                grade: "8-10",
+                gradeLabel: "8. – 11. клас",
+                subjectBg: "Математика",
+                subjectEn: "Mathematics",
+                titleBg: "Комбинаторика и вероятности (Симулатор 6 от 49)",
+                titleEn: "Combinatorics & Probability Simulator (6/49)",
+                descBg: "Математически симулатор за комбинации без повторение, статистическо разпределение и теория на вероятностите.",
+                descEn: "Mathematical simulator for combinations without repetition, statistical frequency, and probability theory.",
+                demoType: "combinatorics"
+            },
+            {
+                file: "DDE_Solver.html",
+                cat: "math",
+                grade: "11-12",
+                gradeLabel: "11. – 12. клас / ВУЗ",
+                subjectBg: "Математика",
+                subjectEn: "Mathematics",
+                titleBg: "Решаване на диференциални уравнения със закъснение (DDE)",
+                titleEn: "Delay Differential Equations (DDE) Numerical Solver",
+                descBg: "Числено интегриране по методите на Ойлер, Хойн и Рунге-Кута 4 с LaTeX редактор и интерактивни графики.",
+                descEn: "Numerical integration using Euler, Heun, and Runge-Kutta 4 methods with LaTeX input and interactive plots.",
+                demoType: "dde"
+            },
+
+            // --- ИНФОРМАТИКА И ЦИФРОВА СХЕМОТЕХНИКА (8) ---
+            {
+                file: "Logig_Lab_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "8. – 10. клас",
+                subjectBg: "Информатика",
+                subjectEn: "Informatics",
+                titleBg: "Лаборатория по булева алгебра и логически елементи",
+                titleEn: "Boolean Algebra & Logic Gates Laboratory",
+                descBg: "Интерактивно изследване на логическите порти AND, OR, NOT, XOR, NAND, NOR с таблици на истинност в реално време.",
+                descEn: "Interactive exploration of AND, OR, NOT, XOR, NAND, and NOR logic gates with live truth tables.",
+                demoType: "logic"
+            },
+            {
+                file: "Deshifrator.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "9. – 11. клас",
+                subjectBg: "Информатика",
+                subjectEn: "Informatics",
+                titleBg: "Двоичен дешифратор (Decoder) — цифрова схемотехника",
+                titleEn: "Binary Decoder — Digital Circuit Simulator",
+                descBg: "Симулация на преобразуването на двоични адресни сигнали в активни изходни линии.",
+                descEn: "Simulation of converting binary address inputs into active decoded output lines.",
+                demoType: "logic"
+            },
+            {
+                file: "Multiplexor.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "9. – 11. клас",
+                subjectBg: "Информатика",
+                subjectEn: "Informatics",
+                titleBg: "Мултиплексор (MUX) и Демултиплексор (DEMUX)",
+                titleEn: "Multiplexer (MUX) & Demultiplexer (DEMUX) Lab",
+                descBg: "Интерактивен 4-канален комутатор на цифрови данни с адресни линии S0, S1, булеви формули и таблица на истинност.",
+                descEn: "Interactive 4-channel digital data selector with S0/S1 address lines, Boolean formulas, and truth table.",
+                demoType: "logic"
+            },
+            {
+                file: "Digital_segment_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "8. – 10. клас",
+                subjectBg: "Информатика",
+                subjectEn: "Informatics",
+                titleBg: "7-сегментен индикатор и BCD декодер",
+                titleEn: "7-Segment Display & BCD Decoder Simulator",
+                descBg: "Визуализация на управлението на светодиодните сегменти (a–g) чрез двоично-десетичен код.",
+                descEn: "Visualization of controlling LED segments (a–g) using Binary-Coded Decimal (BCD) inputs.",
+                demoType: "segment"
+            },
+            {
+                file: "kriptirane.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "8. – 11. клас",
+                subjectBg: "Информатика",
+                subjectEn: "Informatics",
+                titleBg: "Криптография и алгоритми за шифриране",
+                titleEn: "Cryptography & Encryption Algorithms Lab",
+                descBg: "Практическо помагало за класически и съвременни методи за шифриране, дешифриране и защита на информацията.",
+                descEn: "Hands-on tool demonstrating classical and modern encryption, decryption, and data security methods.",
+                demoType: "cipher"
+            },
+            {
+                file: "Morz_Generator.html",
+                cat: "informatics",
+                grade: "5-7",
+                gradeLabel: "5. – 8. клас",
+                subjectBg: "Информатика",
+                subjectEn: "Informatics",
+                titleBg: "Генератор и декодер на Морзовата азбука (със звук)",
+                titleEn: "Morse Code Audio Generator & Decoder",
+                descBg: "Преобразуване на текст в светлинни и звукови морзови сигнали чрез Web Audio API.",
+                descEn: "Convert text into visual and audio Morse code signals powered by Web Audio API.",
+                demoType: "morse"
+            },
+            {
+                file: "Nevron_001.html",
+                cat: "informatics",
+                grade: "11-12",
+                gradeLabel: "11. – 12. клас",
+                subjectBg: "Информатика",
+                subjectEn: "Informatics",
+                titleBg: "Изкуствен неврон (Перцептрон) и машинно обучение",
+                titleEn: "Artificial Neuron (Perceptron) & Machine Learning",
+                descBg: "Визуализация на теглата, прага, активационната функция и обучението на изкуствена невронна клетка.",
+                descEn: "Visualization of synaptic weights, bias, activation function, and training of an artificial neuron.",
+                demoType: "neuron"
+            },
+            {
+                file: "Tetris_Game.html",
+                cat: "informatics",
+                grade: "5-7",
+                gradeLabel: "5. – 10. клас",
+                subjectBg: "Информатика",
+                subjectEn: "Informatics",
+                titleBg: "Тетрис — двумерни матрици и игрова логика в JS",
+                titleEn: "Tetris — 2D Matrix Rotation & Game Loop in JS",
+                descBg: "Класическа аркадна игра, демонстрираща работа с двумерни масиви, колизии и управление на състояния.",
+                descEn: "Classic arcade game demonstrating 2D array manipulation, collision detection, and state management.",
+                demoType: "default"
+            },
+
+            // --- ФИЗИКА И ТЕХНИКА (6) ---
+            {
+                file: "Ekvopotencialna.html",
+                cat: "physics",
+                grade: "8-10",
+                gradeLabel: "9. – 11. клас",
+                subjectBg: "Физика",
+                subjectEn: "Physics",
+                titleBg: "Електростатично поле и еквипотенциални повърхнини",
+                titleEn: "Electrostatic Field & Equipotential Surfaces",
+                descBg: "Интерактивна симулация на силови линии и потенциал на електрично поле при произволно разположени заряди.",
+                descEn: "Interactive simulation of electric field lines and equipotential contours for multiple point charges.",
+                demoType: "physics"
+            },
+            {
+                file: "Struna_eq.html",
+                cat: "physics",
+                grade: "11-12",
+                gradeLabel: "10. – 12. клас",
+                subjectBg: "Физика",
+                subjectEn: "Physics",
+                titleBg: "Вибрираща струна, стоящи вълни и хармоници",
+                titleEn: "Vibrating String, Standing Waves & Harmonics",
+                descBg: "Числено решение на вълновото уравнение на струната с настройка на опън, плътност, модове, възли и пучки.",
+                descEn: "Numerical simulation of the string wave equation with adjustable tension, density, modes, nodes, and antinodes.",
+                demoType: "wave"
+            },
+            {
+                file: "Modulator.html",
+                cat: "physics",
+                grade: "11-12",
+                gradeLabel: "11. – 12. клас",
+                subjectBg: "Физика",
+                subjectEn: "Physics",
+                titleBg: "Амплитудна (AM) и честотна (FM) модулация",
+                titleEn: "Amplitude (AM) & Frequency (FM) Modulation Lab",
+                descBg: "Осцилоскоп в реално време за изследване на информационен, носещ и модулиран радиосигнал.",
+                descEn: "Real-time oscilloscope analyzing modulating, carrier, and modulated radio signals.",
+                demoType: "wave"
+            },
+            {
+                file: "Sintezator_001.html",
+                cat: "physics",
+                grade: "8-10",
+                gradeLabel: "7. – 12. клас",
+                subjectBg: "Физика",
+                subjectEn: "Physics",
+                titleBg: "Акустичен синтезатор, осцилоскоп и спектрален анализатор",
+                titleEn: "Acoustic Synthesizer, Oscilloscope & Spectrum Analyzer",
+                descBg: "Генератор на звукови вълни (Sine, Square, Saw, Triangle), ADSR обвивка, филтър и визуализация на честотния спектър.",
+                descEn: "Sound wave generator (Sine, Square, Saw, Triangle), ADSR envelope, low-pass filter, and FFT spectrum analyzer.",
+                demoType: "wave"
+            },
+            {
+                file: "Nivo_indikator_zvuk.html",
+                cat: "physics",
+                grade: "8-10",
+                gradeLabel: "8. – 11. клас",
+                subjectBg: "Физика",
+                subjectEn: "Physics",
+                titleBg: "Аудио осцилоскоп, VU индикатор и положителна обратна връзка",
+                titleEn: "Audio Oscilloscope, VU Meter & Positive Feedback",
+                descBg: "Симулация на усилване на сигнала (Gain) и ефекта на самовъзбуждане (микрофония) при положителна обратна връзка.",
+                descEn: "Simulation of signal amplification (Gain) and acoustic feedback howling loop.",
+                demoType: "physics"
+            },
+            {
+                file: "Klimatik.html",
+                cat: "physics",
+                grade: "8-10",
+                gradeLabel: "8. – 10. клас",
+                subjectBg: "Физика",
+                subjectEn: "Physics",
+                titleBg: "Термодинамичен цикъл на климатик и термопомпа",
+                titleEn: "Air Conditioner & Heat Pump Thermodynamic Cycle",
+                descBg: "Интерактивна схема на работата на компресор, кондензатор, дросел и изпарител при охлаждане и отопление.",
+                descEn: "Interactive diagram of compressor, condenser, expansion valve, and evaporator in cooling and heating modes.",
+                demoType: "physics"
+            },
+
+            // --- БИОЛОГИЯ И ХИМИЯ (9) ---
+            {
+                file: "Bio_optix_lab_003.html",
+                cat: "biology",
+                grade: "8-10",
+                gradeLabel: "8. – 10. клас",
+                subjectBg: "Биология",
+                subjectEn: "Biology",
+                titleBg: "Оптика на човешкото око и зрителни аномалии",
+                titleEn: "Human Eye Optics & Vision Anomalies Lab",
+                descBg: "Симулация на пречупването на светлината през лещата на окото, късогледство, далекогледство и корекция с лещи.",
+                descEn: "Simulation of light refraction through the eye lens, myopia, hyperopia, and corrective lenses.",
+                demoType: "biology"
+            },
+            {
+                file: "Problem_oko.html",
+                cat: "biology",
+                grade: "8-10",
+                gradeLabel: "8. – 9. клас",
+                subjectBg: "Биология",
+                subjectEn: "Biology",
+                titleBg: "Диагностика и корекция на зрението",
+                titleEn: "Vision Diagnostics & Corrective Optics Simulator",
+                descBg: "Интерактивен учебен модул за изследване на фокусирането върху ретината и избор на диоптър.",
+                descEn: "Interactive educational module exploring retinal focus and corrective diopter selection.",
+                demoType: "biology"
+            },
+            {
+                file: "Blood_symulator.html",
+                cat: "biology",
+                grade: "8-10",
+                gradeLabel: "8. – 10. клас",
+                subjectBg: "Биология",
+                subjectEn: "Biology",
+                titleBg: "Кръвоносна система и сърдечен цикъл — симулатор",
+                titleEn: "Circulatory System & Cardiac Cycle Simulator",
+                descBg: "Визуализация на големия и малкия кръг на кръвообращението, пулс и кръвно налягане.",
+                descEn: "Visualization of systemic and pulmonary circulation, heart rate, and blood pressure.",
+                demoType: "biology"
+            },
+            {
+                file: "Blood_symulator_001.html",
+                cat: "biology",
+                grade: "8-10",
+                gradeLabel: "8. – 10. клас",
+                subjectBg: "Биология",
+                subjectEn: "Biology",
+                titleBg: "Състав на кръвта и кръвни клетки (Разширен модел)",
+                titleEn: "Blood Composition & Cellular Dynamics (Advanced)",
+                descBg: "Интерактивно изследване на еритроцити, левкоцити и тромбоцити и тяхната роля в организма.",
+                descEn: "Interactive study of erythrocytes, leukocytes, and thrombocytes and their physiological functions.",
+                demoType: "biology"
+            },
+            {
+                file: "Bql_drob.html",
+                cat: "biology",
+                grade: "8-10",
+                gradeLabel: "8. – 9. клас",
+                subjectBg: "Биология",
+                subjectEn: "Biology",
+                titleBg: "Дихателна система и газообмен в белия дроб",
+                titleEn: "Respiratory System & Alveolar Gas Exchange",
+                descBg: "Динамична визуализация на вдишването, издишването, диафрагмата и обмяната на O₂ и CO₂.",
+                descEn: "Dynamic visualization of inhalation, exhalation, diaphragm motion, and O₂/CO₂ gas exchange.",
+                demoType: "biology"
+            },
+            {
+                file: "Brain_symulator.html",
+                cat: "biology",
+                grade: "8-10",
+                gradeLabel: "8. – 11. клас",
+                subjectBg: "Биология",
+                subjectEn: "Biology",
+                titleBg: "Човешкият мозък — дялове и функционални центрове",
+                titleEn: "Human Brain — Lobes & Functional Centers",
+                descBg: "Интерактивен анатомичен модел на главния мозък с описание на функциите на отделните зони.",
+                descEn: "Interactive anatomical model of the human brain detailing cortical lobes and functional areas.",
+                demoType: "biology"
+            },
+            {
+                file: "Shtitovidna_simulator_001.html",
+                cat: "biology",
+                grade: "8-10",
+                gradeLabel: "8. – 11. клас",
+                subjectBg: "Биология",
+                subjectEn: "Biology",
+                titleBg: "Ендокринна система: Щитовидна жлеза и хормонална регулация",
+                titleEn: "Endocrine System: Thyroid Gland & Hormonal Regulation",
+                descBg: "Симулация на обратната връзка хипофиза – щитовидна жлеза (TSH, T3, T4) и влиянието върху обмяната на веществата.",
+                descEn: "Simulation of the pituitary–thyroid feedback loop (TSH, T3, T4) and metabolic rate.",
+                demoType: "biology"
+            },
+            {
+                file: "Antibiotik_001.html",
+                cat: "biology",
+                grade: "8-10",
+                gradeLabel: "9. – 11. клас",
+                subjectBg: "Биология",
+                subjectEn: "Biology",
+                titleBg: "Действие на антибиотиците и бактериална резистентност",
+                titleEn: "Antibiotic Action & Bacterial Resistance Simulator",
+                descBg: "Симулация на развитието на бактериална популация при правилен и прекъснат прием на антибиотик.",
+                descEn: "Simulation of bacterial population dynamics under complete vs. interrupted antibiotic treatment.",
+                demoType: "biology"
+            },
+            {
+                file: "Logistiq_equation.html",
+                cat: "biology",
+                grade: "11-12",
+                gradeLabel: "10. – 12. клас",
+                subjectBg: "Биология",
+                subjectEn: "Biology",
+                titleBg: "Популационна динамика — логистично уравнение със закъснение",
+                titleEn: "Population Dynamics — Delayed Logistic Equation",
+                descBg: "Екологичен и математически модел на растежа на популация при ограничен капацитет на средата K и закъснение τ.",
+                descEn: "Ecological and mathematical model of population growth with carrying capacity K and response delay τ.",
+                demoType: "population"
+            },
+
+            // --- УЧИЛИЩНИ ИНСТРУМЕНТИ (1) ---
+            {
+                file: "students_programator_time_new_FINAL_002.html",
+                cat: "tools",
+                grade: "all",
+                gradeLabel: "1. – 12. клас",
+                subjectBg: "Училищен инструмент",
+                subjectEn: "School Tool",
+                titleBg: "Генератор и организатор на седмично учебно разписание",
+                titleEn: "Weekly School Timetable Generator & Organizer",
+                descBg: "Интерактивен инструмент за съставяне, визуализиране и управление на училищни програми и часове.",
+                descEn: "Interactive tool for creating, visualizing, and managing weekly school class schedules.",
+                demoType: "default"
+            }
+        ];
+
+        // =========================================================================
+        // THEME & LANGUAGE TOGGLES (SYNCED WITH MAIN PORTFOLIO)
+        // =========================================================================
+        const langToggleBtn = document.getElementById('lang-toggle-btn');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        if (localStorage.getItem('portfolio_lang') === 'en') {
+            document.body.classList.add('en-mode');
+            document.documentElement.lang = 'en';
+        }
+
+        langToggleBtn?.addEventListener('click', () => {
+            document.body.classList.toggle('en-mode');
+            const isEn = document.body.classList.contains('en-mode');
+            document.documentElement.lang = isEn ? 'en' : 'bg';
+            localStorage.setItem('portfolio_lang', isEn ? 'en' : 'bg');
+        });
+
+        if (localStorage.getItem('portfolio_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+
+        themeToggleBtn?.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('portfolio_theme', isDark ? 'dark' : 'light');
+        });
+
+        // =========================================================================
+        // FILTERING & RENDERING LOGIC
+        // =========================================================================
+        let activeCat = 'all';
+        let activeGrade = 'all';
+        let searchQuery = '';
+
+        const catBadgeStyles = {
+            math: "bg-brand-50 text-brand-700 dark:bg-brand-950/70 dark:text-brand-300 border-brand-200 dark:border-brand-800",
+            informatics: "bg-purple-50 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300 border-purple-200 dark:border-purple-800",
+            physics: "bg-sky-50 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border-sky-200 dark:border-sky-800",
+            biology: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+            tools: "bg-amber-50 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+        };
+
+        const catIcons = {
+            math: "fa-square-root-variable",
+            informatics: "fa-microchip",
+            physics: "fa-bolt",
+            biology: "fa-dna",
+            tools: "fa-calendar-days"
+        };
+
+        function renderMaterials() {
+            const grid = document.getElementById('materials-grid');
+            const statCount = document.getElementById('stat-total-count');
+            const visibleCount = document.getElementById('visible-count');
+            if (!grid) return;
+
+            if (statCount) statCount.textContent = MATERIALS_DATA.length;
+
+            const filtered = MATERIALS_DATA.filter(item => {
+                const matchCat = activeCat === 'all' || item.cat === activeCat;
+                const matchGrade = activeGrade === 'all' || item.grade === 'all' || item.grade === activeGrade;
+                const q = searchQuery.trim().toLowerCase();
+                const matchSearch = !q ||
+                    item.titleBg.toLowerCase().includes(q) ||
+                    item.titleEn.toLowerCase().includes(q) ||
+                    item.descBg.toLowerCase().includes(q) ||
+                    item.descEn.toLowerCase().includes(q) ||
+                    item.subjectBg.toLowerCase().includes(q) ||
+                    item.subjectEn.toLowerCase().includes(q) ||
+                    item.file.toLowerCase().includes(q);
+                return matchCat && matchGrade && matchSearch;
+            });
+
+            if (visibleCount) visibleCount.textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white dark:bg-slate-800 rounded-3xl p-10 text-center border border-slate-200 dark:border-slate-700">
+                        <i class="fa-solid fa-folder-open text-3xl text-slate-400 mb-2"></i>
+                        <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">
+                            <span class="lang-inline-bg">Няма намерени учебни материали по избраните филтри.</span>
+                            <span class="lang-inline-en">No educational modules match the selected filters.</span>
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map((item) => {
+                const realIdx = MATERIALS_DATA.indexOf(item);
+                const badgeClass = catBadgeStyles[item.cat] || catBadgeStyles.math;
+                const iconClass = catIcons[item.cat] || "fa-file-code";
+
+                return `
+                    <article class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between glow-hover">
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-3.5">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold ${badgeClass}">
+                                    <i class="fa-solid ${iconClass}"></i>
+                                    <span class="lang-inline-bg">${item.subjectBg}</span>
+                                    <span class="lang-inline-en">${item.subjectEn}</span>
+                                </span>
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-semibold">
+                                    ${item.gradeLabel}
+                                </span>
+                            </div>
+
+                            <h3 class="font-bold text-base text-slate-800 dark:text-slate-100 mb-2 leading-snug">
+                                <span class="lang-inline-bg">${item.titleBg}</span>
+                                <span class="lang-inline-en">${item.titleEn}</span>
+                            </h3>
+
+                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                                <span class="lang-inline-bg">${item.descBg}</span>
+                                <span class="lang-inline-en">${item.descEn}</span>
+                            </p>
+                        </div>
+
+                        <div>
+                            <div class="text-[11px] font-mono text-slate-400 mb-3 flex items-center gap-1.5 truncate">
+                                <i class="fa-regular fa-file-code text-brand-500 shrink-0"></i>
+                                <span class="truncate">materials/${item.file}</span>
+                            </div>
+                            <div class="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/80 no-print">
+                                <button onclick="openMaterialPreview(${realIdx})" class="flex-1 px-3.5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-play"></i>
+                                    <span class="lang-inline-bg">Преглед на живо</span>
+                                    <span class="lang-inline-en">Live Preview</span>
+                                </button>
+                                <a href="${item.file}" target="_blank" rel="noopener" class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold transition" title="Отвори в нов раздел">
+                                    <i class="fa-solid fa-up-right-from-square"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        document.querySelectorAll('.mat-cat-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mat-cat-btn').forEach(b => {
+                    b.classList.remove('bg-brand-600', 'text-white', 'shadow-sm', 'font-bold');
+                    b.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-200', 'font-semibold');
+                });
+                btn.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-200', 'font-semibold');
+                btn.classList.add('bg-brand-600', 'text-white', 'shadow-sm', 'font-bold');
+                activeCat = btn.dataset.cat;
+                renderMaterials();
+            });
+        });
+
+        document.getElementById('grade-filter')?.addEventListener('change', (e) => {
+            activeGrade = e.target.value;
+            renderMaterials();
+        });
+
+        document.getElementById('material-search')?.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderMaterials();
+        });
+
+        function resetAllFilters() {
+            activeCat = 'all';
+            activeGrade = 'all';
+            searchQuery = '';
+            document.getElementById('grade-filter').value = 'all';
+            document.getElementById('material-search').value = '';
+            document.querySelectorAll('.mat-cat-btn').forEach((b, i) => {
+                if (i === 0) {
+                    b.classList.add('bg-brand-600', 'text-white', 'shadow-sm', 'font-bold');
+                    b.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-200', 'font-semibold');
+                } else {
+                    b.classList.remove('bg-brand-600', 'text-white', 'shadow-sm', 'font-bold');
+                    b.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-200', 'font-semibold');
+                }
+            });
+            renderMaterials();
+        }
+
+        // =========================================================================
+        // INTERACTIVE MODAL PREVIEW (SANDBOX IN CANVAS + REAL IFRAME ON GITHUB PAGES)
+        // =========================================================================
+        function openMaterialPreview(idx) {
+            const item = MATERIALS_DATA[idx];
+            if (!item) return;
+
+            const modal = document.getElementById('material-modal');
+            const headerInfo = document.getElementById('modal-header-info');
+            const newTabLink = document.getElementById('modal-open-newtab');
+            const stage = document.getElementById('preview-stage');
+
+            headerInfo.innerHTML = `
+                <span class="inline-block px-2.5 py-0.5 rounded-md bg-brand-600 text-white text-[10px] font-bold mb-1">
+                    <span class="lang-inline-bg">${item.subjectBg}</span>
+                    <span class="lang-inline-en">${item.subjectEn}</span>
+                    · ${item.gradeLabel}
+                </span>
+                <h3 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
+                    <span class="lang-inline-bg">${item.titleBg}</span>
+                    <span class="lang-inline-en">${item.titleEn}</span>
+                </h3>
+            `;
+
+            newTabLink.href = item.file;
+            stage.className = "flex-1 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-5 sm:p-6 overflow-y-auto";
+            stage.innerHTML = buildInteractiveDemo(item);
+            modal.classList.remove('hidden');
+
+            // If hosted on GitHub Pages where the actual .html file exists in materials/, load it in iframe
+            if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('googleusercontent') && !window.location.hostname.includes('scf.usercontent')) {
+                fetch(item.file, { method: 'HEAD' }).then(res => {
+                    if (res.ok) {
+                        stage.className = "flex-1 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden h-[70vh] bg-white";
+                        stage.innerHTML = `<iframe src="${item.file}" title="${item.titleBg}" class="w-full h-full border-0"></iframe>`;
+                    }
+                }).catch(() => {});
+            }
+        }
+
+        function buildInteractiveDemo(item) {
+            if (item.demoType === 'pythagoras') {
+                return `
+                    <div class="space-y-4 text-xs">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <span class="font-bold text-sm text-brand-600 dark:text-brand-400">Интерактивна проверка: a² + b² = c²</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold">Canvas Симулация</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="block">Катет <strong>a</strong> (см):
+                                <input id="pit-a" type="number" value="3" min="1" max="100" oninput="calcPitDemo()" class="mt-1 w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-bold">
+                            </label>
+                            <label class="block">Катет <strong>b</strong> (см):
+                                <input id="pit-b" type="number" value="4" min="1" max="100" oninput="calcPitDemo()" class="mt-1 w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-bold">
+                            </label>
+                        </div>
+                        <div id="pit-res" class="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-xs leading-relaxed">
+                            a² + b² = 3² + 4² = 9 + 16 = <strong>25</strong> ⇒ Хипотенуза <strong>c = 5.00 см</strong> · Лице <strong>S = 6.00 см²</strong>
+                        </div>
+                    </div>
+                `;
+            }
+            if (item.demoType === 'logic' || item.demoType === 'segment') {
+                return `
+                    <div class="space-y-4 text-xs">
+                        <span class="font-bold text-sm text-purple-600 dark:text-purple-400 block">Интерактивен стенд по цифрова схемотехника</span>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <label class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-bold cursor-pointer">
+                                <input id="in-a" type="checkbox" checked onchange="calcLogicDemo()" class="w-4 h-4 accent-brand-600"> Вход A (1/0)
+                            </label>
+                            <label class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-bold cursor-pointer">
+                                <input id="in-b" type="checkbox" onchange="calcLogicDemo()" class="w-4 h-4 accent-brand-600"> Вход B (1/0)
+                            </label>
+                        </div>
+                        <div id="logic-res" class="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
+                            <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">AND: <strong>0</strong></div>
+                            <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">OR: <strong>1</strong></div>
+                            <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">XOR: <strong>1</strong></div>
+                            <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">NAND: <strong>1</strong></div>
+                        </div>
+                    </div>
+                `;
+            }
+            if (item.demoType === 'cipher' || item.demoType === 'morse') {
+                return `
+                    <div class="space-y-4 text-xs">
+                        <span class="font-bold text-sm text-purple-600 dark:text-purple-400 block">Интерактивен енкодер (Шифър на Цезар / Морзов код)</span>
+                        <input id="cipher-in" type="text" value="STEM LAB" oninput="calcCipherDemo()" class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-bold uppercase">
+                        <div id="cipher-res" class="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono space-y-1.5">
+                            <div>Шифър на Цезар (+3): <strong>VWHP ODE</strong></div>
+                            <div>Морзов код: <strong>... - . -- / .-.. .- -...</strong></div>
+                        </div>
+                    </div>
+                `;
+            }
+            if (item.demoType === 'wave' || item.demoType === 'physics') {
+                return `
+                    <div class="space-y-4 text-xs">
+                        <span class="font-bold text-sm text-sky-600 dark:text-sky-400 block">Интерактивен вълнов и честотен параметризатор</span>
+                        <label class="block">Честота <strong>f</strong>: <strong id="freq-val">440 Hz</strong>
+                            <input id="freq-slider" type="range" min="100" max="1200" value="440" oninput="calcWaveDemo()" class="mt-1.5 w-full accent-brand-600">
+                        </label>
+                        <div id="wave-res" class="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono">
+                            Период T = 1/f = <strong>2.27 ms</strong> · Дължина на вълната във въздух λ = <strong>0.78 m</strong>
+                        </div>
+                    </div>
+                `;
+            }
+            return `
+                <div class="text-center py-8 space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-purple-600 text-white flex items-center justify-center mx-auto text-2xl shadow-md">
+                        <i class="fa-solid fa-flask-vial"></i>
+                    </div>
+                    <h4 class="font-bold text-base text-slate-800 dark:text-slate-100">${item.titleBg}</h4>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">${item.descBg}</p>
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-brand-50 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-800 text-[11px] font-mono text-brand-700 dark:text-brand-300">
+                        <i class="fa-regular fa-file-code"></i> Свързан файл: materials/${item.file}
+                    </div>
+                    <p class="text-[11px] text-slate-500">Когато качиш файловете в GitHub Pages, този прозорец автоматично зарежда пълната симулация.</p>
+                </div>
+            `;
+        }
+
+        function calcPitDemo() {
+            const a = parseFloat(document.getElementById('pit-a')?.value || 0);
+            const b = parseFloat(document.getElementById('pit-b')?.value || 0);
+            const out = document.getElementById('pit-res');
+            if (!out) return;
+            const c = Math.sqrt(a * a + b * b);
+            const s = (a * b) / 2;
+            out.innerHTML = `a² + b² = ${a}² + ${b}² = <strong>${(a*a + b*b).toFixed(2)}</strong> ⇒ Хипотенуза <strong>c = ${c.toFixed(2)} см</strong> · Лице <strong>S = ${s.toFixed(2)} см²</strong>`;
+        }
+
+        function calcLogicDemo() {
+            const a = document.getElementById('in-a')?.checked ? 1 : 0;
+            const b = document.getElementById('in-b')?.checked ? 1 : 0;
+            const out = document.getElementById('logic-res');
+            if (!out) return;
+            out.innerHTML = `
+                <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">AND: <strong>${a & b}</strong></div>
+                <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">OR: <strong>${a | b}</strong></div>
+                <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">XOR: <strong>${a ^ b}</strong></div>
+                <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">NAND: <strong>${(a & b) ? 0 : 1}</strong></div>
+            `;
+        }
+
+        function calcCipherDemo() {
+            const txt = (document.getElementById('cipher-in')?.value || '').toUpperCase();
+            const out = document.getElementById('cipher-res');
+            if (!out) return;
+            const morseMap = { A:'.-', B:'-...', C:'-.-.', D:'-..', E:'.', F:'..-.', G:'--.', H:'....', I:'..', J:'.---', K:'-.-', L:'.-..', M:'--', N:'-.', O:'---', P:'.--.', Q:'--.-', R:'.-.', S:'...', T:'-', U:'..-', V:'...-', W:'.--', X:'-..-', Y:'-.--', Z:'--..', ' ':'/' };
+            const caesar = txt.replace(/[A-Z]/g, ch => String.fromCharCode(((ch.charCodeAt(0) - 65 + 3) % 26) + 65));
+            const morse = txt.split('').map(c => morseMap[c] || '').filter(Boolean).join(' ');
+            out.innerHTML = `<div>Шифър на Цезар (+3): <strong>${caesar || '—'}</strong></div><div>Морзов код: <strong>${morse || '—'}</strong></div>`;
+        }
+
+        function calcWaveDemo() {
+            const f = parseFloat(document.getElementById('freq-slider')?.value || 440);
+            const lbl = document.getElementById('freq-val');
+            const out = document.getElementById('wave-res');
+            if (lbl) lbl.textContent = `${f} Hz`;
+            if (out) {
+                const T = (1000 / f).toFixed(2);
+                const lambda = (343 / f).toFixed(2);
+                out.innerHTML = `Период T = 1/f = <strong>${T} ms</strong> · Дължина на вълната във въздух λ = <strong>${lambda} m</strong>`;
+            }
+        }
+
+        function closeMaterialModal() {
+            const modal = document.getElementById('material-modal');
+            const stage = document.getElementById('preview-stage');
+            if (stage) stage.innerHTML = '';
+            modal?.classList.add('hidden');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMaterialModal();
+        });
+
+        renderMaterials();
+    </script>
+</body>
+</html>
