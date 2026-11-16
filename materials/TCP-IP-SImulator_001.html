@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCP/IP Модел - Детайлна Визуализация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2a5298);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .simulation-area {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            min-height: 700px;
+        }
+        
+        .visualization {
+            padding: 20px;
+            background: #f8f9fa;
+            border-right: 2px solid #e9ecef;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .communication-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .host {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            border-radius: 10px;
+            color: white;
+            width: 200px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .host-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .host-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .network-path {
+            flex: 1;
+            height: 4px;
+            background: #e9ecef;
+            margin: 0 20px;
+            position: relative;
+        }
+        
+        .router {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #e74c3c;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .layers-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .layer {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            min-height: 100px;
+            border-left: 5px solid #4ecdc4;
+        }
+        
+        .layer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .layer-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        
+        .layer-number {
+            background: #4ecdc4;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .layer-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .protocols {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .protocol {
+            background: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .packet-space {
+            flex: 1;
+            height: 60px;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .packet {
+            width: 120px;
+            height: 40px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            position: relative;
+            transition: all 0.5s ease;
+        }
+        
+        .packet-header {
+            position: absolute;
+            top: -2px;
+            left: 5px;
+            right: 5px;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            z-index: 10;
+        }
+        
+        .arrow-label {
+            position: absolute;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 11;
+        }
+        
+        .down-arrow {
+            border-width: 15px 10px 0 10px;
+            border-color: #e74c3c transparent transparent transparent;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .up-arrow {
+            border-width: 0 10px 15px 10px;
+            border-color: transparent transparent #27ae60 transparent;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .controls-panel {
+            padding: 20px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .control-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4ecdc4;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .protocol-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .control-btn:active {
+            transform: translateY(0);
+        }
+        
+        .data-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .data-input {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .packet-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .detail-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .detail-value {
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
+        }
+        
+        .encapsulation-process {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #9b59b6;
+        }
+        
+        .process-step {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .step-number {
+            background: #9b59b6;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .animation-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .speed-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .speed-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .packet-structure {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #e9ecef;
+        }
+        
+        .structure-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        
+        .structure-visual {
+            display: flex;
+            height: 80px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .structure-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 5px;
+        }
+        
+        .application-data { background: #4ecdc4; flex: 3; }
+        .transport-header { background: #3498db; flex: 1; }
+        .network-header { background: #9b59b6; flex: 1; }
+        .datalink-header { background: #e74c3c; flex: 1; }
+        .trailer { background: #95a5a6; flex: 0.5; }
+        
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌐 TCP/IP Модел - Детайлна Визуализация</h1>
+            <p class="subtitle">Стрелки и анимации показващи движението на пакетите през слоевете</p>
+        </header>
+        
+        <div class="simulation-area">
+            <div class="visualization">
+                <div class="communication-flow">
+                    <div class="host">
+                        <div class="host-icon">💻</div>
+                        <div class="host-name">ИЗПРАЩАЧ</div>
+                        <div>192.168.1.10</div>
+                    </div>
+                    
+                    <div class="network-path">
+                        <div class="router">🔄</div>
+                    </div>
+                    
+                    <div class="host">
+                        <div class="host-icon">🖥️</div>
+                        <div class="host-name">ПОЛУЧАТЕЛ</div>
+                        <div>192.168.1.20</div>
+                    </div>
+                </div>
+                
+                <div class="layers-diagram">
+                    <div class="layer" id="application-layer">
+                        <div class="layer-header">
+                            <div class="layer-name">Приложен Слой (Application)</div>
+                            <div class="layer-number">5</div>
+                        </div>
+                        <div class="layer-content">
+                            <div class="protocols">
+                                <div class="protocol">HTTP</div>
+                                <div class="protocol">FTP</div>
+                                <div class="protocol">SMTP</div>
+                                <div class="protocol">DNS</div>
+                            </div>
+                            <div class="packet-space" id="app-packet-space">
+                                <div class="packet" id="app-packet">Данни</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="layer" id="transport-layer">
+                        <div class="layer-header">
+                            <div class="layer-name">Транспортен Слой (Transport)</div>
+                            <div class="layer-number">4</div>
+                        </div>
+                        <div class="layer-content">
+                            <div class="protocols">
+                                <div class="protocol">TCP</div>
+                                <div class="protocol">UDP</div>
+                            </div>
+                            <div class="packet-space" id="transport-packet-space">
+                                <div class="packet" id="transport-packet">TCP Сегмент</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="layer" id="network-layer">
+                        <div class="layer-header">
+                            <div class="layer-name">Мрежов Слой (Network)</div>
+                            <div class="layer-number">3</div>
+                        </div>
+                        <div class="layer-content">
+                            <div class="protocols">
+                                <div class="protocol">IP</div>
+                                <div class="protocol">ICMP</div>
+                                <div class="protocol">ARP</div>
+                            </div>
+                            <div class="packet-space" id="network-packet-space">
+                                <div class="packet" id="network-packet">IP Пакет</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="layer" id="data-link-layer">
+                        <div class="layer-header">
+                            <div class="layer-name">Канален Слой (Data Link)</div>
+                            <div class="layer-number">2</div>
+                        </div>
+                        <div class="layer-content">
+                            <div class="protocols">
+                                <div class="protocol">Ethernet</div>
+                                <div class="protocol">PPP</div>
+                            </div>
+                            <div class="packet-space" id="datalink-packet-space">
+                                <div class="packet" id="datalink-packet">Ethernet Кадър</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="layer" id="physical-layer">
+                        <div class="layer-header">
+                            <div class="layer-name">Физически Слой (Physical)</div>
+                            <div class="layer-number">1</div>
+                        </div>
+                        <div class="layer-content">
+                            <div class="protocols">
+                                <div class="protocol">Кабели</div>
+                                <div class="protocol">Сигнали</div>
+                            </div>
+                            <div class="packet-space" id="physical-packet-space">
+                                <div class="packet" id="physical-packet">10101010...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="packet-structure">
+                    <div class="structure-title">Структура на Пакета</div>
+                    <div class="structure-visual">
+                        <div class="structure-segment application-data">Приложни Данни</div>
+                        <div class="structure-segment transport-header">TCP Заглавка</div>
+                        <div class="structure-segment network-header">IP Заглавка</div>
+                        <div class="structure-segment datalink-header">Ethernet Заглавка</div>
+                        <div class="structure-segment trailer">CRC</div>
+                    </div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4ecdc4;"></div>
+                            <span>Приложни данни</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #3498db;"></div>
+                            <span>TCP заглавка</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #9b59b6;"></div>
+                            <span>IP заглавка</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #e74c3c;"></div>
+                            <span>Ethernet заглавка</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls-panel">
+                <div class="control-section">
+                    <div class="section-title">🎮 Контроли на Симулацията</div>
+                    <div class="protocol-buttons">
+                        <button class="control-btn" id="httpBtn">HTTP Заявка</button>
+                        <button class="control-btn" id="ftpBtn">FTP Трансфер</button>
+                        <button class="control-btn" id="emailBtn">Email</button>
+                        <button class="control-btn" id="dnsBtn">DNS Заявка</button>
+                        <button class="control-btn" id="startBtn">Стартирай</button>
+                        <button class="control-btn" id="resetBtn">Нулирай</button>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <div class="section-title">💬 Персонализирано Съобщение</div>
+                    <div class="data-controls">
+                        <input type="text" class="data-input" id="messageInput" placeholder="Въведете вашето съобщение...">
+                        <button class="control-btn" id="sendBtn">Изпрати Съобщение</button>
+                    </div>
+                </div>
+                
+                <div class="packet-details">
+                    <div class="section-title">🔍 Детайли на Текущия Пакет</div>
+                    <div class="detail-item">
+                        <div class="detail-name">Приложни данни:</div>
+                        <div class="detail-value" id="detail-app">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-name">Изходен порт:</div>
+                        <div class="detail-value" id="detail-sport">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-name">Целеви порт:</div>
+                        <div class="detail-value" id="detail-dport">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-name">Изходен IP:</div>
+                        <div class="detail-value" id="detail-sip">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-name">Целев IP:</div>
+                        <div class="detail-value" id="detail-dip">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-name">MAC адрес:</div>
+                        <div class="detail-value" id="detail-mac">-</div>
+                    </div>
+                </div>
+                
+                <div class="encapsulation-process">
+                    <div class="section-title">📦 Процес на Капсулиране</div>
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <div>Приложният слой създава данните</div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <div>Транспортният слой добавя TCP/UDP заглавка</div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <div>Мрежовият слой добавя IP заглавка</div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-number">4</div>
+                        <div>Каналният слой добавя Ethernet заглавка и трейлър</div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-number">5</div>
+                        <div>Пакетът се предава по физическата среда</div>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <div class="section-title">⚡ Скорост на Анимацията</div>
+                    <div class="animation-controls">
+                        <button class="speed-btn active" data-speed="1000">Бавна</button>
+                        <button class="speed-btn" data-speed="500">Нормална</button>
+                        <button class="speed-btn" data-speed="200">Бърза</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Елементи
+            const startBtn = document.getElementById('startBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            const httpBtn = document.getElementById('httpBtn');
+            const ftpBtn = document.getElementById('ftpBtn');
+            const emailBtn = document.getElementById('emailBtn');
+            const dnsBtn = document.getElementById('dnsBtn');
+            const messageInput = document.getElementById('messageInput');
+            const speedBtns = document.querySelectorAll('.speed-btn');
+            
+            // Пакетни пространства
+            const appSpace = document.getElementById('app-packet-space');
+            const transportSpace = document.getElementById('transport-packet-space');
+            const networkSpace = document.getElementById('network-packet-space');
+            const datalinkSpace = document.getElementById('datalink-packet-space');
+            const physicalSpace = document.getElementById('physical-packet-space');
+            
+            // Детайли
+            const detailApp = document.getElementById('detail-app');
+            const detailSport = document.getElementById('detail-sport');
+            const detailDport = document.getElementById('detail-dport');
+            const detailSip = document.getElementById('detail-sip');
+            const detailDip = document.getElementById('detail-dip');
+            const detailMac = document.getElementById('detail-mac');
+            
+            let isSimulationRunning = false;
+            let animationSpeed = 1000;
+            let currentMessage = "Здравей, TCP/IP свят!";
+            
+            // Протоколни конфигурации
+            const protocols = {
+                http: {
+                    name: "HTTP Заявка",
+                    message: "GET /index.html HTTP/1.1\nHost: www.example.com\nUser-Agent: TCP/IP Simulator",
+                    sport: 54321,
+                    dport: 80
+                },
+                ftp: {
+                    name: "FTP Трансфер",
+                    message: "FTP: Прехвърляне на файл document.pdf",
+                    sport: 54322,
+                    dport: 21
+                },
+                email: {
+                    name: "Email Съобщение",
+                    message: "От: user@example.com\nДо: friend@domain.com\nТема: TCP/IP\nСъобщение: Тестов имейл!",
+                    sport: 54323,
+                    dport: 25
+                },
+                dns: {
+                    name: "DNS Заявка",
+                    message: "DNS QUERY: www.google.com",
+                    sport: 54324,
+                    dport: 53
+                }
+            };
+            
+            // Инициализация на скоростни бутони
+            speedBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    speedBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    animationSpeed = parseInt(this.dataset.speed);
+                });
+            });
+            
+            // Протоколни бутони
+            httpBtn.addEventListener('click', () => setProtocol('http'));
+            ftpBtn.addEventListener('click', () => setProtocol('ftp'));
+            emailBtn.addEventListener('click', () => setProtocol('email'));
+            dnsBtn.addEventListener('click', () => setProtocol('dns'));
+            
+            function setProtocol(protocol) {
+                if (isSimulationRunning) return;
+                
+                const config = protocols[protocol];
+                currentMessage = config.message;
+                messageInput.value = config.message;
+                
+                updatePacketDetails({
+                    app: config.message,
+                    sport: config.sport,
+                    dport: config.dport,
+                    sip: '192.168.1.10',
+                    dip: '192.168.1.20',
+                    mac: '00:1A:2B:3C:4D:5E → 00:1A:2B:3C:4D:6F'
+                });
+            }
+            
+            // Стартиране на симулацията
+            startBtn.addEventListener('click', startSimulation);
+            sendBtn.addEventListener('click', function() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    currentMessage = message;
+                    startSimulation();
+                }
+            });
+            
+            // Нулиране
+            resetBtn.addEventListener('click', resetSimulation);
+            
+            function startSimulation() {
+                if (isSimulationRunning) return;
+                isSimulationRunning = true;
+                
+                resetArrows();
+                simulateEncapsulation();
+            }
+            
+            function resetSimulation() {
+                isSimulationRunning = false;
+                resetArrows();
+                resetPackets();
+                resetDetails();
+            }
+            
+            function resetArrows() {
+                document.querySelectorAll('.arrow, .arrow-label').forEach(el => el.remove());
+            }
+            
+            function resetPackets() {
+                document.querySelectorAll('.packet').forEach(packet => {
+                    packet.style.transform = 'translateX(0)';
+                    packet.style.opacity = '1';
+                });
+            }
+            
+            function resetDetails() {
+                updatePacketDetails({
+                    app: '-',
+                    sport: '-',
+                    dport: '-',
+                    sip: '-',
+                    dip: '-',
+                    mac: '-'
+                });
+            }
+            
+            function updatePacketDetails(details) {
+                detailApp.textContent = details.app.length > 30 ? details.app.substring(0, 30) + '...' : details.app;
+                detailSport.textContent = details.sport;
+                detailDport.textContent = details.dport;
+                detailSip.textContent = details.sip;
+                detailDip.textContent = details.dip;
+                detailMac.textContent = details.mac;
+            }
+            
+            // Симулиране на процеса на капсулиране
+            function simulateEncapsulation() {
+                updatePacketDetails({
+                    app: currentMessage,
+                    sport: '54321',
+                    dport: '80',
+                    sip: '192.168.1.10',
+                    dip: '192.168.1.20',
+                    mac: '00:1A:2B:3C:4D:5E → 00:1A:2B:3C:4D:6F'
+                });
+                
+                // Стъпка 1: Приложен слой
+                setTimeout(() => {
+                    createArrow(appSpace, 'down', 'Създаване на данни', 0);
+                    highlightPacket('app-packet');
+                }, animationSpeed * 0.5);
+                
+                // Стъпка 2: Транспортен слой
+                setTimeout(() => {
+                    createArrow(appSpace, 'down', 'Добавяне на TCP заглавка', 1);
+                    createArrow(transportSpace, 'down', 'TCP сегмент', 1);
+                    movePacket('app-packet', transportSpace);
+                    highlightPacket('transport-packet');
+                }, animationSpeed * 1.5);
+                
+                // Стъпка 3: Мрежов слой
+                setTimeout(() => {
+                    createArrow(transportSpace, 'down', 'Добавяне на IP заглавка', 2);
+                    createArrow(networkSpace, 'down', 'IP пакет', 2);
+                    movePacket('transport-packet', networkSpace);
+                    highlightPacket('network-packet');
+                }, animationSpeed * 2.5);
+                
+                // Стъпка 4: Канален слой
+                setTimeout(() => {
+                    createArrow(networkSpace, 'down', 'Добавяне на Ethernet заглавка', 3);
+                    createArrow(datalinkSpace, 'down', 'Ethernet кадър', 3);
+                    movePacket('network-packet', datalinkSpace);
+                    highlightPacket('datalink-packet');
+                }, animationSpeed * 3.5);
+                
+                // Стъпка 5: Физически слой
+                setTimeout(() => {
+                    createArrow(datalinkSpace, 'down', 'Преобразуване в битове', 4);
+                    createArrow(physicalSpace, 'down', 'Пренос на сигнал', 4);
+                    movePacket('datalink-packet', physicalSpace);
+                    highlightPacket('physical-packet');
+                    
+                    // Симулиране на пренос
+                    setTimeout(() => {
+                        simulateTransmission();
+                    }, animationSpeed * 1);
+                }, animationSpeed * 4.5);
+            }
+            
+            function simulateTransmission() {
+                // Показване на пакета по мрежовия път
+                const physicalPacket = document.getElementById('physical-packet');
+                const startX = physicalSpace.getBoundingClientRect().left + 50;
+                const endX = document.querySelector('.router').getBoundingClientRect().left;
+                
+                // Анимиране до рутера
+                animatePacketToRouter(physicalPacket, startX, endX, () => {
+                    // Анимиране от рутера до получателя
+                    const receiverX = document.querySelector('.host:last-child').getBoundingClientRect().left;
+                    animatePacketFromRouter(physicalPacket, endX, receiverX, () => {
+                        // Започване на декомпресиране
+                        simulateDecapsulation();
+                    });
+                });
+            }
+            
+            function simulateDecapsulation() {
+                // Стъпка 1: Физически слой (получател)
+                setTimeout(() => {
+                    createArrow(physicalSpace, 'up', 'Приемане на сигнал', 5);
+                }, animationSpeed * 0.5);
+                
+                // Стъпка 2: Канален слой
+                setTimeout(() => {
+                    createArrow(physicalSpace, 'up', 'Премахване на битове', 6);
+                    createArrow(datalinkSpace, 'up', 'Премахване на Ethernet заглавка', 6);
+                    movePacket('physical-packet', datalinkSpace, true);
+                }, animationSpeed * 1.5);
+                
+                // Стъпка 3: Мрежов слой
+                setTimeout(() => {
+                    createArrow(datalinkSpace, 'up', 'Премахване на Ethernet заглавка', 7);
+                    createArrow(networkSpace, 'up', 'Премахване на IP заглавка', 7);
+                    movePacket('datalink-packet', networkSpace, true);
+                }, animationSpeed * 2.5);
+                
+                // Стъпка 4: Транспортен слой
+                setTimeout(() => {
+                    createArrow(networkSpace, 'up', 'Премахване на IP заглавка', 8);
+                    createArrow(transportSpace, 'up', 'Премахване на TCP заглавка', 8);
+                    movePacket('network-packet', transportSpace, true);
+                }, animationSpeed * 3.5);
+                
+                // Стъпка 5: Приложен слой
+                setTimeout(() => {
+                    createArrow(transportSpace, 'up', 'Премахване на TCP заглавка', 9);
+                    createArrow(appSpace, 'up', 'Данните са получени!', 9);
+                    movePacket('transport-packet', appSpace, true);
+                    
+                    // Показване на съобщение за успех
+                    setTimeout(() => {
+                        alert('Съобщението е получено успешно!');
+                        isSimulationRunning = false;
+                    }, animationSpeed * 1);
+                }, animationSpeed * 4.5);
+            }
+            
+            function createArrow(container, direction, label, step) {
+                const arrow = document.createElement('div');
+                arrow.className = `arrow ${direction}-arrow`;
+                arrow.style.top = `${20 + step * 15}px`;
+                container.appendChild(arrow);
+                
+                const labelEl = document.createElement('div');
+                labelEl.className = 'arrow-label';
+                labelEl.textContent = label;
+                labelEl.style.top = `${5 + step * 15}px`;
+                labelEl.style.left = '60%';
+                container.appendChild(labelEl);
+                
+                return arrow;
+            }
+            
+            function highlightPacket(packetId) {
+                const packet = document.getElementById(packetId);
+                packet.style.boxShadow = '0 0 0 3px #f39c12';
+                setTimeout(() => {
+                    packet.style.boxShadow = '0 3px 10px rgba(0,0,0,0.2)';
+                }, animationSpeed / 2);
+            }
+            
+            function movePacket(packetId, targetContainer, isReverse = false) {
+                const packet = document.getElementById(packetId);
+                const targetRect = targetContainer.getBoundingClientRect();
+                const packetRect = packet.getBoundingClientRect();
+                
+                const moveX = targetRect.left - packetRect.left + (targetRect.width - packetRect.width) / 2;
+                
+                packet.style.transition = `transform ${animationSpeed / 1000}s ease`;
+                packet.style.transform = `translateX(${isReverse ? -moveX : moveX}px)`;
+                
+                if (isReverse) {
+                    setTimeout(() => {
+                        packet.style.transform = 'translateX(0)';
+                    }, animationSpeed);
+                }
+            }
+            
+            function animatePacketToRouter(packet, startX, endX, callback) {
+                const networkPath = document.querySelector('.network-path');
+                const packetClone = packet.cloneNode(true);
+                packetClone.style.position = 'fixed';
+                packetClone.style.left = `${startX}px`;
+                packetClone.style.top = `${networkPath.getBoundingClientRect().top + 10}px`;
+                packetClone.style.zIndex = '1000';
+                document.body.appendChild(packetClone);
+                
+                packet.style.opacity = '0.3';
+                
+                const distance = endX - startX;
+                const duration = animationSpeed * 2;
+                
+                let startTime = null;
+                
+                function animate(time) {
+                    if (!startTime) startTime = time;
+                    const progress = (time - startTime) / duration;
+                    
+                    if (progress < 1) {
+                        packetClone.style.left = `${startX + distance * progress}px`;
+                        requestAnimationFrame(animate);
+                    } else {
+                        document.body.removeChild(packetClone);
+                        if (callback) callback();
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            function animatePacketFromRouter(packet, startX, endX, callback) {
+                const networkPath = document.querySelector('.network-path');
+                const packetClone = packet.cloneNode(true);
+                packetClone.style.position = 'fixed';
+                packetClone.style.left = `${startX}px`;
+                packetClone.style.top = `${networkPath.getBoundingClientRect().top + 10}px`;
+                packetClone.style.zIndex = '1000';
+                document.body.appendChild(packetClone);
+                
+                const distance = endX - startX;
+                const duration = animationSpeed * 2;
+                
+                let startTime = null;
+                
+                function animate(time) {
+                    if (!startTime) startTime = time;
+                    const progress = (time - startTime) / duration;
+                    
+                    if (progress < 1) {
+                        packetClone.style.left = `${startX + distance * progress}px`;
+                        requestAnimationFrame(animate);
+                    } else {
+                        document.body.removeChild(packetClone);
+                        if (callback) callback();
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            // Инициализация
+            setProtocol('http');
+        });
+    </script>
+</body>
+</html>

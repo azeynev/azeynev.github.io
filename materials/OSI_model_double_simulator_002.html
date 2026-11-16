@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSI Модел Симулатор - Анимирана Визуализация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff0080, #ff8c00, #40e0d0);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(90deg, #ff0080, #ff8c00, #40e0d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .simulator-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .osi-comparison {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .osi-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .side-title {
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .client-title {
+            background: linear-gradient(135deg, #1abc9c, #16a085);
+        }
+        
+        .server-title {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        
+        .osi-layers {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+
+        .layer-connection {
+            position: absolute;
+            height: 40px;
+            width: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            left: 35px;
+            z-index: 1;
+        }
+        
+        .layer {
+            display: flex;
+            align-items: center;
+            padding: 18px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+        
+        .layer.active {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+            transform: scale(1.03);
+        }
+        
+        .layer-number {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            margin-right: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 3;
+        }
+        
+        .layer-info {
+            flex: 1;
+        }
+        
+        .layer-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .layer-desc {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .visualization-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 350px;
+            position: relative;
+            margin: 40px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .device {
+            width: 140px;
+            height: 140px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 5;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .device:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .client {
+            background: linear-gradient(135deg, #1abc9c, #16a085);
+        }
+        
+        .server {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        
+        .device-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .network-path {
+            flex: 1;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 30px;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .network-path::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: networkFlow 3s infinite linear;
+        }
+        
+        @keyframes networkFlow {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .packet {
+            position: absolute;
+            width: 120px;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .request-packet {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+        }
+        
+        .response-packet {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+        
+        .packet-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .packet-data {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            z-index: 8;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .arrow-right {
+            border-width: 10px 0 10px 15px;
+            border-color: transparent transparent transparent #ff7e5f;
+        }
+        
+        .arrow-left {
+            border-width: 10px 15px 10px 0;
+            border-color: transparent #4CAF50 transparent transparent;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1rem;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(2px);
+        }
+        
+        button:disabled {
+            background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .primary-btn {
+            background: linear-gradient(135deg, #ff0080, #ff8c00);
+        }
+        
+        .log-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .log-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .log-title::before {
+            content: '📋';
+            font-size: 1.5rem;
+        }
+        
+        .log-entry {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .log-entry:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        
+        .log-time {
+            color: #f39c12;
+            min-width: 70px;
+        }
+        
+        .log-layer {
+            color: #3498db;
+            min-width: 150px;
+            font-weight: bold;
+        }
+        
+        .log-message {
+            color: #ecf0f1;
+            flex: 1;
+        }
+        
+        .protocol-info {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .protocol-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            color: #f39c12;
+        }
+        
+        .protocol-content {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: #ffeb3b;
+            font-weight: bold;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0080, #ff8c00, #40e0d0);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+        }
+        
+        .glow {
+            animation: glow 2s infinite;
+        }
+        
+        .arrow-animation {
+            animation: moveArrow 2s linear infinite;
+        }
+        
+        @keyframes moveArrow {
+            0% { transform: translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100px); opacity: 0; }
+        }
+        
+        .flow-indicator {
+            position: absolute;
+            font-size: 2rem;
+            z-index: 7;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Нови стилове за анимации между нивата */
+        .packet-movement {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 4;
+            opacity: 0;
+        }
+
+        .packet-movement.response {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .vertical-movement {
+            animation: verticalMove 1.5s ease-in-out;
+        }
+
+        .horizontal-movement {
+            animation: horizontalMove 2s ease-in-out;
+        }
+
+        @keyframes verticalMove {
+            0% { 
+                opacity: 0;
+                transform: translateY(0) scale(0.8);
+            }
+            50% { 
+                opacity: 1;
+                transform: translateY(var(--move-distance)) scale(1);
+            }
+            100% { 
+                opacity: 0;
+                transform: translateY(var(--move-distance)) scale(0.8);
+            }
+        }
+
+        @keyframes horizontalMove {
+            0% { 
+                opacity: 0;
+                transform: translateX(0) scale(0.8);
+            }
+            50% { 
+                opacity: 1;
+                transform: translateX(var(--move-distance)) scale(1);
+            }
+            100% { 
+                opacity: 0;
+                transform: translateX(var(--move-distance)) scale(0.8);
+            }
+        }
+
+        .connection-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 1;
+        }
+
+        .vertical-line {
+            width: 3px;
+            height: 50px;
+            left: 35px;
+        }
+
+        .horizontal-line {
+            width: 100px;
+            height: 3px;
+            top: 50%;
+        }
+
+        .data-flow-animation {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #ff7e5f;
+            border-radius: 50%;
+            z-index: 2;
+            opacity: 0;
+        }
+
+        .flow-up {
+            animation: flowUp 1s ease-in-out;
+        }
+
+        .flow-down {
+            animation: flowDown 1s ease-in-out;
+        }
+
+        .flow-across {
+            animation: flowAcross 2s ease-in-out;
+        }
+
+        @keyframes flowUp {
+            0% { 
+                opacity: 1;
+                transform: translateY(30px);
+            }
+            100% { 
+                opacity: 0;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes flowDown {
+            0% { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+        }
+
+        @keyframes flowAcross {
+            0% { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+            100% { 
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OSI МОДЕЛ СИМУЛАТОР - АНИМИРАНА ВИЗУАЛИЗАЦИЯ</h1>
+            <p class="subtitle">Интерактивна визуализация с анимации между OSI нивата</p>
+            <div class="progress-bar">
+                <div class="progress" id="simulationProgress"></div>
+            </div>
+        </header>
+        
+        <div class="protocol-info">
+            <div class="protocol-title">🎯 Как работи симулацията?</div>
+            <div class="protocol-content">
+                Симулацията показва с анимирани движения как данните се обработват през седемте OSI слоя. 
+                <span class="highlight">Вертикалните анимации</span> показват движението между слоевете, 
+                а <span class="highlight">хоризонталните</span> - предаването през мрежата. 
+                Всеки слой добавя или премахва заглавна информация, докато данните се движат през стека.
+            </div>
+        </div>
+        
+        <div class="osi-comparison">
+            <div class="osi-side">
+                <div class="side-title client-title">💻 КЛИЕНТСКА СТРАНА</div>
+                <div class="osi-layers" id="client-layers">
+                    <!-- Вертикални линии между слоевете -->
+                    <div class="layer-connection" style="top: 95px; height: 65px;"></div>
+                    <div class="layer-connection" style="top: 175px; height: 65px;"></div>
+                    <div class="layer-connection" style="top: 255px; height: 65px;"></div>
+                    <div class="layer-connection" style="top: 335px; height: 65px;"></div>
+                    <div class="layer-connection" style="top: 415px; height: 65px;"></div>
+                    <div class="layer-connection" style="top: 495px; height: 65px;"></div>
+                    
+                    <div class="layer" id="client-layer7">
+                        <div class="layer-number">7</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Приложен слой (Application)</div>
+                            <div class="layer-desc">HTTP, FTP, SMTP - комуникация между приложения</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="client-layer6">
+                        <div class="layer-number">6</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Представителен слой (Presentation)</div>
+                            <div class="layer-desc">Криптиране, компресиране, превод на данни</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="client-layer5">
+                        <div class="layer-number">5</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Сесионен слой (Session)</div>
+                            <div class="layer-desc">Установяване, управление и прекратяване на сесии</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="client-layer4">
+                        <div class="layer-number">4</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Транспортен слой (Transport)</div>
+                            <div class="layer-desc">TCP, UDP - надежден пренос на данни</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="client-layer3">
+                        <div class="layer-number">3</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Мрежов слой (Network)</div>
+                            <div class="layer-desc">IP, маршрутизиране, адресиране</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="client-layer2">
+                        <div class="layer-number">2</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Канален слой (Data Link)</div>
+                            <div class="layer-desc">Ethernet, MAC адреси, кадри</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="client-layer1">
+                        <div class="layer-number">1</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Физически слой (Physical)</div>
+                            <div class="layer-desc">Сигнали, кабели, електрически импулси</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="osi-side">
+                <div class="side-title server-title">🖥️ СЪРВЪРНА СТРАНА</div>
+                <div class="osi-layers" id="server-layers">
+                    <!-- Вертикални линии между слоевете -->
+                    <div class="layer-connection" style="top: 95px; height: 65px;"></div>
+                    <div class="layer-connection" style="top: 175px; height: 65px;"></div>
+                    <div class="layer-connection" style="top: 255px; height: 65px;"></div>
+                    <div class="layer-connection" style="top: 335px; height: 65px;"></div>
+                    <div class="layer-connection" style="top: 415px; height: 65px;"></div>
+                    <div class="layer-connection" style="top: 495px; height: 65px;"></div>
+                    
+                    <div class="layer" id="server-layer7">
+                        <div class="layer-number">7</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Приложен слой (Application)</div>
+                            <div class="layer-desc">HTTP, FTP, SMTP - комуникация между приложения</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="server-layer6">
+                        <div class="layer-number">6</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Представителен слой (Presentation)</div>
+                            <div class="layer-desc">Криптиране, компресиране, превод на данни</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="server-layer5">
+                        <div class="layer-number">5</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Сесионен слой (Session)</div>
+                            <div class="layer-desc">Установяване, управление и прекратяване на сесии</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="server-layer4">
+                        <div class="layer-number">4</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Транспортен слой (Transport)</div>
+                            <div class="layer-desc">TCP, UDP - надежден пренос на данни</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="server-layer3">
+                        <div class="layer-number">3</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Мрежов слой (Network)</div>
+                            <div class="layer-desc">IP, маршрутизиране, адресиране</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="server-layer2">
+                        <div class="layer-number">2</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Канален слой (Data Link)</div>
+                            <div class="layer-desc">Ethernet, MAC адреси, кадри</div>
+                        </div>
+                    </div>
+                    <div class="layer" id="server-layer1">
+                        <div class="layer-number">1</div>
+                        <div class="layer-info">
+                            <div class="layer-name">Физически слой (Physical)</div>
+                            <div class="layer-desc">Сигнали, кабели, електрически импулси</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="visualization-area">
+            <div class="device client glow">
+                <div class="device-icon">💻</div>
+                <div>КЛИЕНТ</div>
+            </div>
+            
+            <div class="network-path"></div>
+            
+            <div class="device server glow">
+                <div class="device-icon">🖥️</div>
+                <div>СЪРВЪР</div>
+            </div>
+            
+            <!-- Стрелки за заявка (клиент -> сървър) -->
+            <div class="arrow arrow-right" id="arrow-request-1" style="top: 120px; left: 250px;"></div>
+            <div class="arrow arrow-right" id="arrow-request-2" style="top: 120px; left: 400px;"></div>
+            <div class="arrow arrow-right" id="arrow-request-3" style="top: 120px; left: 550px;"></div>
+            <div class="arrow arrow-right" id="arrow-request-4" style="top: 120px; left: 700px;"></div>
+            <div class="arrow arrow-right" id="arrow-request-5" style="top: 120px; left: 850px;"></div>
+            
+            <!-- Стрелки за отговор (сървър -> клиент) -->
+            <div class="arrow arrow-left" id="arrow-response-1" style="top: 200px; left: 850px;"></div>
+            <div class="arrow arrow-left" id="arrow-response-2" style="top: 200px; left: 700px;"></div>
+            <div class="arrow arrow-left" id="arrow-response-3" style="top: 200px; left: 550px;"></div>
+            <div class="arrow arrow-left" id="arrow-response-4" style="top: 200px; left: 400px;"></div>
+            <div class="arrow arrow-left" id="arrow-response-5" style="top: 200px; left: 250px;"></div>
+            
+            <!-- Индикатори за поток -->
+            <div class="flow-indicator" id="flow-request" style="top: 120px; left: 200px;">➡️</div>
+            <div class="flow-indicator" id="flow-response" style="top: 200px; left: 900px;">⬅️</div>
+            
+            <div class="packet request-packet" id="request-packet" style="display: none;">
+                <div class="packet-header">Заявка</div>
+                <div class="packet-data">Данни</div>
+            </div>
+            
+            <div class="packet response-packet" id="response-packet" style="display: none;">
+                <div class="packet-header">Отговор</div>
+                <div class="packet-data">Данни</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn" class="primary-btn">🚀 Стартирай симулацията</button>
+            <button id="resetBtn" disabled>🔄 Нулирай</button>
+            <button id="stepBtn" disabled>⏭️ Стъпка по стъпка</button>
+        </div>
+        
+        <div class="log-container">
+            <div class="log-title">Журнал на събитията</div>
+            <div id="eventLog"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startBtn = document.getElementById('startBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const stepBtn = document.getElementById('stepBtn');
+            const requestPacket = document.getElementById('request-packet');
+            const responsePacket = document.getElementById('response-packet');
+            const eventLog = document.getElementById('eventLog');
+            const progressBar = document.getElementById('simulationProgress');
+            
+            const clientLayers = [
+                document.getElementById('client-layer7'),
+                document.getElementById('client-layer6'),
+                document.getElementById('client-layer5'),
+                document.getElementById('client-layer4'),
+                document.getElementById('client-layer3'),
+                document.getElementById('client-layer2'),
+                document.getElementById('client-layer1')
+            ];
+            
+            const serverLayers = [
+                document.getElementById('server-layer7'),
+                document.getElementById('server-layer6'),
+                document.getElementById('server-layer5'),
+                document.getElementById('server-layer4'),
+                document.getElementById('server-layer3'),
+                document.getElementById('server-layer2'),
+                document.getElementById('server-layer1')
+            ];
+            
+            // Стрелки за заявка
+            const requestArrows = [
+                document.getElementById('arrow-request-1'),
+                document.getElementById('arrow-request-2'),
+                document.getElementById('arrow-request-3'),
+                document.getElementById('arrow-request-4'),
+                document.getElementById('arrow-request-5')
+            ];
+            
+            // Стрелки за отговор
+            const responseArrows = [
+                document.getElementById('arrow-response-1'),
+                document.getElementById('arrow-response-2'),
+                document.getElementById('arrow-response-3'),
+                document.getElementById('arrow-response-4'),
+                document.getElementById('arrow-response-5')
+            ];
+            
+            // Индикатори за поток
+            const flowRequest = document.getElementById('flow-request');
+            const flowResponse = document.getElementById('flow-response');
+            
+            let currentStep = 0;
+            let simulationInterval;
+            let isSimulationRunning = false;
+            const totalSteps = 22;
+
+            // Функция за създаване на анимация между слоеве
+            function createLayerAnimation(fromLayer, toLayer, isClientSide, isRequest, content) {
+                const container = isClientSide ? document.getElementById('client-layers') : document.getElementById('server-layers');
+                
+                // Изчисляваме позициите
+                const fromRect = fromLayer.getBoundingClientRect();
+                const toRect = toLayer.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                const fromX = fromRect.left - containerRect.left + fromRect.width / 2;
+                const fromY = fromRect.top - containerRect.top + fromRect.height / 2;
+                const toX = toRect.left - containerRect.left + toRect.width / 2;
+                const toY = toRect.top - containerRect.top + toRect.height / 2;
+                
+                // Създаваме елемента за анимация
+                const animationElement = document.createElement('div');
+                animationElement.className = `packet-movement ${isRequest ? '' : 'response'}`;
+                animationElement.textContent = content;
+                animationElement.style.left = `${fromX - 40}px`;
+                animationElement.style.top = `${fromY - 20}px`;
+                
+                // Определяме типа на анимацията
+                if (Math.abs(fromY - toY) > Math.abs(fromX - toX)) {
+                    // Вертикално движение
+                    animationElement.classList.add('vertical-movement');
+                    animationElement.style.setProperty('--move-distance', `${toY - fromY}px`);
+                } else {
+                    // Хоризонтално движение
+                    animationElement.classList.add('horizontal-movement');
+                    animationElement.style.setProperty('--move-distance', `${toX - fromX}px`);
+                }
+                
+                container.appendChild(animationElement);
+                
+                // Премахваме елемента след като анимацията приключи
+                setTimeout(() => {
+                    container.removeChild(animationElement);
+                }, 2000);
+            }
+
+            // Функция за създаване на анимация за поток от данни
+            function createDataFlowAnimation(startX, startY, endX, endY, isRequest) {
+                const visualizationArea = document.querySelector('.visualization-area');
+                const flowElement = document.createElement('div');
+                flowElement.className = `data-flow-animation ${isRequest ? 'flow-across' : 'flow-across'}`;
+                flowElement.style.left = `${startX}px`;
+                flowElement.style.top = `${startY}px`;
+                flowElement.style.backgroundColor = isRequest ? '#ff7e5f' : '#4CAF50';
+                
+                if (startX !== endX) {
+                    flowElement.style.setProperty('--move-distance', `${endX - startX}px`);
+                }
+                
+                visualizationArea.appendChild(flowElement);
+                
+                setTimeout(() => {
+                    if (flowElement.parentNode) {
+                        visualizationArea.removeChild(flowElement);
+                    }
+                }, 2000);
+            }
+            
+            // Функция за добавяне на запис в журнала
+            function addLogEntry(layer, message, icon = '📡') {
+                const now = new Date();
+                const timeString = `${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
+                
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `<span class="log-time">[${timeString}]</span><span style="font-size: 1.2rem;">${icon}</span><span class="log-layer">${layer}:</span><span class="log-message">${message}</span>`;
+                
+                eventLog.appendChild(logEntry);
+                eventLog.scrollTop = eventLog.scrollHeight;
+            }
+            
+            // Функция за активиране на слой
+            function activateLayer(side, layerIndex) {
+                // Деактивираме всички слоеве
+                clientLayers.forEach(layer => layer.classList.remove('active'));
+                serverLayers.forEach(layer => layer.classList.remove('active'));
+                
+                // Активираме само избрания слой от избраната страна
+                if (side === 'client' && layerIndex >= 0 && layerIndex < clientLayers.length) {
+                    clientLayers[layerIndex].classList.add('active');
+                } else if (side === 'server' && layerIndex >= 0 && layerIndex < serverLayers.length) {
+                    serverLayers[layerIndex].classList.add('active');
+                }
+            }
+            
+            // Функция за показване на стрелки
+            function showArrows(arrows, show) {
+                arrows.forEach(arrow => {
+                    arrow.style.opacity = show ? '1' : '0';
+                });
+            }
+            
+            // Функция за показване на индикатор за поток
+            function showFlowIndicator(flow, show) {
+                flow.style.opacity = show ? '1' : '0';
+            }
+            
+            // Функция за показване на пакета
+            function showPacket(packet, x, y, content) {
+                packet.style.display = 'block';
+                packet.style.left = `${x}px`;
+                packet.style.top = `${y}px`;
+                
+                if (content) {
+                    packet.querySelector('.packet-data').textContent = content;
+                }
+            }
+            
+            // Функция за скриване на пакета
+            function hidePacket(packet) {
+                packet.style.display = 'none';
+            }
+            
+            // Функция за симулиране на стъпка
+            function simulateStep() {
+                if (currentStep >= totalSteps) {
+                    clearInterval(simulationInterval);
+                    isSimulationRunning = false;
+                    startBtn.disabled = false;
+                    stepBtn.disabled = false;
+                    resetBtn.disabled = false;
+                    progressBar.style.width = '100%';
+                    return;
+                }
+                
+                currentStep++;
+                executeStep(currentStep);
+                progressBar.style.width = `${(currentStep / totalSteps) * 100}%`;
+            }
+            
+            // Изпълнение на конкретна стъпка
+            function executeStep(step) {
+                // Позиции за визуализация
+                const clientX = 180;
+                const serverX = 1120;
+                const topY = 120;
+                const bottomY = 200;
+                
+                switch(step) {
+                    case 1:
+                        // Приложен слой - клиент
+                        activateLayer('client', 6);
+                        showPacket(requestPacket, clientX, topY, "HTTP Заявка");
+                        addLogEntry("Клиент - Приложен слой", "Клиентът изпраща HTTP заявка", "🌐");
+                        break;
+                    case 2:
+                        // Движение от слой 7 към слой 6 на клиента
+                        createLayerAnimation(clientLayers[6], clientLayers[5], true, true, "HTTP→Encrypt");
+                        activateLayer('client', 5);
+                        requestPacket.querySelector('.packet-data').textContent = "Криптирани данни";
+                        addLogEntry("Клиент - Представителен слой", "Данните се криптират и компресират", "🔒");
+                        break;
+                    case 3:
+                        // Движение от слой 6 към слой 5 на клиента
+                        createLayerAnimation(clientLayers[5], clientLayers[4], true, true, "Encrypt→Session");
+                        activateLayer('client', 4);
+                        requestPacket.querySelector('.packet-data').textContent = "Сесия ID: 12345";
+                        addLogEntry("Клиент - Сесионен слой", "Установява се сесия със сървъра", "🤝");
+                        break;
+                    case 4:
+                        // Движение от слой 5 към слой 4 на клиента
+                        createLayerAnimation(clientLayers[4], clientLayers[3], true, true, "Session→TCP");
+                        activateLayer('client', 3);
+                        requestPacket.querySelector('.packet-data').textContent = "TCP сегмент";
+                        addLogEntry("Клиент - Транспортен слой", "Данните се разделят на TCP сегменти", "📦");
+                        break;
+                    case 5:
+                        // Движение от слой 4 към слой 3 на клиента
+                        createLayerAnimation(clientLayers[3], clientLayers[2], true, true, "TCP→IP");
+                        activateLayer('client', 2);
+                        requestPacket.querySelector('.packet-data').textContent = "IP пакет";
+                        addLogEntry("Клиент - Мрежов слой", "Добавя се IP заглавка с адреси", "🛣️");
+                        break;
+                    case 6:
+                        // Движение от слой 3 към слой 2 на клиента
+                        createLayerAnimation(clientLayers[2], clientLayers[1], true, true, "IP→Ethernet");
+                        activateLayer('client', 1);
+                        requestPacket.querySelector('.packet-data').textContent = "Ethernet кадър";
+                        addLogEntry("Клиент - Канален слой", "Създава се Ethernet кадър с MAC адреси", "🔗");
+                        break;
+                    case 7:
+                        // Движение от слой 2 към слой 1 на клиента
+                        createLayerAnimation(clientLayers[1], clientLayers[0], true, true, "Ethernet→Bits");
+                        activateLayer('client', 0);
+                        requestPacket.querySelector('.packet-data').textContent = "Битове/Сигнали";
+                        addLogEntry("Клиент - Физически слой", "Данните се преобразуват в сигнали", "⚡");
+                        break;
+                    case 8:
+                        // Пакетът се движи към сървъра
+                        showArrows(requestArrows, true);
+                        showFlowIndicator(flowRequest, true);
+                        requestPacket.style.transition = 'all 2s ease';
+                        showPacket(requestPacket, serverX, topY, "Пакет в мрежата");
+                        
+                        // Създаваме няколко анимации за поток от данни
+                        for (let i = 0; i < 5; i++) {
+                            setTimeout(() => {
+                                createDataFlowAnimation(300, 130, 1000, 130, true);
+                            }, i * 300);
+                        }
+                        
+                        addLogEntry("Мрежа", "Пакетът се предава през мрежата към сървъра", "📶");
+                        break;
+                    case 9:
+                        // Сървърът обработва пакета (физически слой)
+                        showArrows(requestArrows, false);
+                        showFlowIndicator(flowRequest, false);
+                        activateLayer('server', 0);
+                        requestPacket.querySelector('.packet-data').textContent = "Битове/Сигнали";
+                        addLogEntry("Сървър - Физически слой", "Сървърът приема сигналите", "⚡");
+                        break;
+                    case 10:
+                        // Движение от слой 1 към слой 2 на сървъра
+                        createLayerAnimation(serverLayers[0], serverLayers[1], false, true, "Bits→Ethernet");
+                        activateLayer('server', 1);
+                        requestPacket.querySelector('.packet-data').textContent = "Ethernet кадър";
+                        addLogEntry("Сървър - Канален слой", "Сървърът обработва кадъра", "🔗");
+                        break;
+                    case 11:
+                        // Движение от слой 2 към слой 3 на сървъра
+                        createLayerAnimation(serverLayers[1], serverLayers[2], false, true, "Ethernet→IP");
+                        activateLayer('server', 2);
+                        requestPacket.querySelector('.packet-data').textContent = "IP пакет";
+                        addLogEntry("Сървър - Мрежов слой", "Сървърът проверява IP адреса", "🛣️");
+                        break;
+                    case 12:
+                        // Движение от слой 3 към слой 4 на сървъра
+                        createLayerAnimation(serverLayers[2], serverLayers[3], false, true, "IP→TCP");
+                        activateLayer('server', 3);
+                        requestPacket.querySelector('.packet-data').textContent = "TCP сегмент";
+                        addLogEntry("Сървър - Транспортен слой", "Сървърът обработва TCP сегмента", "📦");
+                        break;
+                    case 13:
+                        // Движение от слой 4 към слой 5 на сървъра
+                        createLayerAnimation(serverLayers[3], serverLayers[4], false, true, "TCP→Session");
+                        activateLayer('server', 4);
+                        requestPacket.querySelector('.packet-data').textContent = "Сесия ID: 12345";
+                        addLogEntry("Сървър - Сесионен слой", "Сървърът управлява сесията", "🤝");
+                        break;
+                    case 14:
+                        // Движение от слой 5 към слой 6 на сървъра
+                        createLayerAnimation(serverLayers[4], serverLayers[5], false, true, "Session→Decrypt");
+                        activateLayer('server', 5);
+                        requestPacket.querySelector('.packet-data').textContent = "Декриптирани данни";
+                        addLogEntry("Сървър - Представителен слой", "Сървърът декриптира данните", "🔓");
+                        break;
+                    case 15:
+                        // Движение от слой 6 към слой 7 на сървъра
+                        createLayerAnimation(serverLayers[5], serverLayers[6], false, true, "Decrypt→HTTP");
+                        activateLayer('server', 6);
+                        requestPacket.querySelector('.packet-data').textContent = "HTTP Заявка";
+                        addLogEntry("Сървър - Приложен слой", "Сървърът обработва HTTP заявката", "🌐");
+                        break;
+                    case 16:
+                        // Сървърът генерира отговор
+                        hidePacket(requestPacket);
+                        showPacket(responsePacket, serverX, bottomY, "HTTP Отговор");
+                        addLogEntry("Сървър - Приложен слой", "Сървърът генерира HTTP отговор", "🌐");
+                        break;
+                    case 17:
+                        // Движение от слой 7 към слой 6 на сървъра (отговор)
+                        createLayerAnimation(serverLayers[6], serverLayers[5], false, false, "HTTP→Encrypt");
+                        activateLayer('server', 5);
+                        responsePacket.querySelector('.packet-data').textContent = "Криптирани данни";
+                        addLogEntry("Сървър - Представителен слой", "Отговорът се криптира", "🔒");
+                        break;
+                    case 18:
+                        // Движение от слой 6 към слой 4 на сървъра (отговор) - пропускаме сесионния слой
+                        createLayerAnimation(serverLayers[5], serverLayers[3], false, false, "Encrypt→TCP");
+                        activateLayer('server', 3);
+                        responsePacket.querySelector('.packet-data').textContent = "TCP сегмент";
+                        addLogEntry("Сървър - Транспортен слой", "Отговорът се разделя на TCP сегменти", "📦");
+                        break;
+                    case 19:
+                        // Движение от слой 4 към слой 3 на сървъра (отговор)
+                        createLayerAnimation(serverLayers[3], serverLayers[2], false, false, "TCP→IP");
+                        activateLayer('server', 2);
+                        responsePacket.querySelector('.packet-data').textContent = "IP пакет";
+                        addLogEntry("Сървър - Мрежов слой", "Добавя се IP заглавка", "🛣️");
+                        break;
+                    case 20:
+                        // Отговорът се изпраща обратно към клиента
+                        showArrows(responseArrows, true);
+                        showFlowIndicator(flowResponse, true);
+                        responsePacket.style.transition = 'all 2s ease';
+                        showPacket(responsePacket, clientX, bottomY, "Отговор в мрежата");
+                        
+                        // Създаваме няколко анимации за поток от данни (обратно)
+                        for (let i = 0; i < 5; i++) {
+                            setTimeout(() => {
+                                createDataFlowAnimation(1000, 210, 300, 210, false);
+                            }, i * 300);
+                        }
+                        
+                        addLogEntry("Мрежа", "Отговорът се предава през мрежата към клиента", "📶");
+                        break;
+                    case 21:
+                        // Клиентът получава отговора
+                        showArrows(responseArrows, false);
+                        showFlowIndicator(flowResponse, false);
+                        activateLayer('client', 0);
+                        responsePacket.querySelector('.packet-data').textContent = "Битове/Сигнали";
+                        addLogEntry("Клиент - Физически слой", "Клиентът приема сигналите", "⚡");
+                        break;
+                    case 22:
+                        // Движение през всички слоеве на клиента (отговор)
+                        for (let i = 0; i < clientLayers.length - 1; i++) {
+                            setTimeout(() => {
+                                createLayerAnimation(clientLayers[i], clientLayers[i+1], true, false, `Layer ${i+1}→${i+2}`);
+                                activateLayer('client', i+1);
+                            }, i * 400);
+                        }
+                        
+                        setTimeout(() => {
+                            activateLayer('client', 6);
+                            responsePacket.querySelector('.packet-data').textContent = "HTTP Отговор";
+                            addLogEntry("Клиент - Приложен слой", "Клиентът получава HTTP отговора", "✅");
+                            addLogEntry("Симулация", "Комуникацията е завършена успешно!", "🎉");
+                        }, 2400);
+                        break;
+                }
+            }
+            
+            // Стартиране на симулацията
+            startBtn.addEventListener('click', function() {
+                if (isSimulationRunning) return;
+                
+                isSimulationRunning = true;
+                startBtn.disabled = true;
+                stepBtn.disabled = true;
+                resetBtn.disabled = true;
+                
+                currentStep = 0;
+                eventLog.innerHTML = '';
+                progressBar.style.width = '0%';
+                addLogEntry("Симулация", "Започва симулация на OSI модела...", "🚀");
+                
+                simulationInterval = setInterval(simulateStep, 2500);
+            });
+            
+            // Нулиране на симулацията
+            resetBtn.addEventListener('click', function() {
+                clearInterval(simulationInterval);
+                isSimulationRunning = false;
+                currentStep = 0;
+                
+                startBtn.disabled = false;
+                stepBtn.disabled = false;
+                resetBtn.disabled = true;
+                
+                hidePacket(requestPacket);
+                hidePacket(responsePacket);
+                clientLayers.forEach(layer => layer.classList.remove('active'));
+                serverLayers.forEach(layer => layer.classList.remove('active'));
+                showArrows(requestArrows, false);
+                showArrows(responseArrows, false);
+                showFlowIndicator(flowRequest, false);
+                showFlowIndicator(flowResponse, false);
+                eventLog.innerHTML = '';
+                progressBar.style.width = '0%';
+                addLogEntry("Симулация", "Симулацията е нулирана", "🔄");
+            });
+            
+            // Стъпка по стъпка
+            stepBtn.addEventListener('click', function() {
+                if (isSimulationRunning) return;
+                
+                if (currentStep >= totalSteps) {
+                    addLogEntry("Симулация", "Симулацията е завършена. Нулирайте за ново изпълнение.", "✅");
+                    return;
+                }
+                
+                currentStep++;
+                executeStep(currentStep);
+                progressBar.style.width = `${(currentStep / totalSteps) * 100}%`;
+                
+                if (currentStep >= totalSteps) {
+                    stepBtn.disabled = true;
+                    resetBtn.disabled = false;
+                }
+            });
+            
+            // Инициализация
+            addLogEntry("Симулация", "Системата е готова. Натиснете 'Стартирай симулацията'.", "👆");
+        });
+    </script>
+</body>
+</html>

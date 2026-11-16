@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Учителски Анализатор на Тестове</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; color: black !important; }
+            .shadow-lg, .shadow-md, .shadow-sm, .shadow, .shadow-xl { box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-indigo-700 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 p-2.5 rounded-2xl border border-white/20">
+                    <i class="fa-solid fa-chart-pie text-2xl text-amber-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight">СмартТест Анализатор</h1>
+                    <p class="text-xs text-indigo-200">Проверка, оценки и А/Б/В/Г процентен анализ</p>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="loadDemoData()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition border border-indigo-400/30 flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Примерни данни
+                </button>
+                <button onclick="exportCSV()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-file-csv"></i> Експорт Excel
+                </button>
+                <button onclick="window.print()" class="px-3.5 py-2 bg-indigo-800 hover:bg-indigo-900 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-print"></i> Принтирай
+                </button>
+                <button onclick="clearAllData()" class="px-3.5 py-2 bg-rose-600/90 hover:bg-rose-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-trash-can"></i> Изчисти
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+        
+        <!-- Navigation Tabs -->
+        <div class="mb-6 border-b border-slate-200 no-print">
+            <nav class="flex space-x-2 sm:space-x-6 overflow-x-auto pb-1">
+                <button id="tab-btn-key" onclick="switchTab('key')" class="tab-btn border-indigo-600 text-indigo-600 border-b-2 py-3 px-3 text-sm font-bold flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-key"></i>
+                    <span>1. Ключ с верни отговори</span>
+                    <span id="key-badge" class="bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                <button id="tab-btn-student" onclick="switchTab('student')" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 border-b-2 py-3 px-3 text-sm font-medium flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <span>2. Въвеждане на ученик</span>
+                    <span id="students-badge" class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                <button id="tab-btn-analytics" onclick="switchTab('analytics')" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 border-b-2 py-3 px-3 text-sm font-medium flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-chart-column"></i>
+                    <span>3. Оценки и Общ Анализ</span>
+                </button>
+                <button id="tab-btn-options-analysis" onclick="switchTab('options-analysis')" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 border-b-2 py-3 px-3 text-sm font-medium flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>4. Процентен А/Б/В/Г Анализ</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- MODULE 1: Key Generator & Quick Setup -->
+        <div id="tab-key" class="tab-content block space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-indigo-600"></i>
+                    Бърз генератор на тест
+                </h2>
+                <div class="flex flex-wrap items-end gap-4 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+                    <div class="w-full sm:w-auto">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Брой въпроси в теста</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="quick-q-count" min="1" max="100" value="10" class="w-28 bg-white border border-slate-300 rounded-xl p-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <!-- Quick Buttons -->
+                            <div class="flex gap-1">
+                                <button type="button" onclick="setQuickCount(5)" class="px-2.5 py-2 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600">5</button>
+                                <button type="button" onclick="setQuickCount(10)" class="px-2.5 py-2 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600">10</button>
+                                <button type="button" onclick="setQuickCount(15)" class="px-2.5 py-2 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600">15</button>
+                                <button type="button" onclick="setQuickCount(20)" class="px-2.5 py-2 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600">20</button>
+                                <button type="button" onclick="setQuickCount(25)" class="px-2.5 py-2 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600">25</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full sm:w-auto">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Точки за въпрос</label>
+                        <input type="number" id="quick-default-pts" min="0.5" step="0.5" value="1" class="w-full sm:w-32 bg-white border border-slate-300 rounded-xl p-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <button onclick="generateTestStructure()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-5 rounded-xl shadow transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-gears"></i> Генерирай структура
+                    </button>
+                </div>
+            </div>
+
+            <!-- Key Editor -->
+            <div id="key-editor-card" class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i>
+                        Посочване на верните отговори
+                    </h2>
+                    <div class="text-sm font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200" id="total-test-points">
+                        Максимум точки: 0
+                    </div>
+                </div>
+
+                <div id="key-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div class="col-span-full text-center py-8 text-slate-400">
+                        <i class="fa-solid fa-arrow-up text-3xl mb-2"></i>
+                        <p>Въведете брой въпроси по-горе и натиснете "Генерирай структура".</p>
+                    </div>
+                </div>
+
+                <div id="key-save-bar" class="hidden flex justify-end pt-4 border-t border-slate-100">
+                    <button onclick="saveTestKey()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Запази ключа на теста
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE 2: Student Input Panel -->
+        <div id="tab-student" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Input Panel -->
+                <div class="lg:col-span-8 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-5">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-user-check text-indigo-600"></i>
+                            <span id="student-form-heading">Бърза проверка с 1 клик</span>
+                        </h2>
+                        <button onclick="resetStudentForm()" class="text-xs font-semibold text-indigo-600 hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-rotate-left"></i> Нова форма
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Име на ученика / Номер</label>
+                            <input type="text" id="student-name-input" placeholder="напр. Иван Иванов №12" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Клас (незадължително)</label>
+                            <input type="text" id="student-class-input" placeholder="напр. 7А клас" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Quick Answer Buttons Grid -->
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="block text-xs font-bold uppercase text-slate-500">Отговори на ученика</label>
+                            <span class="text-xs text-slate-400"><i class="fa-solid fa-circle-info mr-1 text-indigo-500"></i> Зелено = Верен | Червено = Грешен</span>
+                        </div>
+
+                        <div id="student-quick-buttons-container" class="space-y-3 max-h-[480px] overflow-y-auto pr-2 border border-slate-100 p-3 bg-slate-50/50 rounded-2xl">
+                            <!-- Dynamically loaded -->
+                        </div>
+                    </div>
+
+                    <button onclick="evaluateAndSaveStudent()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>Провери, оцени и запази резултата</span>
+                    </button>
+                </div>
+
+                <!-- Live Evaluation & Personal Option Breakdown -->
+                <div class="lg:col-span-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-md font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-square-poll-vertical text-indigo-600"></i>
+                            Текущ резултат
+                        </h3>
+
+                        <div id="live-eval-preview" class="py-8 text-center text-slate-400 space-y-2">
+                            <i class="fa-solid fa-clipboard-check text-4xl text-slate-300"></i>
+                            <p class="text-sm">Изберете отговори, за да видите моментен анализ.</p>
+                        </div>
+
+                        <div id="live-eval-stats" class="hidden space-y-4 pt-2">
+                            <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-100 space-y-2">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-600">Общо точки:</span>
+                                    <span id="preview-points" class="font-bold text-slate-900">0 / 0</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-600">Успеваемост:</span>
+                                    <span id="preview-percent" class="font-bold text-indigo-600">0%</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm border-t border-indigo-100 pt-2">
+                                    <span class="text-slate-800 font-bold">Оценка:</span>
+                                    <span id="preview-grade" class="text-lg font-extrabold text-emerald-600">2.00</span>
+                                </div>
+                            </div>
+
+                            <!-- Individual Option Percentages -->
+                            <div class="space-y-2">
+                                <span class="text-xs font-bold uppercase text-slate-400 block">Разпределение на отговорите на ученика:</span>
+                                <div class="grid grid-cols-2 gap-2 text-xs font-bold text-center">
+                                    <div class="p-2 bg-amber-50 border border-amber-200 rounded-xl text-amber-800">
+                                        А: <span id="indiv-count-A">0% (0)</span>
+                                    </div>
+                                    <div class="p-2 bg-blue-50 border border-blue-200 rounded-xl text-blue-800">
+                                        Б: <span id="indiv-count-B">0% (0)</span>
+                                    </div>
+                                    <div class="p-2 bg-purple-50 border border-purple-200 rounded-xl text-purple-800">
+                                        В: <span id="indiv-count-V">0% (0)</span>
+                                    </div>
+                                    <div class="p-2 bg-rose-50 border border-rose-200 rounded-xl text-rose-800">
+                                        Г: <span id="indiv-count-G">0% (0)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE 3: Overall Class Analytics -->
+        <div id="tab-analytics" class="tab-content hidden space-y-6">
+            <!-- Key Performance Metrics -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <div class="text-xs font-bold text-slate-400 uppercase">Брой ученици</div>
+                    <div id="analytics-total-count" class="text-3xl font-extrabold text-slate-800 mt-1">0</div>
+                    <div class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-user-group text-indigo-500"></i> Проверени писмени работи</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <div class="text-xs font-bold text-slate-400 uppercase">Среден успех</div>
+                    <div id="analytics-avg-grade" class="text-3xl font-extrabold text-indigo-600 mt-1">0.00</div>
+                    <div class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-star text-amber-400"></i> По 6-балната система</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <div class="text-xs font-bold text-slate-400 uppercase">Средна успеваемост</div>
+                    <div id="analytics-avg-percent" class="text-3xl font-extrabold text-emerald-600 mt-1">0%</div>
+                    <div class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-percent text-emerald-500"></i> Верни отговори</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <div class="text-xs font-bold text-slate-400 uppercase">Най-висок резултат</div>
+                    <div id="analytics-max-score" class="text-3xl font-extrabold text-amber-500 mt-1">0 / 0</div>
+                    <div class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-trophy text-amber-400"></i> Максимални точки</div>
+                </div>
+            </div>
+
+            <!-- Difficult & Easy Questions Insights -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-red-100 text-red-600 rounded-2xl text-xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div>
+                        <div class="text-xs font-bold text-slate-400 uppercase">Най-труден въпрос за класа</div>
+                        <div id="stat-hardest-q" class="text-base font-bold text-slate-800 mt-0.5">Няма данни</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-emerald-100 text-emerald-600 rounded-2xl text-xl"><i class="fa-solid fa-circle-check"></i></div>
+                    <div>
+                        <div class="text-xs font-bold text-slate-400 uppercase">Най-лесен въпрос за класа</div>
+                        <div id="stat-easiest-q" class="text-base font-bold text-slate-800 mt-0.5">Няма данни</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-bar text-indigo-600"></i> Разпределение на оценките
+                    </h3>
+                    <div class="h-64 relative">
+                        <canvas id="gradeDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-indigo-600"></i> Успеваемост по всеки въпрос (%)
+                    </h3>
+                    <div class="h-64 relative">
+                        <canvas id="questionAccuracyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Class Table -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3">
+                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-indigo-600"></i> Списък с резултатите на учениците
+                    </h3>
+                    <div class="w-full sm:w-auto flex items-center gap-2">
+                        <input type="text" id="search-student-input" onkeyup="filterStudentsTable()" placeholder="Търсене на ученик..." class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-xs uppercase border-b border-slate-200">
+                                <th class="p-3">#</th>
+                                <th class="p-3">Име / Ученик</th>
+                                <th class="p-3">Клас</th>
+                                <th class="p-3">Точки</th>
+                                <th class="p-3">Успеваемост</th>
+                                <th class="p-3">Оценка</th>
+                                <th class="p-3">А/Б/В/Г (Индивидуално)</th>
+                                <th class="p-3 text-right no-print">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analytics-table-body" class="divide-y divide-slate-100">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE 4: STATISTICAL OPTIONS ANALYSIS (А, Б, В, Г) -->
+        <div id="tab-options-analysis" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-indigo-600"></i>
+                            Анализ на използваните опции (А, Б, В, Г)
+                        </h2>
+                        <p class="text-xs text-slate-500">Процентно и бройно разпределение на посочените отговори от целия клас</p>
+                    </div>
+                </div>
+
+                <!-- Overall Class Option Percent Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-amber-50/80 border border-amber-200 p-4 rounded-2xl">
+                        <div class="flex justify-between items-center text-amber-900 font-extrabold text-sm">
+                            <span>Опция А</span>
+                            <span class="bg-amber-200/70 text-amber-900 text-xs px-2 py-0.5 rounded-full" id="opt-badge-A">0 бр.</span>
+                        </div>
+                        <div class="text-3xl font-extrabold text-amber-700 mt-2" id="opt-percent-A">0%</div>
+                        <div class="w-full bg-amber-200 rounded-full h-2 mt-2">
+                            <div id="opt-bar-A" class="bg-amber-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50/80 border border-blue-200 p-4 rounded-2xl">
+                        <div class="flex justify-between items-center text-blue-900 font-extrabold text-sm">
+                            <span>Опция Б</span>
+                            <span class="bg-blue-200/70 text-blue-900 text-xs px-2 py-0.5 rounded-full" id="opt-badge-B">0 бр.</span>
+                        </div>
+                        <div class="text-3xl font-extrabold text-blue-700 mt-2" id="opt-percent-B">0%</div>
+                        <div class="w-full bg-blue-200 rounded-full h-2 mt-2">
+                            <div id="opt-bar-B" class="bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-50/80 border border-purple-200 p-4 rounded-2xl">
+                        <div class="flex justify-between items-center text-purple-900 font-extrabold text-sm">
+                            <span>Опция В</span>
+                            <span class="bg-purple-200/70 text-purple-900 text-xs px-2 py-0.5 rounded-full" id="opt-badge-V">0 бр.</span>
+                        </div>
+                        <div class="text-3xl font-extrabold text-purple-700 mt-2" id="opt-percent-V">0%</div>
+                        <div class="w-full bg-purple-200 rounded-full h-2 mt-2">
+                            <div id="opt-bar-V" class="bg-purple-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-rose-50/80 border border-rose-200 p-4 rounded-2xl">
+                        <div class="flex justify-between items-center text-rose-900 font-extrabold text-sm">
+                            <span>Опция Г</span>
+                            <span class="bg-rose-200/70 text-rose-900 text-xs px-2 py-0.5 rounded-full" id="opt-badge-G">0 бр.</span>
+                        </div>
+                        <div class="text-3xl font-extrabold text-rose-700 mt-2" id="opt-percent-G">0%</div>
+                        <div class="w-full bg-rose-200 rounded-full h-2 mt-2">
+                            <div id="opt-bar-G" class="bg-rose-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Donut Chart & Detailed Question Breakdown -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Chart Panel -->
+                    <div class="lg:col-span-5 bg-slate-50 p-5 rounded-2xl border border-slate-200/80 flex flex-col justify-between">
+                        <h3 class="text-sm font-bold text-slate-800 mb-2">Общо съотношение за цялата паралелка</h3>
+                        <div class="h-64 relative flex items-center justify-center">
+                            <canvas id="optionsPieChart"></canvas>
+                        </div>
+                        <p class="text-xs text-slate-400 text-center mt-2">Показва процентното участие на всяка буква от всички попълнени отговори.</p>
+                    </div>
+
+                    <!-- Breakdown per Question -->
+                    <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200/80 space-y-4">
+                        <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">
+                            <i class="fa-solid fa-list-ol text-indigo-600 mr-1"></i>
+                            Избор на отговор по ВСЕКИ ОТДЕЛЕН въпрос
+                        </h3>
+
+                        <div id="per-question-options-container" class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Student Detail Modal -->
+    <div id="student-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div>
+                    <h3 id="modal-student-name" class="text-lg font-bold text-slate-800">Анатомичен преглед</h3>
+                    <p id="modal-student-subtitle" class="text-xs text-slate-500"></p>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-2 rounded-xl">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div id="modal-body-content" class="p-6 overflow-y-auto space-y-3 flex-grow">
+                <!-- Dynamic Breakdown -->
+            </div>
+
+            <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-xl">
+                    Затвори
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Box -->
+    <div id="toast-box" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 no-print"></div>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let testKey = [];
+        let students = [];
+        let currentEditingStudentId = null;
+        let currentStudentAnswers = {};
+
+        // Chart instances
+        let gradeChartInstance = null;
+        let accuracyChartInstance = null;
+        let optionsPieChartInstance = null;
+
+        // Init App
+        window.onload = function() {
+            loadFromStorage();
+            if (testKey.length === 0) {
+                document.getElementById('quick-q-count').value = 10;
+                generateTestStructure();
+            } else {
+                renderKeyGrid();
+            }
+            renderStudentQuickButtons();
+            renderStudentsTable();
+            updateBadges();
+        };
+
+        function setQuickCount(n) {
+            document.getElementById('quick-q-count').value = n;
+            generateTestStructure();
+        }
+
+        // Tab Navigation Switcher
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-indigo-600', 'text-indigo-600', 'font-bold');
+                el.classList.add('border-transparent', 'text-slate-500');
+            });
+
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tab}`);
+            activeBtn.classList.add('border-indigo-600', 'text-indigo-600', 'font-bold');
+            activeBtn.classList.remove('border-transparent', 'text-slate-500');
+
+            if (tab === 'analytics') {
+                renderAnalyticsView();
+            } else if (tab === 'options-analysis') {
+                renderOptionsAnalysisView();
+            }
+        }
+
+        // --- MODULE 1: KEY GENERATOR LOGIC ---
+        function generateTestStructure() {
+            const count = parseInt(document.getElementById('quick-q-count').value) || 10;
+            const defaultPts = parseFloat(document.getElementById('quick-default-pts').value) || 1;
+
+            testKey = [];
+            for (let i = 1; i <= count; i++) {
+                testKey.push({
+                    number: i,
+                    correctAnswer: 'А', // default option
+                    points: defaultPts
+                });
+            }
+
+            renderKeyGrid();
+            saveToStorage();
+            showToast(`Създаден е ключ с ${count} въпроса!`, 'success');
+        }
+
+        function renderKeyGrid() {
+            const container = document.getElementById('key-grid-container');
+            const totalPtsEl = document.getElementById('total-test-points');
+            const saveBar = document.getElementById('key-save-bar');
+
+            if (testKey.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8 text-slate-400">
+                        <i class="fa-solid fa-arrow-up text-3xl mb-2"></i>
+                        <p>Задайте брой въпроси по-горе и натиснете "Генерирай структура".</p>
+                    </div>
+                `;
+                totalPtsEl.innerText = 'Максимум точки: 0';
+                saveBar.classList.add('hidden');
+                return;
+            }
+
+            let maxPts = 0;
+            container.innerHTML = testKey.map((q, idx) => {
+                maxPts += q.points;
+                return `
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-800 text-sm">Въпрос №${q.number}</span>
+                            <div class="flex items-center gap-1">
+                                <label class="text-[11px] text-slate-400">Точки:</label>
+                                <input type="number" min="0.5" step="0.5" value="${q.points}" onchange="updateKeyPoint(${idx}, this.value)" class="w-14 bg-white border border-slate-300 rounded-md text-xs p-1 font-semibold text-center">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1">
+                            <label class="text-xs text-slate-500 font-semibold mr-1">Верен:</label>
+                            ${['А', 'Б', 'В', 'Г'].map(opt => `
+                                <button type="button" onclick="setKeyAnswer(${idx}, '${opt}')" class="flex-1 py-1.5 rounded-lg text-xs font-bold transition ${q.correctAnswer === opt ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'}">
+                                    ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            totalPtsEl.innerText = `Максимум точки: ${maxPts}`;
+            saveBar.classList.remove('hidden');
+            renderStudentQuickButtons();
+            updateBadges();
+        }
+
+        function setKeyAnswer(index, value) {
+            testKey[index].correctAnswer = value;
+            renderKeyGrid();
+        }
+
+        function updateKeyPoint(index, val) {
+            testKey[index].points = parseFloat(val) || 1;
+            renderKeyGrid();
+        }
+
+        function saveTestKey() {
+            saveToStorage();
+            showToast('Ключът на теста е запазен успешно!', 'success');
+        }
+
+        // --- MODULE 2: STUDENT INPUT LOGIC ---
+        function renderStudentQuickButtons() {
+            const container = document.getElementById('student-quick-buttons-container');
+
+            if (testKey.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400">
+                        <p class="text-sm">Първо създайте ключ за теста в Таб 1.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = testKey.map((q) => `
+                <div class="p-3 bg-white border border-slate-200/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center rounded-lg">
+                            №${q.number}
+                        </span>
+                        <span class="text-xs text-slate-500 font-medium">
+                            (Верен: <strong class="text-indigo-600">${q.correctAnswer}</strong> | ${q.points} т.)
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-1.5">
+                        ${['А', 'Б', 'В', 'Г'].map(opt => `
+                            <button type="button" data-q="${q.number}" data-val="${opt}" onclick="selectStudentAnswer(${q.number}, '${opt}')" class="sq-btn-${q.number} px-3.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectStudentAnswer(qNum, value) {
+            currentStudentAnswers[qNum] = value;
+            const qObj = testKey.find(k => k.number === qNum);
+            const isCorrect = qObj && qObj.correctAnswer === value;
+
+            // Highlight active button with color coding
+            document.querySelectorAll(`.sq-btn-${qNum}`).forEach(btn => {
+                if (btn.getAttribute('data-val') === value) {
+                    if (isCorrect) {
+                        btn.className = `sq-btn-${qNum} px-3.5 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-sm border border-emerald-600 transition`;
+                    } else {
+                        btn.className = `sq-btn-${qNum} px-3.5 py-1.5 text-xs font-bold rounded-lg bg-rose-600 text-white shadow-sm border border-rose-600 transition`;
+                    }
+                } else {
+                    btn.className = `sq-btn-${qNum} px-3.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition`;
+                }
+            });
+
+            updateLiveEvaluation();
+        }
+
+        function updateLiveEvaluation() {
+            let totalEarned = 0;
+            let totalPossible = 0;
+
+            let countA = 0, countB = 0, countV = 0, countG = 0;
+            let totalAnswered = 0;
+
+            testKey.forEach(q => {
+                totalPossible += q.points;
+                const studentAns = currentStudentAnswers[q.number];
+                if (studentAns) {
+                    totalAnswered++;
+                    if (studentAns === 'А') countA++;
+                    if (studentAns === 'Б') countB++;
+                    if (studentAns === 'В') countV++;
+                    if (studentAns === 'Г') countG++;
+
+                    if (studentAns === q.correctAnswer) {
+                        totalEarned += q.points;
+                    }
+                }
+            });
+
+            const percent = totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0;
+            const grade = calculateBgGrade(percent);
+
+            document.getElementById('live-eval-preview').classList.add('hidden');
+            const stats = document.getElementById('live-eval-stats');
+            stats.classList.remove('hidden');
+
+            document.getElementById('preview-points').innerText = `${totalEarned} / ${totalPossible}`;
+            document.getElementById('preview-percent').innerText = `${percent}%`;
+            document.getElementById('preview-grade').innerText = grade.toFixed(2);
+
+            // Calculate option breakdown for this student
+            const pctA = totalAnswered > 0 ? Math.round((countA / totalAnswered) * 100) : 0;
+            const pctB = totalAnswered > 0 ? Math.round((countB / totalAnswered) * 100) : 0;
+            const pctV = totalAnswered > 0 ? Math.round((countV / totalAnswered) * 100) : 0;
+            const pctG = totalAnswered > 0 ? Math.round((countG / totalAnswered) * 100) : 0;
+
+            document.getElementById('indiv-count-A').innerText = `${pctA}% (${countA})`;
+            document.getElementById('indiv-count-B').innerText = `${pctB}% (${countB})`;
+            document.getElementById('indiv-count-V').innerText = `${pctV}% (${countV})`;
+            document.getElementById('indiv-count-G').innerText = `${pctG}% (${countG})`;
+        }
+
+        function evaluateAndSaveStudent() {
+            const nameInput = document.getElementById('student-name-input');
+            const classInput = document.getElementById('student-class-input');
+            const name = nameInput.value.trim();
+            const className = classInput.value.trim();
+
+            if (!name) {
+                showToast('Моля, въведете име на ученика!', 'error');
+                return;
+            }
+
+            if (testKey.length === 0) {
+                showToast('Тестът няма добавени въпроси!', 'error');
+                return;
+            }
+
+            let earnedPoints = 0;
+            let maxPoints = 0;
+
+            testKey.forEach(q => {
+                maxPoints += q.points;
+                const ans = currentStudentAnswers[q.number] || '';
+                if (ans === q.correctAnswer) {
+                    earnedPoints += q.points;
+                }
+            });
+
+            const percentage = maxPoints > 0 ? Math.round((earnedPoints / maxPoints) * 100) : 0;
+            const grade = calculateBgGrade(percentage);
+
+            const studentData = {
+                id: currentEditingStudentId || Date.now(),
+                name: name,
+                studentClass: className || '-',
+                answers: { ...currentStudentAnswers },
+                score: earnedPoints,
+                maxScore: maxPoints,
+                percentage: percentage,
+                grade: grade
+            };
+
+            if (currentEditingStudentId) {
+                students = students.map(s => s.id === currentEditingStudentId ? studentData : s);
+                showToast('Записът на ученика е обновен!', 'success');
+            } else {
+                students.push(studentData);
+                showToast('Ученикът е добавен успешно!', 'success');
+            }
+
+            saveToStorage();
+            resetStudentForm();
+            renderStudentsTable();
+            updateBadges();
+        }
+
+        // Bulgarian standard grading scale
+        function calculateBgGrade(percent) {
+            if (percent >= 90) return 6.00;
+            if (percent >= 75) return 5.00 + ((percent - 75) / 15);
+            if (percent >= 55) return 4.00 + ((percent - 55) / 20);
+            if (percent >= 35) return 3.00 + ((percent - 35) / 20);
+            return 2.00;
+        }
+
+        function resetStudentForm() {
+            currentEditingStudentId = null;
+            document.getElementById('student-name-input').value = '';
+            document.getElementById('student-class-input').value = '';
+            document.getElementById('student-form-heading').innerText = 'Бърза проверка с 1 клик';
+            
+            for (let k in currentStudentAnswers) delete currentStudentAnswers[k];
+
+            document.getElementById('live-eval-preview').classList.remove('hidden');
+            document.getElementById('live-eval-stats').classList.add('hidden');
+
+            renderStudentQuickButtons();
+        }
+
+        function editStudent(id) {
+            const student = students.find(s => s.id === id);
+            if (!student) return;
+
+            currentEditingStudentId = student.id;
+            switchTab('student');
+
+            document.getElementById('student-name-input').value = student.name;
+            document.getElementById('student-class-input').value = student.studentClass !== '-' ? student.studentClass : '';
+            document.getElementById('student-form-heading').innerText = `Редакция: ${student.name}`;
+
+            for (let qNum in student.answers) {
+                selectStudentAnswer(parseInt(qNum), student.answers[qNum]);
+            }
+        }
+
+        function deleteStudent(id) {
+            students = students.filter(s => s.id !== id);
+            saveToStorage();
+            renderStudentsTable();
+            updateBadges();
+            showToast('Ученикът е изтрит', 'info');
+        }
+
+        // --- MODULE 3: OVERALL ANALYTICS & CHARTS ---
+        function renderAnalyticsView() {
+            const total = students.length;
+            document.getElementById('analytics-total-count').innerText = total;
+
+            if (total === 0) {
+                document.getElementById('analytics-avg-grade').innerText = '0.00';
+                document.getElementById('analytics-avg-percent').innerText = '0%';
+                document.getElementById('analytics-max-score').innerText = '0 / 0';
+                document.getElementById('stat-hardest-q').innerText = 'Няма данни';
+                document.getElementById('stat-easiest-q').innerText = 'Няма данни';
+                renderStudentsTable();
+                return;
+            }
+
+            const avgGrade = (students.reduce((a, b) => a + b.grade, 0) / total).toFixed(2);
+            const avgPercent = Math.round(students.reduce((a, b) => a + b.percentage, 0) / total);
+            const maxStudent = students.reduce((max, s) => s.score > max.score ? s : max, students[0]);
+
+            document.getElementById('analytics-avg-grade').innerText = avgGrade;
+            document.getElementById('analytics-avg-percent').innerText = `${avgPercent}%`;
+            document.getElementById('analytics-max-score').innerText = `${maxStudent.score} / ${maxStudent.maxScore}`;
+
+            let questionAccuracy = testKey.map(q => {
+                let correctCount = 0;
+                students.forEach(s => {
+                    if (s.answers[q.number] === q.correctAnswer) correctCount++;
+                });
+                return {
+                    number: q.number,
+                    accuracy: total > 0 ? Math.round((correctCount / total) * 100) : 0
+                };
+            });
+
+            if (questionAccuracy.length > 0) {
+                questionAccuracy.sort((a, b) => a.accuracy - b.accuracy);
+                const hardest = questionAccuracy[0];
+                const easiest = questionAccuracy[questionAccuracy.length - 1];
+
+                document.getElementById('stat-hardest-q').innerText = `Въпрос №${hardest.number} (${hardest.accuracy}% верни)`;
+                document.getElementById('stat-easiest-q').innerText = `Въпрос №${easiest.number} (${easiest.accuracy}% верни)`;
+            }
+
+            renderGradeChart();
+            renderAccuracyChart();
+            renderStudentsTable();
+        }
+
+        function renderGradeChart() {
+            const ctx = document.getElementById('gradeDistributionChart').getContext('2d');
+            const counts = { 'Отличен 6': 0, 'Мн. Добър 5': 0, 'Добър 4': 0, 'Среден 3': 0, 'Слаб 2': 0 };
+
+            students.forEach(s => {
+                if (s.grade >= 5.50) counts['Отличен 6']++;
+                else if (s.grade >= 4.50) counts['Мн. Добър 5']++;
+                else if (s.grade >= 3.50) counts['Добър 4']++;
+                else if (s.grade >= 2.50) counts['Среден 3']++;
+                else counts['Слаб 2']++;
+            });
+
+            if (gradeChartInstance) gradeChartInstance.destroy();
+
+            gradeChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(counts),
+                    datasets: [{
+                        data: Object.values(counts),
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+        }
+
+        function renderAccuracyChart() {
+            const ctx = document.getElementById('questionAccuracyChart').getContext('2d');
+
+            const labels = testKey.map(q => `№${q.number}`);
+            const data = testKey.map(q => {
+                let correct = 0;
+                students.forEach(s => {
+                    if (s.answers[q.number] === q.correctAnswer) correct++;
+                });
+                return students.length > 0 ? Math.round((correct / students.length) * 100) : 0;
+            });
+
+            if (accuracyChartInstance) accuracyChartInstance.destroy();
+
+            accuracyChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '% успеваемост',
+                        data: data,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#4f46e5'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 100 } }
+                }
+            });
+        }
+
+        function renderStudentsTable() {
+            const tbody = document.getElementById('analytics-table-body');
+
+            if (students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400">Няма въведени ученици</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = students.map((s, idx) => {
+                // Calculate individual option percentages
+                let cA = 0, cB = 0, cV = 0, cG = 0, totalAns = 0;
+                for (let q in s.answers) {
+                    totalAns++;
+                    if (s.answers[q] === 'А') cA++;
+                    if (s.answers[q] === 'Б') cB++;
+                    if (s.answers[q] === 'В') cV++;
+                    if (s.answers[q] === 'Г') cG++;
+                }
+
+                const pA = totalAns > 0 ? Math.round((cA / totalAns) * 100) : 0;
+                const pB = totalAns > 0 ? Math.round((cB / totalAns) * 100) : 0;
+                const pV = totalAns > 0 ? Math.round((cV / totalAns) * 100) : 0;
+                const pG = totalAns > 0 ? Math.round((cG / totalAns) * 100) : 0;
+
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 text-slate-400 font-bold">${idx + 1}</td>
+                        <td class="p-3 font-bold text-slate-800">${escapeHtml(s.name)}</td>
+                        <td class="p-3 font-semibold text-slate-500">${escapeHtml(s.studentClass)}</td>
+                        <td class="p-3 font-bold">${s.score} / ${s.maxScore}</td>
+                        <td class="p-3 font-semibold text-indigo-600">${s.percentage}%</td>
+                        <td class="p-3">
+                            <span class="font-bold px-2 py-1 rounded-lg text-xs ${s.grade >= 5.5 ? 'bg-emerald-100 text-emerald-700' : s.grade >= 4.5 ? 'bg-blue-100 text-blue-700' : s.grade >= 3.5 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}">
+                                ${s.grade.toFixed(2)}
+                            </span>
+                        </td>
+                        <td class="p-3">
+                            <div class="flex items-center gap-1 text-[11px] font-bold">
+                                <span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">А: ${pA}%</span>
+                                <span class="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">Б: ${pB}%</span>
+                                <span class="bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded">В: ${pV}%</span>
+                                <span class="bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded">Г: ${pG}%</span>
+                            </div>
+                        </td>
+                        <td class="p-3 text-right space-x-2 no-print">
+                            <button onclick="viewStudentDetails(${s.id})" title="Преглед" class="text-slate-500 hover:text-indigo-600 p-1">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button onclick="editStudent(${s.id})" title="Редактирай" class="text-slate-500 hover:text-amber-600 p-1">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteStudent(${s.id})" title="Изтрий" class="text-slate-500 hover:text-rose-600 p-1">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterStudentsTable() {
+            const q = document.getElementById('search-student-input').value.toLowerCase();
+            const rows = document.querySelectorAll('#analytics-table-body tr');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(q) ? '' : 'none';
+            });
+        }
+
+        // --- MODULE 4: DETAILED STATISTICAL OPTIONS ANALYSIS (А, Б, В, Г) ---
+        function renderOptionsAnalysisView() {
+            let totalA = 0, totalB = 0, totalV = 0, totalG = 0;
+            let totalAnswersOverall = 0;
+
+            // Structure to store counts per question
+            const perQuestionCounts = {};
+            testKey.forEach(q => {
+                perQuestionCounts[q.number] = { 'А': 0, 'Б': 0, 'В': 0, 'Г': 0, total: 0 };
+            });
+
+            students.forEach(s => {
+                for (let qNum in s.answers) {
+                    const ans = s.answers[qNum];
+                    if (['А', 'Б', 'В', 'Г'].includes(ans)) {
+                        totalAnswersOverall++;
+                        if (ans === 'А') totalA++;
+                        if (ans === 'Б') totalB++;
+                        if (ans === 'В') totalV++;
+                        if (ans === 'Г') totalG++;
+
+                        if (perQuestionCounts[qNum]) {
+                            perQuestionCounts[qNum][ans]++;
+                            perQuestionCounts[qNum].total++;
+                        }
+                    }
+                }
+            });
+
+            const pctA = totalAnswersOverall > 0 ? Math.round((totalA / totalAnswersOverall) * 100) : 0;
+            const pctB = totalAnswersOverall > 0 ? Math.round((totalB / totalAnswersOverall) * 100) : 0;
+            const pctV = totalAnswersOverall > 0 ? Math.round((totalV / totalAnswersOverall) * 100) : 0;
+            const pctG = totalAnswersOverall > 0 ? Math.round((totalG / totalAnswersOverall) * 100) : 0;
+
+            // Update Class Cards
+            document.getElementById('opt-badge-A').innerText = `${totalA} бр.`;
+            document.getElementById('opt-percent-A').innerText = `${pctA}%`;
+            document.getElementById('opt-bar-A').style.width = `${pctA}%`;
+
+            document.getElementById('opt-badge-B').innerText = `${totalB} бр.`;
+            document.getElementById('opt-percent-B').innerText = `${pctB}%`;
+            document.getElementById('opt-bar-B').style.width = `${pctB}%`;
+
+            document.getElementById('opt-badge-V').innerText = `${totalV} бр.`;
+            document.getElementById('opt-percent-V').innerText = `${pctV}%`;
+            document.getElementById('opt-bar-V').style.width = `${pctV}%`;
+
+            document.getElementById('opt-badge-G').innerText = `${totalG} бр.`;
+            document.getElementById('opt-percent-G').innerText = `${pctG}%`;
+            document.getElementById('opt-bar-G').style.width = `${pctG}%`;
+
+            // Render Donut/Pie Chart
+            renderOptionsPieChart(pctA, pctB, pctV, pctG);
+
+            // Render Breakdown per Question
+            const qContainer = document.getElementById('per-question-options-container');
+
+            if (testKey.length === 0) {
+                qContainer.innerHTML = `<div class="text-slate-400 text-center py-4">Няма въпроси в теста.</div>`;
+                return;
+            }
+
+            qContainer.innerHTML = testKey.map(q => {
+                const qStat = perQuestionCounts[q.number] || { 'А': 0, 'Б': 0, 'В': 0, 'Г': 0, total: 0 };
+                const totalQ = qStat.total;
+
+                const qPctA = totalQ > 0 ? Math.round((qStat['А'] / totalQ) * 100) : 0;
+                const qPctB = totalQ > 0 ? Math.round((qStat['Б'] / totalQ) * 100) : 0;
+                const qPctV = totalQ > 0 ? Math.round((qStat['В'] / totalQ) * 100) : 0;
+                const qPctG = totalQ > 0 ? Math.round((qStat['Г'] / totalQ) * 100) : 0;
+
+                return `
+                    <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-800">Въпрос №${q.number} (Верен: <strong class="text-indigo-600">${q.correctAnswer}</strong>)</span>
+                            <span class="text-slate-400 font-semibold">${totalQ} отговора</span>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-2 text-center text-xs font-bold">
+                            <div class="p-1.5 rounded-lg border ${q.correctAnswer === 'А' ? 'ring-2 ring-emerald-500 bg-amber-100/70 border-amber-300 text-amber-900' : 'bg-white border-slate-200 text-slate-700'}">
+                                А: ${qPctA}% (${qStat['А']})
+                            </div>
+                            <div class="p-1.5 rounded-lg border ${q.correctAnswer === 'Б' ? 'ring-2 ring-emerald-500 bg-blue-100/70 border-blue-300 text-blue-900' : 'bg-white border-slate-200 text-slate-700'}">
+                                Б: ${qPctB}% (${qStat['Б']})
+                            </div>
+                            <div class="p-1.5 rounded-lg border ${q.correctAnswer === 'В' ? 'ring-2 ring-emerald-500 bg-purple-100/70 border-purple-300 text-purple-900' : 'bg-white border-slate-200 text-slate-700'}">
+                                В: ${qPctV}% (${qStat['В']})
+                            </div>
+                            <div class="p-1.5 rounded-lg border ${q.correctAnswer === 'Г' ? 'ring-2 ring-emerald-500 bg-rose-100/70 border-rose-300 text-rose-900' : 'bg-white border-slate-200 text-slate-700'}">
+                                Г: ${qPctG}% (${qStat['Г']})
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderOptionsPieChart(pctA, pctB, pctV, pctG) {
+            const ctx = document.getElementById('optionsPieChart').getContext('2d');
+
+            if (optionsPieChartInstance) optionsPieChartInstance.destroy();
+
+            optionsPieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Опция А (%)', 'Опция Б (%)', 'Опция В (%)', 'Опция Г (%)'],
+                    datasets: [{
+                        data: [pctA, pctB, pctV, pctG],
+                        backgroundColor: ['#f59e0b', '#3b82f6', '#a855f7', '#f43f5e'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // --- MODAL & EXPORT LOGIC ---
+        function viewStudentDetails(id) {
+            const student = students.find(s => s.id === id);
+            if (!student) return;
+
+            document.getElementById('modal-student-name').innerText = `${student.name} ${student.studentClass !== '-' ? `(${student.studentClass})` : ''}`;
+            document.getElementById('modal-student-subtitle').innerText = `Точки: ${student.score}/${student.maxScore} (${student.percentage}%) | Оценка: ${student.grade.toFixed(2)}`;
+
+            const container = document.getElementById('modal-body-content');
+            container.innerHTML = testKey.map(q => {
+                const ans = student.answers[q.number] || 'Няма отговор';
+                const isCorrect = ans === q.correctAnswer;
+
+                return `
+                    <div class="p-3 rounded-xl border flex items-center justify-between ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}">
+                        <div class="space-y-0.5">
+                            <div class="font-bold text-xs">Въпрос №${q.number}</div>
+                            <div class="text-xs">
+                                Отговор на ученика: <strong class="${isCorrect ? 'text-emerald-700' : 'text-rose-700'}">${ans}</strong>
+                                ${!isCorrect ? ` (Верен: <strong class="text-emerald-700">${q.correctAnswer}</strong>)` : ''}
+                            </div>
+                        </div>
+                        <div class="text-xs font-bold px-2 py-1 rounded-md ${isCorrect ? 'bg-emerald-200 text-emerald-800' : 'bg-rose-200 text-rose-800'}">
+                            ${isCorrect ? `+${q.points} т.` : '0 т.'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('student-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('student-modal').classList.add('hidden');
+        }
+
+        function exportCSV() {
+            if (students.length === 0) {
+                showToast('Няма данни за експортиране!', 'error');
+                return;
+            }
+
+            let csv = '\uFEFFИме,Клас,Точки,Макс.Точки,Успеваемост %,Оценка\n';
+            students.forEach(s => {
+                csv += `"${s.name}","${s.studentClass}",${s.score},${s.maxScore},${s.percentage}%,${s.grade.toFixed(2)}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Проверка_Тест_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        function loadDemoData() {
+            testKey = [
+                { number: 1, correctAnswer: 'А', points: 1 },
+                { number: 2, correctAnswer: 'Б', points: 1 },
+                { number: 3, correctAnswer: 'В', points: 1 },
+                { number: 4, correctAnswer: 'Г', points: 1 },
+                { number: 5, correctAnswer: 'А', points: 1 }
+            ];
+
+            students = [
+                { id: 1, name: 'Иван Иванов', studentClass: '7А', answers: { 1: 'А', 2: 'Б', 3: 'В', 4: 'Г', 5: 'А' }, score: 5, maxScore: 5, percentage: 100, grade: 6.00 },
+                { id: 2, name: 'Мария Петрова', studentClass: '7А', answers: { 1: 'А', 2: 'Б', 3: 'А', 4: 'Г', 5: 'А' }, score: 4, maxScore: 5, percentage: 80, grade: 5.33 },
+                { id: 3, name: 'Георги Стоянов', studentClass: '7А', answers: { 1: 'Б', 2: 'Б', 3: 'Г', 4: 'А', 5: 'В' }, score: 1, maxScore: 5, percentage: 20, grade: 2.00 },
+                { id: 4, name: 'Елена Димитрова', studentClass: '7А', answers: { 1: 'А', 2: 'В', 3: 'В', 4: 'Г', 5: 'Б' }, score: 3, maxScore: 5, percentage: 60, grade: 4.25 }
+            ];
+
+            saveToStorage();
+            renderKeyGrid();
+            renderStudentQuickButtons();
+            renderStudentsTable();
+            updateBadges();
+            showToast('Заредени са примерни данни за клас!', 'success');
+        }
+
+        function clearAllData() {
+            if (confirm('Сигурни ли сте, че искате да изчистите целия тест и проверените ученици?')) {
+                testKey = [];
+                students = [];
+                localStorage.clear();
+                resetStudentForm();
+                renderKeyGrid();
+                renderStudentsTable();
+                updateBadges();
+                showToast('Всички данни са изчистени', 'info');
+            }
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('smart_test_key', JSON.stringify(testKey));
+            localStorage.setItem('smart_test_students', JSON.stringify(students));
+        }
+
+        function loadFromStorage() {
+            const k = localStorage.getItem('smart_test_key');
+            const s = localStorage.getItem('smart_test_students');
+            if (k) testKey = JSON.parse(k);
+            if (s) students = JSON.parse(s);
+        }
+
+        function updateBadges() {
+            document.getElementById('key-badge').innerText = testKey.length;
+            document.getElementById('students-badge').innerText = students.length;
+        }
+
+        function showToast(msg, type = 'info') {
+            const box = document.getElementById('toast-box');
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-slate-800';
+
+            toast.className = `${bg} text-white text-xs font-bold px-4 py-3 rounded-xl shadow-lg flex items-center space-x-2 transition duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i><span>${msg}</span>`;
+
+            box.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        function escapeHtml(str) {
+            return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
