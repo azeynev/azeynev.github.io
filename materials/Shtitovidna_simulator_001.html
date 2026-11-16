@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ФИНАЛЕН СИМУЛАТОР: Динамичен Процес на Щитовидната Жлеза</title>
+    <style>
+        /* === ЦВЕТОВИ ПРОМЕНЛИВИ === */
+        :root {
+            --primary-color: #3498db;     
+            --secondary-color: #2ecc71;   
+            --warning-color: #e74c3c;     /* Червено - Хиперфункция / Високо */
+            --info-color: #f39c12;        /* Оранжево - Хипофункция / Ниско */
+            --bg-color: #ecf0f1;
+            --card-bg: #ffffff;
+            --gland-color-base: #9b59b6;  
+            --neutral-color: #bdc3c7;     
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: #333;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        /* === КОНТРОЛИ И БУТОН === */
+        #main-controls { display: flex; justify-content: center; margin-bottom: 20px; }
+        
+        #start-btn {
+            padding: 12px 30px; font-size: 1.2em; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s;
+        }
+        #start-btn.running { background-color: var(--warning-color); color: white; }
+        #start-btn.stopped { background-color: var(--secondary-color); color: white; }
+
+        #controls-section {
+            display: flex; justify-content: space-around; gap: 20px; margin-bottom: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 8px;
+        }
+        .control-group {
+            flex-basis: 48%; background-color: #f9f9f9; padding: 15px; border-radius: 8px;
+        }
+        input[type="range"] { 
+            width: 100%; margin-bottom: 15px; 
+            opacity: 0.5; 
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        input[type="range"].active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* === ВИЗУАЛИЗАЦИЯ НА ОБРАТНАТА ВРЪЗКА === */
+        #feedback-diagram {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative;
+        }
+
+        .organ-box {
+            flex-basis: 30%; text-align: center; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); position: relative; transition: all 0.5s ease; min-height: 180px;
+            color: white; 
+        }
+        
+        #thyroid-gland { background-color: var(--gland-color-base); }
+        #thyroid-gland::before {
+            content: '🦋'; 
+            font-size: 5em; 
+            display: block; 
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .hormone-value {
+            font-size: 1.5em; font-weight: bold; margin-top: 5px;
+            display: inline-block;
+            transition: color 0.5s; 
+        }
+
+        /* === АНИМАЦИИ (Пулсиране чрез JS) === */
+        .flow-arrow {
+            width: 10%; text-align: center; font-size: 3em; color: #ccc; transition: color 0.3s, transform 0.3s;
+        }
+        
+        .pulsating {
+            animation: pulse 0.5s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1.0); }
+            100% { opacity: 1.0; transform: scale(1.05); }
+        }
+
+        /* === СТАТУС НА ПРОЦЕСА (Ключов елемент) === */
+        #process-status {
+            padding: 15px;
+            margin-top: 20px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            min-height: 50px;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        .status-normal { background-color: var(--secondary-color); color: white; }
+        .status-hyper { background-color: var(--warning-color); color: white; }
+        .status-hypo { background-color: var(--info-color); color: white; }
+
+        /* === СЕКЦИЯ СИМПТОМИ (Функционална) === */
+        #effects-section { padding: 20px; border: 2px dashed #ccc; border-radius: 10px; margin-top: 20px; }
+
+        #symptoms-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 15px; }
+
+        #symptoms-list li {
+            flex-basis: calc(50% - 15px); padding: 12px 10px; border-left: 5px solid #ccc; transition: border-left 0.3s, background-color 0.3s, opacity 0.3s;
+            background-color: #f0f0f0; opacity: 0.6; border-radius: 5px; color: #333;
+        }
+        
+        /* Активен симптом */
+        .effect-active {
+            background-color: var(--warning-color); 
+            color: white; 
+            border-left: 5px solid white !important; 
+            font-weight: bold; 
+            opacity: 1;
+        }
+        
+        /* Неактивен симптом (за другия тип дисфункция) */
+        .effect-inactive {
+            background-color: #e0fff0; 
+            border-left: 5px solid var(--secondary-color) !important; 
+            opacity: 0.6; 
+            color: #333;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>💥 ФИНАЛЕН СИМУЛАТОР: Динамичен Процес на Щитовидната Жлеза</h1>
+        
+        <div id="main-controls">
+            <button id="start-btn" class="stopped" onclick="toggleSimulation()">Стартирай Симулацията</button>
+        </div>
+
+        <p style="text-align: center; font-style: italic; color: #3498db;">
+            * Натиснете "СТАРТ" и движете плъзгачите, за да видите директната промяна в хормоните, потока и симптомите.
+        </p>
+
+        <div id="controls-section">
+            <div class="control-group">
+                <label for="tsh-level">1. TSH (Ниво на Стимулация от Хипофизата):</label>
+                <input type="range" id="tsh-level" min="0.1" max="10.0" step="0.1" value="2.0">
+                <p>TSH: <span id="tsh-value">2.0</span> µIU/mL (Норма: 0.5 - 4.5)</p>
+            </div>
+            
+            <div class="control-group">
+                <label for="iodine-intake">2. Функционалност на Жлезата (Капацитет за Производство):</label>
+                <input type="range" id="iodine-intake" min="1" max="10" step="1" value="5">
+                <p>Ефективност: <span id="iodine-value">Нормална (5/10)</span></p>
+            </div>
+        </div>
+        
+        <h2>🔄 Хомеостазис: Верига за Обратна Връзка и Процес</h2>
+        
+        <div id="feedback-diagram">
+            
+            <div class="organ-box" id="pituitary-gland" style="background-color: var(--primary-color);">
+                <h3>Хипофиза</h3>
+                <p class="hormone-name">TSH</p>
+                <span class="hormone-value" id="display-tsh">2.0</span>
+                <p class="status-text" id="status-tsh">Нормално</p>
+            </div>
+            
+            <div class="flow-arrow" id="arrow-tsh">➡️</div>
+
+            <div class="organ-box" id="thyroid-gland">
+                <h3>ЩИТОВИДНА ЖЛЕЗА</h3>
+                <p class="hormone-name">Свободен T4</p>
+                <span class="hormone-value" id="display-t4">1.2</span>
+                <p class="status-text" id="status-t4">Нормално</p>
+            </div>
+            
+            <div class="flow-arrow" id="arrow-t4t3">➡️</div>
+
+            <div class="organ-box" id="target-cells" style="background-color: var(--neutral-color); color: #333;">
+                <h3>Клетки на Тялото</h3>
+                <p class="hormone-name">Свободен T3</p>
+                <span class="hormone-value" id="display-t3">3.5</span>
+                <p class="status-text" id="status-t3">Нормално</p>
+            </div>
+        </div>
+        
+        <div id="process-status">
+            Текущо Състояние: **Неактивно**. Натиснете "Стартирай Симулацията".
+        </div>
+
+        <h2>🧠 Динамични Ефекти върху Тялото (Симптоми)</h2>
+        <div id="effects-section">
+            <ul id="symptoms-list">
+                <li data-hypo="active" data-hyper="inactive" id="symptom-energy">😴 Умора, липса на енергия (Хипо)</li>
+                <li data-hypo="active" data-hyper="inactive" id="symptom-weight">⬆️ Качване на тегло, забавен метаболизъм (Хипо)</li>
+                <li data-hypo="active" data-hyper="inactive" id="symptom-skin">❄️ Суха, студена кожа (Хипо)</li>
+                
+                <li data-hypo="inactive" data-hyper="active" id="symptom-heart">💓 Ускорен/Неравномерен пулс (Хипер)</li>
+                <li data-hypo="inactive" data-hyper="active" id="symptom-temp">🔥 Непоносимост към топлина, потене (Хипер)</li>
+                <li data-hypo="inactive" data-hyper="active" id="symptom-anxiety">🤯 Тревожност, раздразнителност (Хипер)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // --- ДЕФИНИЦИИ И КОНСТАНТИ ---
+        const TSH_NORMAL_RANGE = { min: 0.5, max: 4.5 };
+        const T4_NORMAL_RANGE = { min: 0.8, max: 1.8 }; 
+        const T3_NORMAL_RANGE = { min: 2.5, max: 4.5 }; 
+        
+        const COLOR_MAP = { normal: '#2ecc71', high: '#e74c3c', low: '#f39c12' };
+        
+        // DOM Елементи
+        const tshInput = document.getElementById('tsh-level');
+        const iodineInput = document.getElementById('iodine-intake');
+        const rangeInputs = document.querySelectorAll('input[type="range"]');
+        const pituitaryBox = document.getElementById('pituitary-gland');
+        const thyroidBox = document.getElementById('thyroid-gland');
+        const targetCellsBox = document.getElementById('target-cells');
+        const arrowTSH = document.getElementById('arrow-tsh');
+        const arrowT4T3 = document.getElementById('arrow-t4t3');
+        const processStatus = document.getElementById('process-status');
+        
+        let isSimulationRunning = false;
+
+        // --- ЛОГИКА НА ХОРМОНИТЕ ---
+
+        function calculateHormoneLevels(tsh, iodineEfficiency) {
+            let T4_BASE = 0.5; 
+            let T3_BASE = 1.0; 
+            
+            // Формула, показваща зависимостта (TSH * Ефективност = T4)
+            let T4_production = T4_BASE + (Math.log10(tsh + 0.1) * 0.5 + 1) * (iodineEfficiency * 0.12);
+            let T3_production = T3_BASE + (T4_production * 1.5);
+            
+            T4_production = Math.min(Math.max(T4_production, 0.1), 3.5);
+            T3_production = Math.min(Math.max(T3_production, 0.1), 8.0);
+
+            return { T4: parseFloat(T4_production.toFixed(1)), T3: parseFloat(T3_production.toFixed(1)) };
+        }
+
+        function determineStatus(value, range) {
+            if (value < range.min) {
+                return { text: "НИСКО", state: "low", effect: "hypo" };
+            } else if (value > range.max) {
+                return { text: "ВИСОКО", state: "high", effect: "hyper" };
+            } else {
+                return { text: "Нормално", state: "normal", effect: "normal" };
+            }
+        }
+        
+        // --- ВИЗУАЛНА АКТУАЛИЗАЦИЯ (Пулсиране и Цветове) ---
+        
+        function updateVisuals(element, status, isTSH=false) {
+            element.classList.remove('pulsating');
+            element.style.backgroundColor = ''; 
+            element.style.color = 'white'; 
+            element.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
+
+            if (!isSimulationRunning) {
+                // Връщане към неактивно състояние
+                element.style.backgroundColor = element.id === 'target-cells' ? 'var(--neutral-color)' : (element.id === 'pituitary-gland' ? 'var(--primary-color)' : 'var(--gland-color-base)');
+                element.style.color = element.id === 'target-cells' ? '#333' : 'white';
+                return;
+            }
+
+            let color = COLOR_MAP[status.state];
+            
+            if (status.state !== 'normal') {
+                element.classList.add('pulsating');
+                // Ярък Glow ефект
+                element.style.boxShadow = `0 0 20px ${color}, 0 0 40px ${color}`;
+            } else {
+                 element.style.boxShadow = `0 0 10px ${COLOR_MAP.normal}`;
+            }
+
+            // Актуализация на фона на органа
+            element.style.backgroundColor = color;
+            element.style.color = 'white'; 
+            if (element.id === 'target-cells' && status.state === 'normal') {
+                element.style.color = 'white';
+            }
+        }
+        
+        function updateArrows(tshStatus, t4Status) {
+            const getArrowStyle = (status) => {
+                if (!isSimulationRunning) return '#ccc';
+                return COLOR_MAP[status.state];
+            };
+
+            arrowTSH.style.color = getArrowStyle(tshStatus);
+            arrowT4T3.style.color = getArrowStyle(t4Status);
+            
+            // Динамика на потока (пулсиране)
+            if (tshStatus.state !== 'normal' && isSimulationRunning) {
+                arrowTSH.classList.add('pulsating');
+            } else {
+                arrowTSH.classList.remove('pulsating');
+            }
+             if (t4Status.state !== 'normal' && isSimulationRunning) {
+                arrowT4T3.classList.add('pulsating');
+            } else {
+                arrowT4T3.classList.remove('pulsating');
+            }
+        }
+
+        function updateProcessStatus(tshStatus, t4Status) {
+            let text = "";
+            let statusClass = "";
+            
+            if (!isSimulationRunning) {
+                 processStatus.textContent = "Текущо Състояние: Неактивно. Натиснете \"Стартирай Симулацията\".";
+                 processStatus.className = "";
+                 return;
+            }
+
+            if (t4Status.effect === 'hyper') {
+                statusClass = "status-hyper";
+                text = `ХИПЕРФУНКЦИЯ! T4/T3 са ВИСОКИ. Хипофизата реагира, като намалява TSH (${tshStatus.text}). Тялото работи на високи обороти.`;
+            } else if (t4Status.effect === 'hypo') {
+                statusClass = "status-hypo";
+                text = `ХИПОФУНКЦИЯ! T4/T3 са НИСКИ. Хипофизата компенсира, като повишава TSH (${tshStatus.text}). Метаболизмът се забавя.`;
+            } else {
+                statusClass = "status-normal";
+                text = `НОРМА (Еутиреоидизъм). T4/T3 и TSH са в референтни граници. Процесът е балансиран.`;
+            }
+
+            processStatus.textContent = `Текущо Състояние: ${text}`;
+            processStatus.className = statusClass;
+        }
+
+        // --- ФУНКЦИОНАЛНОСТ НА СИМПТОМИТЕ ---
+
+        function updateSymptoms(hormoneStatus) {
+            const symptoms = document.getElementById('symptoms-list').querySelectorAll('li');
+            
+            symptoms.forEach(li => {
+                li.classList.remove('effect-active', 'effect-inactive');
+                
+                if (!isSimulationRunning) {
+                    // Неактивно състояние
+                    li.style.opacity = 0.6;
+                    li.style.borderLeftColor = '#ccc';
+                    li.style.backgroundColor = '#f0f0f0';
+                    li.style.color = '#333';
+                    return;
+                }
+                
+                const isHypoEffect = li.dataset.hypo === 'active';
+                const isHyperEffect = li.dataset.hyper === 'active';
+
+                if (hormoneStatus === 'hypo') {
+                    if (isHypoEffect) { li.classList.add('effect-active'); } 
+                    else { li.classList.add('effect-inactive'); }
+                } else if (hormoneStatus === 'hyper') {
+                    if (isHyperEffect) { li.classList.add('effect-active'); } 
+                    else { li.classList.add('effect-inactive'); }
+                } else {
+                    // Нормално състояние
+                    li.classList.add('effect-inactive');
+                    li.style.borderLeftColor = 'var(--secondary-color)';
+                }
+            });
+        }
+        
+        // --- ГЛАВНА ФУНКЦИЯ ЗА СИМУЛАЦИЯ ---
+
+        function updateSimulation() {
+            const tsh = parseFloat(tshInput.value);
+            const iodineEfficiency = parseInt(iodineInput.value);
+            
+            document.getElementById('tsh-value').textContent = tsh.toFixed(1);
+            document.getElementById('iodine-value').textContent = `${iodineEfficiency === 5 ? 'Нормална' : iodineEfficiency < 5 ? 'Намалена' : 'Повишена'} (${iodineEfficiency}/10)`;
+
+            const hormoneResults = calculateHormoneLevels(tsh, iodineEfficiency);
+
+            const statusTSH = determineStatus(tsh, TSH_NORMAL_RANGE);
+            const statusT4 = determineStatus(hormoneResults.T4, T4_NORMAL_RANGE);
+            const statusT3 = determineStatus(hormoneResults.T3, T3_NORMAL_RANGE);
+
+            // Актуализация на дисплеите
+            document.getElementById('display-tsh').textContent = tsh.toFixed(1);
+            document.getElementById('status-tsh').textContent = statusTSH.text;
+            document.getElementById('display-t4').textContent = hormoneResults.T4.toFixed(1);
+            document.getElementById('status-t4').textContent = statusT4.text;
+            document.getElementById('display-t3').textContent = hormoneResults.T3.toFixed(1);
+            document.getElementById('status-t3').textContent = statusT3.text;
+
+            // Визуална актуализация
+            updateVisuals(pituitaryBox, statusTSH, true);
+            updateVisuals(thyroidBox, statusT4);
+            updateVisuals(targetCellsBox, statusT3);
+
+            updateArrows(statusTSH, statusT4);
+            updateSymptoms(statusT4.effect);
+            updateProcessStatus(statusTSH, statusT4);
+        }
+        
+        // --- СТАРТ / СТОП ---
+
+        window.toggleSimulation = function() {
+            isSimulationRunning = !isSimulationRunning;
+            const startButton = document.getElementById('start-btn');
+            
+            if (isSimulationRunning) {
+                startButton.textContent = 'СТОП Симулацията (Скриване на Динамиката)';
+                startButton.classList.remove('stopped');
+                startButton.classList.add('running');
+                rangeInputs.forEach(input => input.classList.add('active'));
+            } else {
+                startButton.textContent = 'СТАРТ Симулацията (Активиране на Динамиката)';
+                startButton.classList.remove('running');
+                startButton.classList.add('stopped');
+                rangeInputs.forEach(input => input.classList.remove('active'));
+            }
+            
+            updateSimulation();
+        }
+
+        // --- ИНИЦИАЛИЗАЦИЯ И СЪБИТИЯ ---
+        tshInput.addEventListener('input', updateSimulation);
+        iodineInput.addEventListener('input', updateSimulation);
+
+        document.addEventListener('DOMContentLoaded', updateSimulation);
+    </script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipotential Surfaces Pro</title>
+    <style>
+        :root {
+            --bg: #050508;
+            --panel: rgba(20, 20, 35, 0.9);
+            --accent: #00f2ff;
+            --pos: #ff3e60;
+            --neg: #3e88ff;
+        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
+        
+        .main-container { display: grid; grid-template-columns: 1fr 320px; height: 100vh; }
+        
+        /* Визуализация */
+        #canvas-container { position: relative; background: #000; cursor: crosshair; }
+        canvas { display: block; }
+
+        /* Панел за управление */
+        .sidebar { 
+            background: var(--panel); border-left: 1px solid #333; padding: 20px;
+            display: flex; flex-direction: column; gap: 18px; box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        
+        h1 { font-size: 1.1rem; margin: 0; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        
+        .control-group { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid #444; }
+        label { display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 8px; text-transform: uppercase; }
+
+        .btn-group { display: flex; gap: 8px; }
+        .btn { 
+            flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; 
+            font-weight: bold; transition: 0.2s; font-size: 0.8rem;
+        }
+        .btn-pos { background: rgba(255, 62, 96, 0.2); color: var(--pos); border: 1px solid var(--pos); }
+        .btn-neg { background: rgba(62, 136, 255, 0.2); color: var(--neg); border: 1px solid var(--neg); }
+        .btn.active { background: white; color: black; border-color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,255,255,0.2); }
+
+        .btn-action { width: 100%; padding: 12px; background: var(--accent); color: black; border: none; border-radius: 6px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 5px; }
+        .btn-action:hover { filter: brightness(1.2); }
+
+        .legend { font-size: 0.8rem; line-height: 1.4; color: #888; margin-top: auto; }
+        .legend b { color: #ddd; }
+
+        /* Сонда (Probe) */
+        #probe {
+            position: absolute; pointer-events: none; padding: 6px 10px;
+            background: rgba(0,0,0,0.8); border: 1px solid var(--accent);
+            border-radius: 4px; font-family: monospace; font-size: 0.8rem; color: var(--accent);
+            display: none; transform: translate(15px, 15px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div id="canvas-container">
+        <canvas id="labCanvas"></canvas>
+        <div id="probe">V: 0.0V</div>
+    </div>
+
+    <div class="sidebar">
+        <h1>Електричен Потенциал</h1>
+        
+        <div class="control-group">
+            <label>Избор на заряд за добавяне</label>
+            <div class="btn-group">
+                <button id="posBtn" class="btn btn-pos active" onclick="setMode('pos')">+ Заряд</button>
+                <button id="negBtn" class="btn btn-neg" onclick="setMode('neg')">- Заряд</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>Визуализация</label>
+            <div style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px;">
+                <label style="display:flex; align-items:center; gap:8px; text-transform:none; color:white;">
+                    <input type="checkbox" id="checkField" checked onchange="draw()"> Силови линии (E)
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; text-transform:none; color:white;">
+                    <input type="checkbox" id="checkParticles" checked> Движещи се частици
+                </label>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="resetApp()">Изчисти полето</button>
+
+        <div class="legend">
+            <b>Урок за демонстрация:</b><br>
+            • Линиите, които виждате, свързват точки с еднакъв потенциал.<br>
+            • Силовите линии (белите) винаги са <b>перпендикулярни</b> на еквипотенциалните.<br>
+            • Работата за преместване на заряд по еквипотенциална линия е <b>нула</b>.
+        </div>
+        
+        <div style="font-size: 0.7rem; color: #444; text-align: center;">Разработено за образователни цели</div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('labCanvas');
+    const ctx = canvas.getContext('2d');
+    const probe = document.getElementById('probe');
+    const container = document.getElementById('canvas-container');
+
+    let charges = [];
+    let testParticles = [];
+    let mode = 'pos';
+    let width, height;
+    const K = 4000;
+
+    function resize() {
+        width = canvas.width = container.clientWidth;
+        height = canvas.height = container.clientHeight;
+        draw();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function setMode(m) {
+        mode = m;
+        document.getElementById('posBtn').classList.toggle('active', m === 'pos');
+        document.getElementById('negBtn').classList.toggle('active', m === 'neg');
+    }
+
+    function resetApp() {
+        charges = [];
+        testParticles = [];
+        // Начален дипол
+        charges.push({ x: width*0.4, y: height/2, q: 1 });
+        charges.push({ x: width*0.6, y: height/2, q: -1 });
+        draw();
+    }
+
+    container.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        charges.push({ x, y, q: mode === 'pos' ? 1 : -1 });
+        draw();
+    });
+
+    container.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const V = calculatePotential(x, y);
+        probe.style.display = 'block';
+        probe.style.left = x + 'px';
+        probe.style.top = y + 'px';
+        probe.innerText = `V: ${V.toFixed(1)} V`;
+    });
+
+    function calculatePotential(x, y) {
+        let v = 0;
+        for (let c of charges) {
+            const r = Math.hypot(x - c.x, y - c.y);
+            v += (K * c.q) / (r + 15);
+        }
+        return v;
+    }
+
+    function calculateField(x, y) {
+        let ex = 0, ey = 0;
+        for (let c of charges) {
+            const dx = x - c.x;
+            const dy = y - c.y;
+            const r2 = dx*dx + dy*dy;
+            const r = Math.sqrt(r2);
+            const e = (K * c.q) / (r2 + 100);
+            ex += e * (dx/r);
+            ey += e * (dy/r);
+        }
+        return { ex, ey };
+    }
+
+    function draw() {
+        // 1. Потенциална карта (Background)
+        const step = 4;
+        for (let x = 0; x < width; x += step) {
+            for (let y = 0; y < height; y += step) {
+                const V = calculatePotential(x, y);
+                const intensity = Math.min(100, Math.abs(V) * 0.8);
+                if (V > 0) ctx.fillStyle = `rgb(${intensity * 0.8}, ${intensity * 0.2}, ${intensity * 0.2})`;
+                else ctx.fillStyle = `rgb(${intensity * 0.2}, ${intensity * 0.3}, ${intensity * 0.8})`;
+                ctx.fillRect(x, y, step, step);
+            }
+        }
+
+        // 2. Изолинии (Equipotentials) - Математическо очертаване
+        ctx.lineWidth = 1;
+        for (let vTarget = -200; vTarget <= 200; vTarget += 20) {
+            if (vTarget === 0) continue;
+            ctx.strokeStyle = vTarget > 0 ? 'rgba(255,100,100,0.3)' : 'rgba(100,150,255,0.3)';
+            // Тук използваме опростен растер за контури
+        }
+
+        // 3. Силови линии (E-Field)
+        if (document.getElementById('checkField').checked) {
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+            const grid = 40;
+            for (let x = grid/2; x < width; x += grid) {
+                for (let y = grid/2; y < height; y += grid) {
+                    const F = calculateField(x, y);
+                    const angle = Math.atan2(F.ey, F.ex);
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(-5, 0); ctx.lineTo(5, 0);
+                    ctx.moveTo(5, 0); ctx.lineTo(2, -2);
+                    ctx.moveTo(5, 0); ctx.lineTo(2, 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        }
+
+        // 4. Заряди
+        charges.forEach(c => {
+            const grad = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, 15);
+            grad.addColorStop(0, '#fff');
+            grad.addColorStop(1, c.q > 0 ? varToHex('--pos') : varToHex('--neg'));
+            
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = c.q > 0 ? '#ff3e60' : '#3e88ff';
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, 12, 0, Math.PI*2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            ctx.fillStyle = 'black';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(c.q > 0 ? '+' : '-', c.x, c.y + 6);
+        });
+    }
+
+    function animate() {
+        if (document.getElementById('checkParticles').checked && charges.length > 0) {
+            // Генериране на нови частици рядко
+            if (Math.random() < 0.05) {
+                testParticles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    age: 0
+                });
+            }
+
+            // Обновяване на частиците
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            testParticles.forEach((p, i) => {
+                const E = calculateField(p.x, p.y);
+                p.x += E.ex * 0.5;
+                p.y += E.ey * 0.5;
+                p.age++;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2);
+                ctx.fill();
+
+                if (p.age > 100 || p.x < 0 || p.x > width || p.y < 0 || p.y > height) {
+                    testParticles.splice(i, 1);
+                }
+            });
+        }
+        requestAnimationFrame(animate);
+    }
+
+    function varToHex(varName) {
+        return varName === '--pos' ? '#ff3e60' : '#3e88ff';
+    }
+
+    resetApp();
+    animate();
+</script>
+</body>
+</html>

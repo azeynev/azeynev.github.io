@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Advanced Medical Lung Simulator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root { --bg: #1a1a1a; --panel: #222; --accent: #00d4ff; --danger: #ff4d4d; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Segoe UI', sans-serif; color: white; overflow: hidden; }
+
+        .wrapper { display: grid; grid-template-columns: 320px 1fr 320px; grid-template-rows: 40px 1fr 40px; height: 100vh; }
+        
+        header { grid-column: 1/4; background: #333; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #444; font-size: 13px; z-index: 10; }
+        
+        aside { background: var(--panel); padding: 25px; border-right: 1px solid #333; display: flex; flex-direction: column; gap: 15px; z-index: 5; }
+        .right-p { border-right: none; border-left: 1px solid #333; }
+
+        h3 { font-size: 11px; color: #777; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .ctrl { margin-bottom: 20px; }
+        label { display: block; font-size: 12px; margin-bottom: 8px; color: #ccc; }
+        input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+        .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .btn { background: #333; border: 1px solid #444; border-radius: 5px; aspect-ratio: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; }
+        .btn:hover { border-color: var(--accent); background: #3d3d3d; }
+        .btn.active { border-color: var(--danger); background: #442222; }
+
+        .monitor { background: #000; padding: 15px; border-radius: 8px; border-left: 3px solid var(--accent); font-family: monospace; }
+        .stat { display: flex; justify-content: space-between; margin: 5px 0; }
+        .val { color: var(--accent); font-weight: bold; }
+
+        main { position: relative; background: radial-gradient(circle, #222 0%, #050505 100%); overflow: hidden; }
+        #render-target { width: 100%; height: 100%; }
+        .lung-label { position: absolute; bottom: 50px; font-size: 20px; color: #444; text-transform: uppercase; letter-spacing: 2px; }
+
+        footer { grid-column: 1/4; background: #111; border-top: 1px solid #333; display: flex; align-items: center; padding: 0 15px; font-size: 11px; color: #555; }
+        .heal-btn { background: #0066cc; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: auto; transition: 0.3s; }
+        .heal-btn:hover { background: #0088ff; }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <header>UI-Panel <span style="margin-left:auto; opacity:0.5">Device: LUNG_SIM_PRO_V1</span></header>
+
+    <aside>
+        <div class="ctrl">
+            <h3>Параметри</h3>
+            <label>Честа (RR)</label>
+            <input type="range" id="rr" min="0.5" max="3" step="0.1" value="1">
+            <label>Обем (TV)</label>
+            <input type="range" id="tv" min="0.1" max="0.5" step="0.05" value="0.25">
+        </div>
+        <div class="ctrl">
+            <h3>Заболявания</h3>
+            <div class="icon-grid">
+                <button class="btn" onclick="setCondition('normal')">🫁</button>
+                <button class="btn" onclick="setCondition('asthma')">⚠️</button>
+                <button class="btn" onclick="setCondition('pneumonia')">💧</button>
+                <button class="btn" onclick="setCondition('emphysema')">🚬</button>
+                <button class="btn">🔬</button>
+                <button class="btn">💊</button>
+                <button class="btn">📊</button>
+                <button class="btn">👤</button>
+            </div>
+        </div>
+    </aside>
+
+    <main>
+        <div id="render-target"></div>
+        <div class="lung-label" style="left: 20%">Right lung</div>
+        <div class="lung-label" style="right: 20%">Left lung</div>
+    </main>
+
+    <aside class="right-p">
+        <h3>Медицински монитор</h3>
+        <div class="monitor">
+            <div class="stat"><span>O₂ Saturation</span><span class="val" id="spo2">98%</span></div>
+            <div class="stat"><span>Frequency</span><span class="val" id="freq">16 bpm</span></div>
+        </div>
+        <h3>Диагностика</h3>
+        <div class="monitor" style="border-color: #f1c40f;">
+            <p id="diag" style="font-size: 12px; margin:0">Нормално състояние на белодробната тъкан.</p>
+        </div>
+        <button class="heal-btn" onclick="setCondition('normal')">Спешна терапия (Лечение)</button>
+    </aside>
+
+    <footer>
+        <input type="checkbox" checked disabled> overlay .thuate stoniar analto roeding atra papers.
+    </footer>
+</div>
+
+<script>
+    let scene, camera, renderer, leftLung, rightLung, treeLeft, treeRight;
+    let clock = new THREE.Clock();
+    let state = { rr: 1, tv: 0.25, color: new THREE.Color(0xff8888) };
+
+    function init() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(45, (window.innerWidth-640)/window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth - 640, window.innerHeight - 80);
+        document.getElementById('render-target').appendChild(renderer.domElement);
+
+        // Светлини
+        const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambient);
+        const point = new THREE.PointLight(0xffffff, 1);
+        point.position.set(5, 5, 5);
+        scene.add(point);
+
+        // Създаване на Дробовете
+        const lungGeo = new THREE.SphereGeometry(1, 64, 64);
+        
+        // Външна обвивка (полупрозрачна)
+        const lungMat = new THREE.MeshStandardMaterial({
+            color: 0xff8888,
+            transparent: true,
+            opacity: 0.4,
+            roughness: 0.1,
+            metalness: 0.1,
+            depthWrite: false
+        });
+
+        // Вътрешна структура (Бронхиално дърво)
+        // Използваме Wireframe + специфичен мащаб за ефект на "вените"
+        const treeMat = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            wireframe: true,
+            wireframeLinewidth: 1,
+            transparent: true,
+            opacity: 0.2
+        });
+
+        const createLungPair = (xPos, isLeft) => {
+            const group = new THREE.Group();
+            
+            const outer = new THREE.Mesh(lungGeo, lungMat.clone());
+            outer.scale.set(isLeft ? 0.9 : 1, 1.6, 0.8);
+            
+            const inner = new THREE.Mesh(lungGeo, treeMat.clone());
+            inner.scale.set(isLeft ? 0.85 : 0.95, 1.5, 0.75);
+            
+            group.add(outer, inner);
+            group.position.x = xPos;
+            return group;
+        };
+
+        leftLung = createLungPair(1.2, true);
+        rightLung = createLungPair(-1.2, false);
+        
+        const mainGroup = new THREE.Group();
+        mainGroup.add(leftLung, rightLung);
+
+        // Трахея
+        const tracheGeo = new THREE.CylinderGeometry(0.15, 0.2, 2, 32);
+        const tracheMat = new THREE.MeshStandardMaterial({ color: 0xdddddd });
+        const trache = new THREE.Mesh(tracheGeo, tracheMat);
+        trache.position.y = 0.8;
+        mainGroup.add(trache);
+
+        scene.add(mainGroup);
+        animate();
+    }
+
+    function setCondition(cond) {
+        const d = document.getElementById('diag');
+        const s = document.getElementById('spo2');
+        if(cond === 'normal') {
+            state.color.set(0xff8888); s.innerText = "98%";
+            d.innerText = "Нормално състояние на белодробната тъкан.";
+        } else if(cond === 'asthma') {
+            state.color.set(0xff3333); s.innerText = "92%";
+            d.innerText = "ВНИМАНИЕ: Остър бронхоспазъм. Стеснение на пътищата.";
+        } else if(cond === 'pneumonia') {
+            state.color.set(0x667744); s.innerText = "85%";
+            d.innerText = "ИНФЕКЦИЯ: Наличие на течност в алвеоларното пространство.";
+        } else if(cond === 'emphysema') {
+            state.color.set(0x555555); s.innerText = "88%";
+            d.innerText = "ЕМФИЗЕМ: Трайно увреждане от токсични агенти.";
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+        state.rr = document.getElementById('rr').value;
+        state.tv = document.getElementById('tv').value;
+
+        const breath = 1 + Math.sin(t * state.rr * 2.5) * state.tv;
+        
+        [leftLung, rightLung].forEach(lung => {
+            lung.scale.set(breath, breath, breath);
+            // Плавна промяна на цвета на външната обвивка
+            lung.children[0].material.color.lerp(state.color, 0.05);
+        });
+
+        document.getElementById('freq').innerText = Math.round(state.rr * 16) + " bpm";
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+        camera.aspect = (window.innerWidth-640)/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth-640, window.innerHeight);
+    });
+
+    init();
+</script>
+</body>
+</html>

@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧭 Симулатор на Морзова Азбука</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;500;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== ОСНОВНИ СТИЛОВЕ ===== */
+        :root {
+            --primary-blue: #2d87f0;
+            --primary-dark: #1a1a2e;
+            --primary-light: #16213e;
+            --accent-yellow: #ffd166;
+            --accent-green: #06d6a0;
+            --accent-red: #ef476f;
+            --text-light: #f8f9fa;
+            --text-dim: #adb5bd;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --radius: 15px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: var(--radius);
+            border: 2px solid var(--primary-blue);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-green), var(--primary-blue), var(--accent-yellow));
+            animation: scanline 3s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 0 25px rgba(45, 135, 240, 0.5);
+        }
+
+        .logo-text h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            background: linear-gradient(90deg, var(--accent-green), var(--primary-blue), var(--accent-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .logo-text p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* ===== ОСНОВЕН КОНТЕНТ ===== */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1100px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== ЛЯВ ПАНЕЛ - ВЪВЕД И КОНТРОЛИ ===== */
+        .input-panel {
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: var(--radius);
+            padding: 30px;
+            border: 2px solid var(--accent-green);
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(45, 135, 240, 0.3);
+        }
+
+        .panel-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: var(--accent-green);
+        }
+
+        .panel-header i {
+            font-size: 1.8rem;
+            color: var(--accent-yellow);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 150px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(45, 135, 240, 0.5);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            font-family: 'Roboto Mono', monospace;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(45, 135, 240, 0.2);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), #1a73e8);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(45, 135, 240, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent-green), #05a87c);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(6, 214, 160, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--accent-yellow), #e6b800);
+            color: var(--primary-dark);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 209, 102, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--accent-red), #d1345b);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(239, 71, 111, 0.3);
+        }
+
+        /* ===== СКОРОСТ И ТОН КОНТРОЛИ ===== */
+        .control-group {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: var(--text-dim);
+        }
+
+        .slider {
+            width: 100%;
+            height: 10px;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, var(--accent-green), var(--primary-blue), var(--accent-red));
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid var(--primary-blue);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .control-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-family: 'Roboto Mono', monospace;
+            color: var(--accent-yellow);
+        }
+
+        /* ===== ДЕСЕН ПАНЕЛ - ИЗХОД И КОД ===== */
+        .output-panel {
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: var(--radius);
+            padding: 30px;
+            border: 2px solid var(--accent-yellow);
+            box-shadow: var(--shadow);
+        }
+
+        .morse-output {
+            min-height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid rgba(255, 209, 102, 0.3);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.8rem;
+            line-height: 1.8;
+            color: var(--accent-yellow);
+            overflow-wrap: break-word;
+            position: relative;
+        }
+
+        .morse-output.blink {
+            animation: blinkCursor 0.8s infinite alternate;
+        }
+
+        @keyframes blinkCursor {
+            from { border-color: rgba(255, 209, 102, 0.3); }
+            to { border-color: var(--accent-yellow); }
+        }
+
+        .code-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .code-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-blue);
+            transition: var(--transition);
+        }
+
+        .code-item:hover {
+            transform: translateY(-5px);
+            background: rgba(45, 135, 240, 0.1);
+        }
+
+        .code-char {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .code-morse {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--accent-yellow);
+            letter-spacing: 3px;
+        }
+
+        /* ===== МОРЗОВА ВИЗУАЛИЗАЦИЯ ===== */
+        .visualization-panel {
+            grid-column: 1 / -1;
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: var(--radius);
+            padding: 30px;
+            border: 2px solid var(--accent-red);
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+
+        .visualization-container {
+            height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .signal-wave {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, var(--primary-blue) 50%, transparent 100%);
+            opacity: 0;
+            animation: signalPulse 1.5s infinite;
+        }
+
+        @keyframes signalPulse {
+            0% { transform: translateX(-100%); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+
+        .signal-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 20px var(--accent-green);
+            animation: dotPulse 0.5s infinite alternate;
+        }
+
+        @keyframes dotPulse {
+            from { transform: translateY(-50%) scale(1); }
+            to { transform: translateY(-50%) scale(1.2); }
+        }
+
+        .signal-dash {
+            position: absolute;
+            width: 40px;
+            height: 10px;
+            background: var(--accent-yellow);
+            border-radius: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 15px var(--accent-yellow);
+        }
+
+        /* ===== АЗБУЧНА ТАБЛИЦА ===== */
+        .alphabet-panel {
+            grid-column: 1 / -1;
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: var(--radius);
+            padding: 30px;
+            border: 2px solid var(--primary-blue);
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .alphabet-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .alphabet-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-green);
+            background: rgba(6, 214, 160, 0.1);
+        }
+
+        .alphabet-card.active {
+            border-color: var(--accent-yellow);
+            background: rgba(255, 209, 102, 0.1);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { box-shadow: 0 0 0 0 rgba(255, 209, 102, 0.4); }
+            to { box-shadow: 0 0 0 10px rgba(255, 209, 102, 0); }
+        }
+
+        .char {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .morse-code {
+            font-family: 'Roboto Mono', monospace;
+            color: var(--accent-yellow);
+            letter-spacing: 3px;
+            font-size: 1.1rem;
+        }
+
+        /* ===== ИСТОРИЯ НА ПРЕВОДИТЕ ===== */
+        .history-panel {
+            grid-column: 1 / -1;
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: var(--radius);
+            padding: 30px;
+            border: 2px solid var(--accent-green);
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            padding-right: 10px;
+        }
+
+        .history-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-blue);
+            transition: var(--transition);
+        }
+
+        .history-item:hover {
+            background: rgba(45, 135, 240, 0.1);
+        }
+
+        .history-text {
+            color: var(--text-light);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .history-morse {
+            font-family: 'Roboto Mono', monospace;
+            color: var(--accent-yellow);
+            letter-spacing: 2px;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 30px;
+            color: var(--text-dim);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions {
+            max-width: 800px;
+            margin: 0 auto 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-yellow);
+        }
+
+        /* ===== УВЕДОМЛЕНИЯ ===== */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+        }
+
+        .notification.success {
+            background: rgba(6, 214, 160, 0.9);
+            border: 1px solid var(--accent-green);
+        }
+
+        .notification.warning {
+            background: rgba(255, 209, 102, 0.9);
+            color: var(--primary-dark);
+            border: 1px solid var(--accent-yellow);
+        }
+
+        .notification.info {
+            background: rgba(45, 135, 240, 0.9);
+            border: 1px solid var(--primary-blue);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .logo-text h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                gap: 20px;
+            }
+            
+            .input-panel, .output-panel, .visualization-panel, .alphabet-panel, .history-panel {
+                padding: 20px;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .alphabet-grid {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            }
+            
+            .code-display {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+            
+            .logo-text h1 {
+                font-size: 1.6rem;
+            }
+            
+            .morse-output {
+                font-size: 1.4rem;
+                padding: 15px;
+            }
+            
+            .btn {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* ===== ПРОГРЕС БАР ===== */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--primary-blue));
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        /* ===== КЛАВИАТУРА ===== */
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .key {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Roboto Mono', monospace;
+            font-weight: bold;
+            color: var(--text-light);
+        }
+
+        .key:hover {
+            background: rgba(45, 135, 240, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .key.active {
+            background: var(--accent-yellow);
+            color: var(--primary-dark);
+            box-shadow: 0 0 15px var(--accent-yellow);
+        }
+
+        .space-key {
+            grid-column: span 3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-satellite"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>СИМУЛАТОР НА МОРЗОВА АЗБУКА</h1>
+                    <p>Превод от/на морзов код • Обучение и практика • Интерактивна визуализация</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основен контент -->
+        <div class="main-content">
+            <!-- Ляв панел - Въвеждане и контроли -->
+            <div class="input-panel">
+                <div class="panel-header">
+                    <i class="fas fa-keyboard"></i>
+                    <h2>ВЪВЕДИ ТЕКСТ</h2>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Текст за превод в морзов код:</label>
+                    <textarea class="text-input" id="textInput" placeholder="Въведете текст на български или английски език...">SOS</textarea>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="convertToMorse()">
+                        <i class="fas fa-code"></i> Кодирай в Морз
+                    </button>
+                    <button class="btn btn-success" onclick="convertFromMorse()">
+                        <i class="fas fa-language"></i> Декодирай от Морз
+                    </button>
+                    <button class="btn btn-warning" onclick="playMorse()">
+                        <i class="fas fa-volume-up"></i> Пусни звук
+                    </button>
+                    <button class="btn btn-danger" onclick="stopMorse()">
+                        <i class="fas fa-stop"></i> Спри звук
+                    </button>
+                </div>
+                
+                <div class="control-group">
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Скорост на предаване</span>
+                            <span id="speedValue">20 WPM</span>
+                        </div>
+                        <input type="range" class="slider" id="speedSlider" min="5" max="40" value="20">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Честота на тона</span>
+                            <span id="toneValue">600 Hz</span>
+                        </div>
+                        <input type="range" class="slider" id="toneSlider" min="300" max="1200" value="600">
+                    </div>
+                    
+                    <div class="control-display">
+                        <span>Точка: <span id="dotLength">60ms</span></span>
+                        <span>Тире: <span id="dashLength">180ms</span></span>
+                        <span>Пауза: <span id="pauseLength">60ms</span></span>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <button class="btn btn-secondary" onclick="clearAll()" style="width: 100%;">
+                    <i class="fas fa-trash-alt"></i> Изчисти всичко
+                </button>
+            </div>
+
+            <!-- Десен панел - Изход и код -->
+            <div class="output-panel">
+                <div class="panel-header">
+                    <i class="fas fa-broadcast-tower"></i>
+                    <h2>МОРЗОВ ИЗХОД</h2>
+                </div>
+                
+                <div class="morse-output" id="morseOutput">
+                    ••• ——— •••
+                </div>
+                
+                <div class="panel-header" style="margin-top: 30px;">
+                    <i class="fas fa-list"></i>
+                    <h2>РАЗБИВКА НА КОДА</h2>
+                </div>
+                
+                <div class="code-display" id="codeDisplay">
+                    <!-- Кодът ще се показва тук -->
+                </div>
+            </div>
+
+            <!-- Визуализация -->
+            <div class="visualization-panel">
+                <div class="panel-header">
+                    <i class="fas fa-wave-square"></i>
+                    <h2>ВИЗУАЛИЗАЦИЯ НА СИГНАЛА</h2>
+                </div>
+                
+                <p style="color: var(--text-dim); margin-bottom: 15px;">
+                    Наблюдавайте реалната визуализация на морзовия сигнал. Точките са къси импулси, а тиретата са дълги.
+                </p>
+                
+                <div class="visualization-container" id="visualizationContainer">
+                    <div class="signal-wave"></div>
+                </div>
+                
+                <div class="control-display" style="margin-top: 15px;">
+                    <span><div style="display: inline-block; width: 15px; height: 15px; background: var(--accent-green); border-radius: 50%; margin-right: 8px;"></div> Точка (•)</span>
+                    <span><div style="display: inline-block; width: 30px; height: 10px; background: var(--accent-yellow); border-radius: 5px; margin-right: 8px;"></div> Тире (—)</span>
+                    <span><div style="display: inline-block; width: 40px; height: 3px; background: var(--accent-red); border-radius: 2px; margin-right: 8px;"></div> Пауза</span>
+                </div>
+            </div>
+
+            <!-- Морзова азбука -->
+            <div class="alphabet-panel">
+                <div class="panel-header">
+                    <i class="fas fa-book"></i>
+                    <h2>МОРЗОВА АЗБУКА (БЪЛГАРСКА)</h2>
+                </div>
+                
+                <p style="color: var(--text-dim); margin-bottom: 15px;">
+                    Кликнете върху буква или цифра, за да видите нейния морзов код и да я добавите към текста.
+                </p>
+                
+                <div class="alphabet-grid" id="alphabetGrid">
+                    <!-- Азбуката ще се генерира динамично -->
+                </div>
+            </div>
+
+            <!-- История -->
+            <div class="history-panel">
+                <div class="panel-header">
+                    <i class="fas fa-history"></i>
+                    <h2>ИСТОРИЯ НА ПРЕВОДИТЕ</h2>
+                </div>
+                
+                <div class="history-list" id="historyList">
+                    <!-- Историята ще се добавя тук -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer с инструкции -->
+        <footer class="footer">
+            <div class="instructions">
+                <h3 style="color: var(--accent-yellow); margin-bottom: 15px;">🎯 Как да използвате симулатора:</h3>
+                <ol style="text-align: left; padding-left: 20px; color: var(--text-light);">
+                    <li>Въведете текст в полето "Текст за превод"</li>
+                    <li>Натиснете "Кодирай в Морз" за превод в морзов код</li>
+                    <li>Използвайте "Пусни звук" за аудио предаване</li>
+                    <li>Регулирайте скоростта и тона със плъзгачите</li>
+                    <li>Кликнете върху букви от таблицата за бърз достъп</li>
+                    <li>Декодирайте морзов код обратно в текст</li>
+                </ol>
+            </div>
+            
+            <p>🧭 СИМУЛАТОР НА МОРЗОВА АЗБУКА - УЧЕБНА ПЛАТФОРМА 🧭</p>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: var(--text-dim);">
+                © 2024 Телеграфна комуникация • Образователни цели • Разработено с ❤️ за изучаване на морзова азбука
+            </p>
+        </footer>
+    </div>
+
+    <!-- Уведомление -->
+    <div class="notification" id="notification" style="display: none;">
+        <i class="fas fa-info-circle"></i> <span id="notificationText">Съобщение</span>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // ===== ГЛОБАЛНИ ПРОМЕНЛИВИ =====
+        let isPlaying = false;
+        let playInterval = null;
+        let currentIndex = 0;
+        let morseSequence = '';
+        let audioContext = null;
+        let oscillator = null;
+        let gainNode = null;
+        let speed = 20; // WPM (думи в минута)
+        let toneFrequency = 600; // Hz
+        let history = [];
+
+        // ===== МОРЗОВА АЗБУКА =====
+        const morseCode = {
+            // Латински букви (интернационални)
+            'A': '•—', 'B': '—•••', 'C': '—•—•', 'D': '—••', 'E': '•', 'F': '••—•',
+            'G': '——•', 'H': '••••', 'I': '••', 'J': '•———', 'K': '—•—', 'L': '•—••',
+            'M': '——', 'N': '—•', 'O': '———', 'P': '•——•', 'Q': '——•—', 'R': '•—•',
+            'S': '•••', 'T': '—', 'U': '••—', 'V': '•••—', 'W': '•——', 'X': '—••—',
+            'Y': '—•——', 'Z': '——••',
+            
+            // Български букви (кирилица)
+            'А': '•—', 'Б': '—•••', 'В': '•——', 'Г': '——•', 'Д': '—••', 'Е': '•',
+            'Ж': '•••—', 'З': '——••', 'И': '••', 'Й': '•———', 'К': '—•—', 'Л': '•—••',
+            'М': '——', 'Н': '—•', 'О': '———', 'П': '•——•', 'Р': '•—•', 'С': '•••',
+            'Т': '—', 'У': '••—', 'Ф': '••—•', 'Х': '••••', 'Ц': '—•—•', 'Ч': '———•',
+            'Ш': '————', 'Щ': '——•—', 'Ъ': '——•——', 'Ь': '—••—', 'Ю': '••——', 'Я': '•—•—',
+            
+            // Цифри
+            '0': '—————', '1': '•————', '2': '••———', '3': '•••——', '4': '••••—',
+            '5': '•••••', '6': '—••••', '7': '——•••', '8': '———••', '9': '————•',
+            
+            // Препинателни знаци и специални символи
+            '.': '•—•—•—', ',': '——••——', '?': '••——••', "'": '•————•', '!': '—•—•——',
+            '/': '—••—•', '(': '—•——•', ')': '—•——•—', '&': '•—•••', ':': '———•••',
+            ';': '—•—•—•', '=': '—•••—', '+': '•—•—•', '-': '—••••—', '_': '••——•—',
+            '"': '•—••—•', '$': '•••—••—', '@': '•——•—•', ' ': '/'
+        };
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAlphabet();
+            initializeSliders();
+            updateDisplay();
+            
+            // Добавяне на начална история
+            addToHistory('SOS', '••• ——— •••');
+            
+            // Показване на уведомление
+            setTimeout(() => {
+                showNotification('Системата за морзова азбука е готова! Въведете текст за започване.', 'info');
+            }, 1000);
+        });
+
+        function initializeAlphabet() {
+            const alphabetGrid = document.getElementById('alphabetGrid');
+            alphabetGrid.innerHTML = '';
+            
+            // Създаване на картички за азбуката
+            const letters = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЬЮЯ';
+            const numbers = '0123456789';
+            const symbols = '.,?!';
+            
+            // Добавяне на букви
+            for (let char of letters) {
+                createAlphabetCard(char, morseCode[char]);
+            }
+            
+            // Добавяне на цифри
+            for (let char of numbers) {
+                createAlphabetCard(char, morseCode[char]);
+            }
+            
+            // Добавяне на специални символи
+            for (let char of symbols) {
+                createAlphabetCard(char, morseCode[char]);
+            }
+        }
+
+        function createAlphabetCard(char, morse) {
+            const alphabetGrid = document.getElementById('alphabetGrid');
+            const card = document.createElement('div');
+            card.className = 'alphabet-card';
+            card.innerHTML = `
+                <div class="char">${char}</div>
+                <div class="morse-code">${morse}</div>
+            `;
+            
+            card.onclick = function() {
+                // Добавяне на буквата към текста
+                const textInput = document.getElementById('textInput');
+                textInput.value += char;
+                
+                // Анимация на избраната карта
+                document.querySelectorAll('.alphabet-card').forEach(c => {
+                    c.classList.remove('active');
+                });
+                card.classList.add('active');
+                
+                setTimeout(() => {
+                    card.classList.remove('active');
+                }, 1000);
+                
+                // Показване на уведомление
+                showNotification(`Добавена буква: ${char} = ${morse}`, 'success');
+            };
+            
+            alphabetGrid.appendChild(card);
+        }
+
+        function initializeSliders() {
+            const speedSlider = document.getElementById('speedSlider');
+            const toneSlider = document.getElementById('toneSlider');
+            
+            speedSlider.addEventListener('input', function() {
+                speed = parseInt(this.value);
+                document.getElementById('speedValue').textContent = `${speed} WPM`;
+                calculateTimings();
+            });
+            
+            toneSlider.addEventListener('input', function() {
+                toneFrequency = parseInt(this.value);
+                document.getElementById('toneValue').textContent = `${toneFrequency} Hz`;
+            });
+            
+            // Инициализиране на стойностите
+            document.getElementById('speedValue').textContent = `${speed} WPM`;
+            document.getElementById('toneValue').textContent = `${toneFrequency} Hz`;
+            calculateTimings();
+        }
+
+        function calculateTimings() {
+            // Изчисляване на времето въз основа на WPM
+            // Стандарт: "PARIS" = 50 time units, точка = 1 unit
+            const dotLength = 1200 / speed; // ms за точка
+            const dashLength = dotLength * 3; // тире = 3 точки
+            const pauseLength = dotLength; // пауза между символи
+            
+            document.getElementById('dotLength').textContent = `${Math.round(dotLength)}ms`;
+            document.getElementById('dashLength').textContent = `${Math.round(dashLength)}ms`;
+            document.getElementById('pauseLength').textContent = `${Math.round(pauseLength)}ms`;
+        }
+
+        // ===== ПРЕВОД В МОРЗОВ КОД =====
+        function convertToMorse() {
+            const textInput = document.getElementById('textInput');
+            const text = textInput.value.toUpperCase();
+            
+            if (!text.trim()) {
+                showNotification('Моля, въведете текст за превод!', 'warning');
+                return;
+            }
+            
+            let morseResult = '';
+            let codeDisplayHTML = '';
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                
+                if (char === ' ') {
+                    morseResult += '/ ';
+                    codeDisplayHTML += createCodeDisplayItem('Празно място', '/');
+                } else if (morseCode[char]) {
+                    morseResult += morseCode[char] + ' ';
+                    codeDisplayHTML += createCodeDisplayItem(char, morseCode[char]);
+                } else {
+                    morseResult += '? ';
+                    codeDisplayHTML += createCodeDisplayItem(char, '???', true);
+                }
+            }
+            
+            // Актуализиране на изхода
+            const morseOutput = document.getElementById('morseOutput');
+            morseOutput.textContent = morseResult.trim();
+            morseOutput.classList.add('blink');
+            
+            // Актуализиране на разбивката
+            document.getElementById('codeDisplay').innerHTML = codeDisplayHTML;
+            
+            // Запазване на последователността за възпроизвеждане
+            morseSequence = morseResult.trim();
+            currentIndex = 0;
+            
+            // Добавяне към историята
+            addToHistory(text, morseResult.trim());
+            
+            // Визуализация
+            startVisualization(morseResult.trim());
+            
+            showNotification('Текстът е преобразуван в морзов код!', 'success');
+        }
+
+        function createCodeDisplayItem(char, morse, isUnknown = false) {
+            if (isUnknown) {
+                return `
+                    <div class="code-item" style="border-left-color: var(--accent-red);">
+                        <div class="code-char" style="color: var(--accent-red);">${char}</div>
+                        <div class="code-morse" style="color: var(--accent-red);">Неизвестен символ</div>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="code-item">
+                    <div class="code-char">${char}</div>
+                    <div class="code-morse">${morse}</div>
+                </div>
+            `;
+        }
+
+        // ===== ПРЕВОД ОТ МОРЗОВ КОД =====
+        function convertFromMorse() {
+            const textInput = document.getElementById('textInput');
+            const morseText = textInput.value.trim();
+            
+            if (!morseText) {
+                showNotification('Моля, въведете морзов код за декодиране!', 'warning');
+                return;
+            }
+            
+            // Разделяне на морзовия код на символи
+            const morseChars = morseText.split(' ');
+            let textResult = '';
+            let codeDisplayHTML = '';
+            
+            // Създаване на обратен речник за морзовия код
+            const reverseMorse = {};
+            for (const [char, code] of Object.entries(morseCode)) {
+                reverseMorse[code] = char;
+            }
+            
+            for (const morseChar of morseChars) {
+                if (morseChar === '/') {
+                    textResult += ' ';
+                    codeDisplayHTML += createCodeDisplayItem('Празно място', '/');
+                } else if (reverseMorse[morseChar]) {
+                    textResult += reverseMorse[morseChar];
+                    codeDisplayHTML += createCodeDisplayItem(reverseMorse[morseChar], morseChar);
+                } else {
+                    textResult += '?';
+                    codeDisplayHTML += createCodeDisplayItem('?', morseChar, true);
+                }
+            }
+            
+            // Актуализиране на изхода
+            const morseOutput = document.getElementById('morseOutput');
+            morseOutput.textContent = morseText;
+            
+            // Актуализиране на разбивката
+            document.getElementById('codeDisplay').innerHTML = codeDisplayHTML;
+            
+            // Добавяне към историята
+            addToHistory(textResult, morseText);
+            
+            showNotification('Морзовият код е декодиран!', 'success');
+        }
+
+        // ===== ВЪЗПРОИЗВЕЖДАНЕ НА ЗВУК =====
+        function playMorse() {
+            if (!morseSequence) {
+                showNotification('Няма морзов код за възпроизвеждане!', 'warning');
+                return;
+            }
+            
+            if (isPlaying) {
+                stopMorse();
+                return;
+            }
+            
+            isPlaying = true;
+            document.querySelector('.btn-warning i').className = 'fas fa-pause';
+            document.querySelector('.btn-warning').innerHTML = '<i class="fas fa-pause"></i> Пауза';
+            
+            currentIndex = 0;
+            const morseArray = morseSequence.split('');
+            
+            // Създаване на аудио контекст
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                gainNode = audioContext.createGain();
+                gainNode.connect(audioContext.destination);
+                gainNode.gain.value = 0.3;
+            }
+            
+            // Изчисляване на времето
+            const dotLength = 1200 / speed;
+            const dashLength = dotLength * 3;
+            const symbolPause = dotLength;
+            const letterPause = dotLength * 3;
+            const wordPause = dotLength * 7;
+            
+            let currentTime = audioContext.currentTime + 0.1;
+            
+            // Ресет на прогрес бара
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = '0%';
+            
+            // Създаване на визуализация
+            startVisualization(morseSequence);
+            
+            // Функция за възпроизвеждане на символ
+            function playNextSymbol() {
+                if (currentIndex >= morseArray.length || !isPlaying) {
+                    stopMorse();
+                    return;
+                }
+                
+                const symbol = morseArray[currentIndex];
+                let duration = 0;
+                
+                // Актуализиране на прогрес бара
+                progressBar.style.width = `${(currentIndex / morseArray.length) * 100}%`;
+                
+                // Актуализиране на визуализацията
+                updateVisualization(symbol, currentIndex);
+                
+                if (symbol === '•') {
+                    // Точка
+                    duration = dotLength / 1000;
+                    playBeep(duration, currentTime);
+                    currentTime += duration + (symbolPause / 1000);
+                } else if (symbol === '—') {
+                    // Тире
+                    duration = dashLength / 1000;
+                    playBeep(duration, currentTime);
+                    currentTime += duration + (symbolPause / 1000);
+                } else if (symbol === ' ') {
+                    // Пауза между букви
+                    currentTime += letterPause / 1000;
+                } else if (symbol === '/') {
+                    // Пауза между думи
+                    currentTime += wordPause / 1000;
+                }
+                
+                currentIndex++;
+                
+                // Следващия символ
+                if (currentIndex < morseArray.length) {
+                    setTimeout(playNextSymbol, (duration * 1000) + symbolPause);
+                } else {
+                    // Край на последователността
+                    setTimeout(() => {
+                        progressBar.style.width = '100%';
+                        setTimeout(() => {
+                            stopMorse();
+                            showNotification('Възпроизвеждането завърши!', 'info');
+                        }, 500);
+                    }, 500);
+                }
+            }
+            
+            // Започване на възпроизвеждането
+            playNextSymbol();
+        }
+
+        function playBeep(duration, startTime) {
+            if (!audioContext || !isPlaying) return;
+            
+            oscillator = audioContext.createOscillator();
+            oscillator.connect(gainNode);
+            oscillator.frequency.value = toneFrequency;
+            oscillator.type = 'sine';
+            
+            oscillator.start(startTime);
+            oscillator.stop(startTime + duration);
+        }
+
+        function stopMorse() {
+            isPlaying = false;
+            
+            if (oscillator) {
+                try {
+                    oscillator.stop();
+                } catch (e) {}
+            }
+            
+            document.querySelector('.btn-warning i').className = 'fas fa-volume-up';
+            document.querySelector('.btn-warning').innerHTML = '<i class="fas fa-volume-up"></i> Пусни звук';
+            
+            // Спиране на визуализацията
+            stopVisualization();
+            
+            // Ресет на прогрес бара
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = '0%';
+        }
+
+        // ===== ВИЗУАЛИЗАЦИЯ =====
+        function startVisualization(morseString) {
+            const container = document.getElementById('visualizationContainer');
+            container.innerHTML = '<div class="signal-wave"></div>';
+            
+            // Запазване на последователността за визуализация
+            window.morseVisualization = morseString;
+        }
+
+        function updateVisualization(symbol, index) {
+            const container = document.getElementById('visualizationContainer');
+            const totalLength = morseSequence.length;
+            
+            // Изчистване на старата визуализация
+            container.innerHTML = '<div class="signal-wave"></div>';
+            
+            // Създаване на нова визуализация за текущия символ
+            if (symbol === '•') {
+                const dot = document.createElement('div');
+                dot.className = 'signal-dot';
+                dot.style.left = `${(index / totalLength) * 100}%`;
+                container.appendChild(dot);
+            } else if (symbol === '—') {
+                const dash = document.createElement('div');
+                dash.className = 'signal-dash';
+                dash.style.left = `${(index / totalLength) * 100}%`;
+                container.appendChild(dash);
+            }
+        }
+
+        function stopVisualization() {
+            const container = document.getElementById('visualizationContainer');
+            container.innerHTML = '<div class="signal-wave"></div>';
+        }
+
+        // ===== ИСТОРИЯ =====
+        function addToHistory(text, morse) {
+            const historyItem = {
+                id: Date.now(),
+                text: text,
+                morse: morse,
+                time: new Date().toLocaleTimeString('bg-BG', { hour12: false })
+            };
+            
+            history.unshift(historyItem);
+            if (history.length > 10) history.pop();
+            
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-text">${item.text}</div>
+                    <div class="history-morse">${item.morse}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 5px;">${item.time}</div>
+                `;
+                
+                historyItem.onclick = function() {
+                    document.getElementById('textInput').value = item.text;
+                    showNotification('Избрано от историята', 'info');
+                };
+                
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // ===== ПОМОЩНИ ФУНКЦИИ =====
+        function clearAll() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('morseOutput').textContent = '••• ——— •••';
+            document.getElementById('codeDisplay').innerHTML = '';
+            document.getElementById('progressBar').style.width = '0%';
+            
+            // Спиране на звука, ако се възпроизвежда
+            stopMorse();
+            
+            // Възстановяване на началния текст
+            addToHistory('SOS', '••• ——— •••');
+            
+            showNotification('Всички полета са изчистени!', 'info');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'flex';
+            
+            // Автоматично скриване
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function updateDisplay() {
+            calculateTimings();
+        }
+
+        // ===== КЛАВИАТУРНИ КОМБИНАЦИИ =====
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Enter за превод в морз
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                convertToMorse();
+            }
+            
+            // Ctrl+Space за пускане на звук
+            if (e.ctrlKey && e.code === 'Space') {
+                e.preventDefault();
+                playMorse();
+            }
+            
+            // Esc за спиране
+            if (e.key === 'Escape') {
+                stopMorse();
+            }
+        });
+
+        // ===== ЕКСПОРТ НА ФУНКЦИИ =====
+        window.convertToMorse = convertToMorse;
+        window.convertFromMorse = convertFromMorse;
+        window.playMorse = playMorse;
+        window.stopMorse = stopMorse;
+        window.clearAll = clearAll;
+    </script>
+</body>
+</html>

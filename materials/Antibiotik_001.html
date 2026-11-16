@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Химичен Симулатор: Механизъм на действие на антибиотиците</title>
+    <style>
+        :root {
+            --primary-blue: #1a5f7a;
+            --secondary-blue: #57c1eb;
+            --accent-green: #4caf50;
+            --accent-red: #ff5252;
+            --accent-yellow: #ffc107;
+            --dark-bg: #0a1929;
+            --light-bg: #132f4c;
+            --text-primary: #ffffff;
+            --text-secondary: #b0bec5;
+            --card-bg: rgba(19, 47, 76, 0.8);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0c2233 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(87, 193, 235, 0.3);
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--secondary-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .simulation-panel {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .controls-panel {
+            flex: 0 0 350px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(87, 193, 235, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .canvas-container {
+            position: relative;
+            background: linear-gradient(145deg, #0d2538, #0a1c2b);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            height: 600px;
+        }
+        
+        #simCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .canvas-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--secondary-blue);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            font-size: 1.5rem;
+        }
+        
+        .control-group {
+            margin-bottom: 24px;
+        }
+        
+        .param-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .param-name {
+            color: var(--text-primary);
+        }
+        
+        .param-value {
+            color: var(--accent-yellow);
+            font-weight: 600;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--secondary-blue);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(87, 193, 235, 0.8);
+        }
+        
+        .buttons-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        button {
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .stats-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: white;
+        }
+        
+        .bacteria-count {
+            color: var(--accent-green);
+            font-size: 1.2rem;
+        }
+        
+        .antibiotic-count {
+            color: var(--accent-red);
+            font-size: 1.2rem;
+        }
+        
+        .educational-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(87, 193, 235, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: var(--secondary-blue);
+            border-bottom: 3px solid var(--secondary-blue);
+        }
+        
+        .tab-content {
+            display: none;
+            line-height: 1.6;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .info-item {
+            margin-bottom: 16px;
+        }
+        
+        .info-item h4 {
+            color: var(--secondary-blue);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .info-item p {
+            color: var(--text-secondary);
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        .legend-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .particle-system {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        @media (max-width: 1100px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .controls-panel {
+                flex: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .buttons-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .canvas-container {
+                height: 450px;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Икони (Font Awesome заместител) */
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .icon-bacteria {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234caf50'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM8 17.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zM9.5 8c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5S9.5 9.38 9.5 8zm6.5 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E");
+        }
+        
+        .icon-antibiotic {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff5252'%3E%3Cpath d='M18.32 8.26l1.41-1.41-4.24-4.24-1.41 1.41c-1.17-1.17-3.07-1.17-4.24 0L7.1 3.54c-1.17 1.17-1.17 3.07 0 4.24l-1.41 1.41 4.24 4.24 1.41-1.41c1.17 1.17 3.07 1.17 4.24 0l2.83-2.83c1.17-1.17 1.17-3.07 0-4.24zM14.15 5.85l-8.3 8.3c-.39.39-.39 1.02 0 1.41l2.83 2.83c.39.39 1.02.39 1.41 0l8.3-8.3-4.24-4.24z'/%3E%3C/svg%3E");
+        }
+        
+        .icon-experiment {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2357c1eb'%3E%3Cpath d='M19 8h-1V3H6v5H5c-1.66 0-3 1.34-3 3v6c0 1.66 1.34 3 3 3h14c1.66 0 3-1.34 3-3v-6c0-1.66-1.34-3-3-3zM8 5h8v3H8V5zm11 12H5v-6c0-.55.45-1 1-1h12c.55 0 1 .45 1 1v6z'/%3E%3C/svg%3E");
+        }
+        
+        .icon-info {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2357c1eb'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/%3E%3C/svg%3E");
+        }
+        
+        /* Променливи за режим на цветна слепота */
+        .colorblind .bacteria-color {
+            background-color: #0066cc !important;
+        }
+        
+        .colorblind .antibiotic-color {
+            background-color: #cc6600 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Химичен Симулатор: Антибиотици и Бактерии</h1>
+            <p class="subtitle">Интерактивен образователен инструмент за визуализация на механизма на действие на антибиотиците и развитието на бактериална устойчивост. Подходящ за учебни часове по химия и биология.</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="simulation-panel">
+                <div class="canvas-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div class="canvas-overlay">
+                        <div style="position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); padding: 8px 15px; border-radius: 20px; font-size: 0.9rem;">
+                            <span>Кликни върху полето за инжектиране на антибиотик</span>
+                        </div>
+                    </div>
+                    <div class="particle-system" id="particleSystem"></div>
+                </div>
+                
+                <div class="educational-panel">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="theory">Теория</div>
+                        <div class="tab" data-tab="mechanism">Механизъм на действие</div>
+                        <div class="tab" data-tab="resistance">Антибиотична устойчивост</div>
+                        <div class="tab" data-tab="instructions">Инструкции</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="theory-tab">
+                        <div class="info-item">
+                            <h4>Антибиотици в медицината</h4>
+                            <p>Антибиотиците са химични вещества, които инхибират растежа или унищожават бактериите. Те се произвеждат от микроорганизми или синтетично и се използват за лечение на бактериални инфекции.</p>
+                        </div>
+                        <div class="info-item">
+                            <h4>Бактериални клетки</h4>
+                            <p>Бактериите са едноклетъчни микроорганизми с прокариотна клетъчна организация. Те се размножават чрез бинарно деление и могат да развият устойчивост към антибиотици чрез мутации и хоризонтален пренос на гени.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="mechanism-tab">
+                        <div class="info-item">
+                            <h4>Мишени на антибиотиците</h4>
+                            <p>Антибиотиците действат върху различни бактериални структури: клетъчната стена (пеницилини), белъчната синтеза (тетрациклини), ДНК репликацията (хинолони) или метаболитните пътища (сулфонамиди).</p>
+                        </div>
+                        <div class="info-item">
+                            <h4>Бактерицидно vs Бактериостатично действие</h4>
+                            <p>Бактерицидните антибиотици убиват бактериите, докато бактериостатичните само спират тяхното размножаване, позволявайки на имунната система да се справи с инфекцията.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="resistance-tab">
+                        <div class="info-item">
+                            <h4>Механизми на устойчивост</h4>
+                            <p>Бактериите развиват устойчивост чрез: (1) Продуциране на ензими, които деградират антибиотика; (2) Модификация на мишената; (3) Намалена клетъчна пропускливост; (4) Активно изхвърляне на антибиотика от клетката.</p>
+                        </div>
+                        <div class="info-item">
+                            <h4>Възприемчивост и устойчивост</h4>
+                            <p>При антибиотична терапия, чувствителните бактерии умират, но резистентните оцеляват и се размножават. Това води до селекция на устойчиви щамове, което затруднява лечението на инфекции.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="instructions-tab">
+                        <div class="info-item">
+                            <h4>Как да използвате симулатора</h4>
+                            <p>1. Кликнете в симулационното поле, за да инжектирате антибиотик.</p>
+                            <p>2. Регулирайте силата на антибиотика и нивото на устойчивост.</p>
+                            <p>3. Добавете нови бактерии, за да наблюдавате популационната динамика.</p>
+                            <p>4. Превключвайте между табовете за образователна информация.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color bacteria-color" style="background-color: #4caf50;"></div>
+                            <span class="legend-text">Чувствителни бактерии</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #ff9800;"></div>
+                            <span class="legend-text">Частично резистентни</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #f44336;"></div>
+                            <span class="legend-text">Високо резистентни</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color antibiotic-color" style="background-color: #ff5252;"></div>
+                            <span class="legend-text">Антибиотик</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls-panel">
+                <h2 class="section-title"><span class="icon icon-experiment"></span>Контроли на експеримента</h2>
+                
+                <div class="control-group">
+                    <div class="param-label">
+                        <span class="param-name">Концентрация на антибиотик</span>
+                        <span class="param-value" id="speed-value">5</span>
+                    </div>
+                    <input type="range" id="speed" min="1" max="10" value="5" step="0.5">
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">Влияе на скоростта и ефективността на антибиотика</div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="param-label">
+                        <span class="param-name">Ниво на резистентност</span>
+                        <span class="param-value" id="resistance-value">30%</span>
+                    </div>
+                    <input type="range" id="resistance" min="0" max="90" value="30">
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">Процент бактерии с вродена устойчивост</div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="param-label">
+                        <span class="param-name">Скорост на репликация</span>
+                        <span class="param-value" id="replication-value">5</span>
+                    </div>
+                    <input type="range" id="replication" min="1" max="10" value="5">
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">Скорост на размножаване на бактериите</div>
+                </div>
+                
+                <div class="buttons-group">
+                    <button class="btn-primary" id="addBacteria">
+                        <span class="icon icon-bacteria"></span>
+                        Добави бактерии
+                    </button>
+                    <button class="btn-secondary" id="resetSim">
+                        <span class="icon icon-experiment"></span>
+                        Рестартирай
+                    </button>
+                </div>
+                
+                <div class="buttons-group">
+                    <button class="btn-secondary" id="antibioticBurst">
+                        <span class="icon icon-antibiotic"></span>
+                        Автоматична доза
+                    </button>
+                    <button class="btn-secondary" id="toggleColorblind">
+                        <span class="icon icon-info"></span>
+                        Режим за цветна слепота
+                    </button>
+                </div>
+                
+                <div class="stats-container">
+                    <h3 class="section-title"><span class="icon icon-info"></span>Статистика на симулацията</h3>
+                    
+                    <div class="stat-row">
+                        <span class="stat-label">Живи бактерии:</span>
+                        <span class="stat-value bacteria-count" id="bacteria-count">0</span>
+                    </div>
+                    
+                    <div class="stat-row">
+                        <span class="stat-label">Активни антибиотици:</span>
+                        <span class="stat-value antibiotic-count" id="antibiotic-count">0</span>
+                    </div>
+                    
+                    <div class="stat-row">
+                        <span class="stat-label">Унищожени бактерии:</span>
+                        <span class="stat-value" id="destroyed-count">0</span>
+                    </div>
+                    
+                    <div class="stat-row">
+                        <span class="stat-label">Средна резистентност:</span>
+                        <span class="stat-value" id="avg-resistance">0%</span>
+                    </div>
+                    
+                    <div class="stat-row">
+                        <span class="stat-label">Време на симулация:</span>
+                        <span class="stat-value" id="time-count">0s</span>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; font-size: 0.8rem; color: var(--text-secondary); margin-top: 20px;">
+                    <p>Симулация за учебни цели | Химия & Биология</p>
+                    <p>Версия 2.0 | Професионален образователен инструмент</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация на симулацията
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Елементи за статистика
+        const bacteriaCountElem = document.getElementById('bacteria-count');
+        const antibioticCountElem = document.getElementById('antibiotic-count');
+        const destroyedCountElem = document.getElementById('destroyed-count');
+        const avgResistanceElem = document.getElementById('avg-resistance');
+        const timeCountElem = document.getElementById('time-count');
+        
+        // Елементи за контроли
+        const speedSlider = document.getElementById('speed');
+        const speedValueElem = document.getElementById('speed-value');
+        const resistanceSlider = document.getElementById('resistance');
+        const resistanceValueElem = document.getElementById('resistance-value');
+        const replicationSlider = document.getElementById('replication');
+        const replicationValueElem = document.getElementById('replication-value');
+        
+        // Настройване на размерите на платното
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        
+        window.addEventListener('load', resizeCanvas);
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Променливи за симулацията
+        let bacteria = [];
+        let antibiotics = [];
+        let particles = [];
+        let destroyedBacteriaCount = 0;
+        let simulationTime = 0;
+        let simulationInterval;
+        let isColorblindMode = false;
+        
+        // Константи за симулацията
+        const BACTERIA_TYPES = {
+            SUSCEPTIBLE: 0,
+            RESISTANT: 1,
+            HIGHLY_RESISTANT: 2
+        };
+        
+        // Цветове за различни типове бактерии
+        const BACTERIA_COLORS = {
+            [BACTERIA_TYPES.SUSCEPTIBLE]: { r: 76, g: 175, b: 80 },
+            [BACTERIA_TYPES.RESISTANT]: { r: 255, g: 152, b: 0 },
+            [BACTERIA_TYPES.HIGHLY_RESISTANT]: { r: 244, g: 67, b: 54 }
+        };
+        
+        const ANTIBIOTIC_COLOR = { r: 255, g: 82, b: 82 };
+        const PARTICLE_COLORS = {
+            bacteriaDeath: { r: 255, g: 235, b: 59 },
+            antibioticHit: { r: 33, g: 150, b: 243 }
+        };
+        
+        // Клас за бактерии
+        class Bacterium {
+            constructor(x, y, type = null) {
+                this.x = x || Math.random() * canvas.width;
+                this.y = y || Math.random() * canvas.height;
+                this.radius = Math.random() * 8 + 6;
+                this.type = type !== null ? type : this.determineType();
+                this.health = 100;
+                this.maxHealth = 100;
+                this.speed = Math.random() * 1.2 + 0.5;
+                this.angle = Math.random() * Math.PI * 2;
+                this.replicationTimer = Math.random() * 100 + 50;
+                this.replicationRate = 5; // По подразбиране
+                this.pulsePhase = Math.random() * Math.PI * 2;
+                this.color = this.getColor();
+            }
+            
+            determineType() {
+                const resistanceLevel = parseInt(resistanceSlider.value);
+                const rand = Math.random() * 100;
+                
+                if (rand < resistanceLevel * 0.5) {
+                    return BACTERIA_TYPES.HIGHLY_RESISTANT;
+                } else if (rand < resistanceLevel) {
+                    return BACTERIA_TYPES.RESISTANT;
+                } else {
+                    return BACTERIA_TYPES.SUSCEPTIBLE;
+                }
+            }
+            
+            getColor() {
+                if (isColorblindMode) {
+                    // Алтернативни цветове за хора с цветна слепота
+                    switch(this.type) {
+                        case BACTERIA_TYPES.SUSCEPTIBLE: return { r: 0, g: 102, b: 204 };
+                        case BACTERIA_TYPES.RESISTANT: return { r: 204, g: 102, b: 0 };
+                        case BACTERIA_TYPES.HIGHLY_RESISTANT: return { r: 153, g: 0, b: 153 };
+                        default: return { r: 76, g: 175, b: 80 };
+                    }
+                } else {
+                    return BACTERIA_COLORS[this.type];
+                }
+            }
+            
+            getResistanceFactor() {
+                switch(this.type) {
+                    case BACTERIA_TYPES.SUSCEPTIBLE: return 0.2;
+                    case BACTERIA_TYPES.RESISTANT: return 0.5;
+                    case BACTERIA_TYPES.HIGHLY_RESISTANT: return 0.8;
+                    default: return 0.2;
+                }
+            }
+            
+            draw() {
+                // Пулсиращ ефект
+                const pulseScale = 1 + Math.sin(Date.now() * 0.005 + this.pulsePhase) * 0.05;
+                const currentRadius = this.radius * pulseScale * (this.health / this.maxHealth);
+                
+                // Основа на бактерията
+                ctx.beginPath();
+                ctx.ellipse(this.x, this.y, currentRadius, currentRadius * 0.8, this.angle, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${0.7 + 0.3 * (this.health / this.maxHealth)})`;
+                ctx.fill();
+                
+                // Контур
+                ctx.strokeStyle = `rgba(${this.color.r * 0.8}, ${this.color.g * 0.8}, ${this.color.b * 0.8}, 0.8)`;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                
+                // Вътрешни детайли (за прилика с бактерия)
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, currentRadius * 0.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color.r * 1.2}, ${this.color.g * 1.2}, ${this.color.b * 1.2}, 0.3)`;
+                ctx.fill();
+                
+                // Флагелум (камшиче)
+                ctx.beginPath();
+                ctx.moveTo(this.x + Math.cos(this.angle) * currentRadius, this.y + Math.sin(this.angle) * currentRadius);
+                ctx.quadraticCurveTo(
+                    this.x + Math.cos(this.angle) * (currentRadius + 12),
+                    this.y + Math.sin(this.angle) * (currentRadius + 12) + 5,
+                    this.x + Math.cos(this.angle) * (currentRadius + 20),
+                    this.y + Math.sin(this.angle) * (currentRadius + 20) - 3
+                );
+                ctx.strokeStyle = `rgba(${this.color.r * 0.6}, ${this.color.g * 0.6}, ${this.color.b * 0.6}, 0.7)`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // Показване на здравето (по избор)
+                if (this.health < this.maxHealth) {
+                    ctx.fillStyle = `rgba(255, 255, 255, 0.9)`;
+                    ctx.font = "10px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText(`${Math.round(this.health)}%`, this.x, this.y - currentRadius - 8);
+                }
+            }
+            
+            update() {
+                // Движение
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+                
+                // Отскачане от стените
+                if (this.x < this.radius) {
+                    this.x = this.radius;
+                    this.angle = Math.PI - this.angle;
+                }
+                if (this.x > canvas.width - this.radius) {
+                    this.x = canvas.width - this.radius;
+                    this.angle = Math.PI - this.angle;
+                }
+                if (this.y < this.radius) {
+                    this.y = this.radius;
+                    this.angle = -this.angle;
+                }
+                if (this.y > canvas.height - this.radius) {
+                    this.y = canvas.height - this.radius;
+                    this.angle = -this.angle;
+                }
+                
+                // Промяна на посоката случайно
+                if (Math.random() < 0.02) {
+                    this.angle += (Math.random() - 0.5) * 0.5;
+                }
+                
+                // Репликация (размножаване)
+                this.replicationTimer -= this.replicationRate;
+                if (this.replicationTimer <= 0 && bacteria.length < 200) {
+                    this.replicate();
+                    this.replicationTimer = Math.random() * 100 + 50;
+                }
+            }
+            
+            replicate() {
+                // Създаване на нова бактерия с вероятност за мутация
+                let childType = this.type;
+                if (Math.random() < 0.05) { // 5% шанс за мутация
+                    childType = Math.floor(Math.random() * 3);
+                }
+                
+                const newBacteria = new Bacterium(
+                    this.x + (Math.random() - 0.5) * 30,
+                    this.y + (Math.random() - 0.5) * 30,
+                    childType
+                );
+                newBacteria.replicationRate = parseInt(replicationSlider.value);
+                bacteria.push(newBacteria);
+            }
+            
+            takeDamage(damage) {
+                const resistanceFactor = this.getResistanceFactor();
+                const actualDamage = damage * (1 - resistanceFactor);
+                this.health -= actualDamage;
+                
+                return this.health <= 0;
+            }
+        }
+        
+        // Клас за антибиотик
+        class Antibiotic {
+            constructor(x, y, potency) {
+                this.x = x;
+                this.y = y;
+                this.radius = 4;
+                this.potency = potency;
+                this.speed = potency * 0.8;
+                this.angle = Math.random() * Math.PI * 2;
+                this.lifetime = 150;
+                this.color = isColorblindMode ? 
+                    { r: 204, g: 102, b: 0 } : 
+                    { r: 255, g: 82, b: 82 };
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                
+                // Градиент за по-интересен изглед
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.radius
+                );
+                gradient.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.9)`);
+                gradient.addColorStop(1, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.3)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                // Контур
+                ctx.strokeStyle = `rgba(255, 255, 255, 0.6)`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // Ефект на сияние
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius + 3, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.3)`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            update() {
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+                this.lifetime--;
+                
+                // Отскачане от стените
+                if (this.x < this.radius) {
+                    this.x = this.radius;
+                    this.angle = Math.PI - this.angle;
+                }
+                if (this.x > canvas.width - this.radius) {
+                    this.x = canvas.width - this.radius;
+                    this.angle = Math.PI - this.angle;
+                }
+                if (this.y < this.radius) {
+                    this.y = this.radius;
+                    this.angle = -this.angle;
+                }
+                if (this.y > canvas.height - this.radius) {
+                    this.y = canvas.height - this.radius;
+                    this.angle = -this.angle;
+                }
+                
+                // Лек завой с времето
+                this.angle += (Math.random() - 0.5) * 0.05;
+            }
+        }
+        
+        // Клас за частици (визуални ефекти)
+        class Particle {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.size = Math.random() * 4 + 2;
+                this.speed = Math.random() * 3 + 1;
+                this.angle = Math.random() * Math.PI * 2;
+                this.lifetime = 30;
+                this.maxLifetime = 30;
+                
+                if (type === 'bacteriaDeath') {
+                    this.color = PARTICLE_COLORS.bacteriaDeath;
+                } else {
+                    this.color = PARTICLE_COLORS.antibioticHit;
+                }
+            }
+            
+            draw() {
+                const alpha = this.lifetime / this.maxLifetime;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${alpha})`;
+                ctx.fill();
+            }
+            
+            update() {
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+                this.lifetime--;
+                this.size *= 0.95;
+            }
+        }
+        
+        // Инициализация на симулацията
+        function initSimulation() {
+            bacteria = [];
+            antibiotics = [];
+            particles = [];
+            destroyedBacteriaCount = 0;
+            simulationTime = 0;
+            
+            // Създаване на начални бактерии
+            for (let i = 0; i < 25; i++) {
+                const bacterium = new Bacterium();
+                bacterium.replicationRate = parseInt(replicationSlider.value);
+                bacteria.push(bacterium);
+            }
+            
+            // Стартиране на таймера
+            clearInterval(simulationInterval);
+            simulationInterval = setInterval(() => {
+                simulationTime++;
+                timeCountElem.textContent = `${simulationTime}s`;
+            }, 1000);
+            
+            // Стартиране на анимацията
+            animate();
+        }
+        
+        // Основна анимационна функция
+        function animate() {
+            // Изчистване на платното
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуване на фонов градиент
+            drawBackground();
+            
+            // Актуализиране и рисуване на антибиотиците
+            for (let i = antibiotics.length - 1; i >= 0; i--) {
+                const antibiotic = antibiotics[i];
+                antibiotic.update();
+                antibiotic.draw();
+                
+                // Премахване на антибиотици с изтекъл живот
+                if (antibiotic.lifetime <= 0) {
+                    antibiotics.splice(i, 1);
+                    continue;
+                }
+                
+                // Проверка за сблъсъци с бактерии
+                for (let j = bacteria.length - 1; j >= 0; j--) {
+                    const bacterium = bacteria[j];
+                    const dx = antibiotic.x - bacterium.x;
+                    const dy = antibiotic.y - bacterium.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < antibiotic.radius + bacterium.radius) {
+                        // Създаване на частици за ефект на удар
+                        for (let k = 0; k < 5; k++) {
+                            particles.push(new Particle(antibiotic.x, antibiotic.y, 'antibioticHit'));
+                        }
+                        
+                        // Нанасяне на щети на бактерията
+                        const isDead = bacterium.takeDamage(antibiotic.potency * 10);
+                        
+                        if (isDead) {
+                            // Създаване на частици за ефект на смърт
+                            for (let k = 0; k < 10; k++) {
+                                particles.push(new Particle(bacterium.x, bacterium.y, 'bacteriaDeath'));
+                            }
+                            
+                            bacteria.splice(j, 1);
+                            destroyedBacteriaCount++;
+                        }
+                        
+                        // Намаляване на ефективността на антибиотика след удар
+                        antibiotic.potency *= 0.7;
+                        if (antibiotic.potency < 0.5) {
+                            antibiotics.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Актуализиране и рисуване на бактериите
+            for (const bacterium of bacteria) {
+                bacterium.update();
+                bacterium.draw();
+            }
+            
+            // Актуализиране и рисуване на частиците
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const particle = particles[i];
+                particle.update();
+                particle.draw();
+                
+                if (particle.lifetime <= 0 || particle.size < 0.5) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            // Актуализиране на статистиката
+            updateStats();
+            
+            // Продължаване на анимацията
+            requestAnimationFrame(animate);
+        }
+        
+        // Функция за рисуване на фона
+        function drawBackground() {
+            // Основен фон
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, "#0a1929");
+            gradient.addColorStop(1, "#0c2233");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Мрежа за микроскопен ефект
+            ctx.strokeStyle = "rgba(87, 193, 235, 0.05)";
+            ctx.lineWidth = 1;
+            
+            // Вертикални линии
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // Хоризонтални линии
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Централна точка
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, 3, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(87, 193, 235, 0.2)";
+            ctx.fill();
+        }
+        
+        // Актуализиране на статистиката
+        function updateStats() {
+            bacteriaCountElem.textContent = bacteria.length;
+            antibioticCountElem.textContent = antibiotics.length;
+            destroyedCountElem.textContent = destroyedBacteriaCount;
+            
+            // Изчисляване на средната резистентност
+            if (bacteria.length > 0) {
+                let totalResistance = 0;
+                for (const bacterium of bacteria) {
+                    totalResistance += bacterium.getResistanceFactor();
+                }
+                const avgResistance = (totalResistance / bacteria.length) * 100;
+                avgResistanceElem.textContent = `${Math.round(avgResistance)}%`;
+            } else {
+                avgResistanceElem.textContent = "0%";
+            }
+        }
+        
+        // Обработчици на събития
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const potency = parseFloat(speedSlider.value);
+            
+            // Създаване на антибиотици
+            for (let i = 0; i < 20; i++) {
+                const antibiotic = new Antibiotic(x, y, potency);
+                antibiotics.push(antibiotic);
+            }
+            
+            // Звуков ефект (опционално)
+            playSoundEffect('injection');
+        });
+        
+        document.getElementById('addBacteria').addEventListener('click', () => {
+            for (let i = 0; i < 15; i++) {
+                const bacterium = new Bacterium();
+                bacterium.replicationRate = parseInt(replicationSlider.value);
+                bacteria.push(bacterium);
+            }
+            playSoundEffect('addBacteria');
+        });
+        
+        document.getElementById('resetSim').addEventListener('click', () => {
+            initSimulation();
+            playSoundEffect('reset');
+        });
+        
+        document.getElementById('antibioticBurst').addEventListener('click', () => {
+            const potency = parseFloat(speedSlider.value);
+            
+            // Създаване на антибиотици в случайни позиции
+            for (let i = 0; i < 5; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                
+                for (let j = 0; j < 10; j++) {
+                    const antibiotic = new Antibiotic(x, y, potency);
+                    antibiotics.push(antibiotic);
+                }
+            }
+            
+            playSoundEffect('burst');
+        });
+        
+        document.getElementById('toggleColorblind').addEventListener('click', () => {
+            isColorblindMode = !isColorblindMode;
+            document.body.classList.toggle('colorblind', isColorblindMode);
+            
+            // Обновяване на цветовете на бактериите
+            for (const bacterium of bacteria) {
+                bacterium.color = bacterium.getColor();
+            }
+            
+            playSoundEffect('toggle');
+        });
+        
+        // Обработчици на плъзгачите
+        speedSlider.addEventListener('input', () => {
+            speedValueElem.textContent = speedSlider.value;
+        });
+        
+        resistanceSlider.addEventListener('input', () => {
+            resistanceValueElem.textContent = `${resistanceSlider.value}%`;
+        });
+        
+        replicationSlider.addEventListener('input', () => {
+            replicationValueElem.textContent = replicationSlider.value;
+            
+            // Прилагане на новата скорост на репликация към всички бактерии
+            for (const bacterium of bacteria) {
+                bacterium.replicationRate = parseInt(replicationSlider.value);
+            }
+        });
+        
+        // Обработчици за табове
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Премахване на активния клас от всички табове
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Добавяне на активен клас към избрания таб
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // Функция за звукови ефекти (опционално)
+        function playSoundEffect(type) {
+            // Това е само пример - в реална ситуация бихме използвали Web Audio API
+            console.log(`Playing sound: ${type}`);
+        }
+        
+        // Стартиране на симулацията при зареждане
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            initSimulation();
+            
+            // Инициализиране на стойностите на плъзгачите
+            speedValueElem.textContent = speedSlider.value;
+            resistanceValueElem.textContent = `${resistanceSlider.value}%`;
+            replicationValueElem.textContent = replicationSlider.value;
+        });
+    </script>
+</body>
+</html>

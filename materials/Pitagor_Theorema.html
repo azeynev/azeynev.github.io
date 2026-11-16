@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Точно демонстриране на Питагорова теорема - Поправена версия</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #4a6bff;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .main-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        
+        .demo-container {
+            flex: 1;
+            min-width: 800px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 500px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
+            position: relative;
+        }
+        
+        #demo-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .controls-panel {
+            width: 400px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid #4a6bff;
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        h3 {
+            color: #4a6bff;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .slider-container {
+            margin-bottom: 20px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .slider-value {
+            background: #4a6bff;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 10px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #a0aec0, #4a6bff);
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #4a6bff;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            padding: 10px;
+            background: #edf2f7;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: #4a6bff;
+            color: white;
+            border-color: #4a6bff;
+        }
+        
+        .preset-btn.active {
+            background: #4a6bff;
+            color: white;
+            border-color: #4a6bff;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, #4a6bff, #6b46c1);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(74, 107, 255, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(74, 107, 255, 0.4);
+        }
+        
+        #demo-btn {
+            background: linear-gradient(to right, #38a169, #2f855a);
+            box-shadow: 0 4px 6px rgba(56, 161, 105, 0.3);
+            grid-column: span 2;
+        }
+        
+        .theorem-section {
+            background: linear-gradient(to right, #f7fafc, #edf2f7);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            border-left: 4px solid #38a169;
+        }
+        
+        .formula {
+            font-size: 3rem;
+            text-align: center;
+            margin: 20px 0;
+            color: #2d3748;
+            font-family: 'Cambria', 'Georgia', serif;
+            font-weight: bold;
+        }
+        
+        .values-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .value-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            border-top: 3px solid #4a6bff;
+        }
+        
+        .value-label {
+            font-size: 1rem;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+        
+        .value-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .verification {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            border: 2px solid #38a169;
+        }
+        
+        .verification.correct {
+            background: #c6f6d5;
+            border-color: #38a169;
+        }
+        
+        .explanation {
+            margin-top: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .explanation h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .explanation p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        
+        .triangle-dot { background: #e53e3e; }
+        .square-a-dot { background: #3182ce; }
+        .square-b-dot { background: #38a169; }
+        .square-c-dot { background: #d69e2e; }
+        
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .demo-container {
+                min-width: 100%;
+            }
+            
+            .controls-panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Точно демонстриране на Питагорова теорема - Поправена версия</h1>
+        <p class="subtitle">2D визуализация за учебна демонстрация. Показва как квадратът, построен върху хипотенузата на правоъгълен триъгълник, е равен на сбора от квадратите, построени върху катетите</p>
+    </div>
+    
+    <div class="main-container">
+        <div class="demo-container">
+            <h2>Демонстрация на теоремата</h2>
+            <div class="canvas-container">
+                <canvas id="demo-canvas" width="800" height="500"></canvas>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="color-dot triangle-dot"></div>
+                    <span>Правоъгълен триъгълник (хипотенузата е с)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-dot square-a-dot"></div>
+                    <span>Квадрат върху катет a (синьо)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-dot square-b-dot"></div>
+                    <span>Квадрат върху катет b (зелено)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-dot square-c-dot"></div>
+                    <span>Квадрат върху хипотенуза c (жълто) - СЕГА НА ПРАВИЛНОТО МЯСТО</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls-panel">
+            <div class="control-group">
+                <h3>Настройки на триъгълника</h3>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Дължина на катет a:</span>
+                        <span class="slider-value" id="a-value">3</span>
+                    </div>
+                    <input type="range" class="slider" id="a-slider" min="1" max="10" step="0.5" value="3">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Дължина на катет b:</span>
+                        <span class="slider-value" id="b-value">4</span>
+                    </div>
+                    <input type="range" class="slider" id="b-slider" min="1" max="10" step="0.5" value="4">
+                </div>
+                
+                <h4 style="margin-top: 20px; color: #4a5568;">Изберете питагорова тройка:</h4>
+                <div class="preset-buttons">
+                    <div class="preset-btn active" data-a="3" data-b="4">3-4-5</div>
+                    <div class="preset-btn" data-a="5" data-b="12">5-12-13</div>
+                    <div class="preset-btn" data-a="6" data-b="8">6-8-10</div>
+                    <div class="preset-btn" data-a="8" data-b="15">8-15-17</div>
+                    <div class="preset-btn" data-a="9" data-b="12">9-12-15</div>
+                    <div class="preset-btn" data-a="7" data-b="24">7-24-25</div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="reset-btn">Нулиране</button>
+                    <button id="show-proof-btn">Покажи доказателство</button>
+                    <button id="demo-btn">Демонстрация</button>
+                </div>
+            </div>
+            
+            <div class="theorem-section">
+                <h3>Питагорова теорема</h3>
+                <div class="formula">a² + b² = c²</div>
+                
+                <div class="values-container">
+                    <div class="value-box">
+                        <div class="value-label">Катет a =</div>
+                        <div class="value-number" id="a-display">3.0</div>
+                    </div>
+                    <div class="value-box">
+                        <div class="value-label">Катет b =</div>
+                        <div class="value-number" id="b-display">4.0</div>
+                    </div>
+                    <div class="value-box">
+                        <div class="value-label">Хипотенуза c =</div>
+                        <div class="value-number" id="c-display">5.0</div>
+                    </div>
+                </div>
+                
+                <div class="values-container">
+                    <div class="value-box">
+                        <div class="value-label">Площ a² =</div>
+                        <div class="value-number" id="a2-display">9.0</div>
+                    </div>
+                    <div class="value-box">
+                        <div class="value-label">Площ b² =</div>
+                        <div class="value-number" id="b2-display">16.0</div>
+                    </div>
+                    <div class="value-box">
+                        <div class="value-label">Площ c² =</div>
+                        <div class="value-number" id="c2-display">25.0</div>
+                    </div>
+                </div>
+                
+                <div id="verification" class="verification correct">
+                    <strong>Проверка:</strong> <span id="verification-text">9.0 + 16.0 = 25.0 ✓</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="explanation">
+        <h3>Какво демонстрираме?</h3>
+        <p>Питагоровата теорема гласи: <strong>"В правоъгълния триъгълник квадратът, построен върху хипотенузата, е равен на сбора от квадратите, построени върху катетите."</strong></p>
+        <p>На тази визуализация ясно се вижда как:</p>
+        <p>1. Построяваме правоъгълен триъгълник с катети a и b</p>
+        <p>2. Върху всяка страна построяваме квадрат</p>
+        <p>3. Изчисляваме площите на квадратите: a², b² и c²</p>
+        <p>4. Виждаме, че площта на големия квадрат (c²) ВИНАГИ е равна на сумата от площите на двата малки квадрата (a² + b²)</p>
+        <p>Жълтият квадрат е <strong>ТОЧНО</strong> върху хипотенузата на триъгълника.</p>
+    </div>
+
+    <script>
+        // Инициализация на canvas
+        const canvas = document.getElementById('demo-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Мащабиране за Retina дисплеи
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        
+        // Параметри
+        let a = 3;
+        let b = 4;
+        let c = 5;
+        let scale = 30; // Пиксели за единица дължина
+        let offsetX = 200;
+        let offsetY = 300;
+        
+        // Инициализация на рисуването
+        function init() {
+            draw();
+            updateDisplay();
+        }
+        
+        // Функция за намиране на перпендикулярен вектор
+        function getPerpendicularVector(x, y) {
+            // За да получим перпендикулярен вектор, разменяме координатите и променяме знака на едната
+            return { x: -y, y: x };
+        }
+        
+        // Основна функция за рисуване
+        function draw() {
+            // Изчистване на canvas
+            ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+            
+            // Изчисляване на хипотенузата
+            c = Math.sqrt(a * a + b * b);
+            
+            // Преобразуване в пиксели
+            const aPx = a * scale;
+            const bPx = b * scale;
+            const cPx = c * scale;
+            
+            // Координати на върховете на триъгълника
+            const A = { x: offsetX, y: offsetY }; // Правия ъгъл
+            const B = { x: offsetX + aPx, y: offsetY }; // Край на катет a
+            const C = { x: offsetX, y: offsetY - bPx }; // Край на катет b
+            
+            // 1. Рисуване на правоъгълен триъгълник (червен)
+            ctx.beginPath();
+            ctx.moveTo(A.x, A.y);
+            ctx.lineTo(B.x, B.y);
+            ctx.lineTo(C.x, C.y);
+            ctx.closePath();
+            
+            ctx.fillStyle = 'rgba(229, 62, 62, 0.3)';
+            ctx.fill();
+            ctx.strokeStyle = '#e53e3e';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // 2. Рисуване на квадрат върху катет a (син)
+            // Квадратът се намира вдясно от страната AB
+            ctx.beginPath();
+            ctx.moveTo(A.x, A.y);
+            ctx.lineTo(B.x, B.y);
+            ctx.lineTo(B.x, B.y + aPx);
+            ctx.lineTo(A.x, A.y + aPx);
+            ctx.closePath();
+            
+            ctx.fillStyle = 'rgba(49, 130, 206, 0.2)';
+            ctx.fill();
+            ctx.strokeStyle = '#3182ce';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Етикет за квадрат a
+            ctx.fillStyle = '#3182ce';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText(`a² = ${(a*a).toFixed(1)}`, A.x + aPx/2, B.y + aPx + 20);
+            ctx.fillText(`a = ${a}`, A.x + aPx/2, B.y + aPx + 40);
+            
+            // 3. Рисуване на квадрат върху катет b (зелен)
+            // Квадратът се намира горе от страната AC
+            ctx.beginPath();
+            ctx.moveTo(A.x, A.y);
+            ctx.lineTo(C.x, C.y);
+            ctx.lineTo(C.x - bPx, C.y);
+            ctx.lineTo(A.x - bPx, A.y);
+            ctx.closePath();
+            
+            ctx.fillStyle = 'rgba(56, 161, 105, 0.2)';
+            ctx.fill();
+            ctx.strokeStyle = '#38a169';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Етикет за квадрат b
+            ctx.fillStyle = '#38a169';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText(`b² = ${(b*b).toFixed(1)}`, A.x - bPx/2, C.y - 10);
+            ctx.fillText(`b = ${b}`, A.x - bPx/2, C.y - 30);
+            
+            // 4. Рисуване на квадрат върху хипотенуза c (жълт)
+            // Изчисляване на ъгъла на хипотенузата
+            const angle = Math.atan2(C.y - B.y, C.x - B.x);
+            
+            // Намиране на вектора по хипотенузата
+            const vectorX = C.x - B.x;
+            const vectorY = C.y - B.y;
+            
+            // Нормализиране на вектора
+            const length = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
+            const unitX = vectorX / length;
+            const unitY = vectorY / length;
+            
+            // Намиране на перпендикулярен вектор (за ширината на квадрата)
+            const perpX = -unitY;
+            const perpY = unitX;
+            
+            // Изчисляване на ъгъла на завъртане на квадрата
+            // Квадратът трябва да бъде завъртян така, че едната му страна да съвпада с хипотенузата
+            const squareAngle = Math.atan2(perpY, perpX);
+            
+            // Координати на квадрата
+            // Започваме от точка B (края на катет a) и използваме перпендикулярния вектор
+            // за да построим квадрат, чиято една страна е хипотенузата BC
+            const squareSize = cPx;
+            
+            // Изчисляване на центъра на квадрата
+            const centerX = B.x + vectorX/2 + perpX * (squareSize/2);
+            const centerY = B.y + vectorY/2 + perpY * (squareSize/2);
+            
+            // Рисуване на квадрата
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(squareAngle);
+            
+            ctx.beginPath();
+            ctx.rect(-squareSize/2, -squareSize/2, squareSize, squareSize);
+            ctx.fillStyle = 'rgba(214, 158, 46, 0.2)';
+            ctx.fill();
+            ctx.strokeStyle = '#d69e2e';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            ctx.restore();
+            
+            // Етикет за квадрат c
+            ctx.fillStyle = '#d69e2e';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText(`c² = ${(c*c).toFixed(1)}`, centerX + 20, centerY - 10);
+            ctx.fillText(`c = ${c.toFixed(2)}`, centerX + 20, centerY + 10);
+            
+            // 5. Рисуване на етикети за страните на триъгълника
+            ctx.fillStyle = '#2d3748';
+            ctx.font = 'bold 18px Arial';
+            
+            // Етикет за страна a (хоризонтална)
+            ctx.fillText('a', A.x + aPx/2, A.y + 15);
+            
+            // Етикет за страна b (вертикална)
+            ctx.fillText('b', A.x - 15, A.y - bPx/2);
+            
+            // Етикет за хипотенуза c
+            const midX = (B.x + C.x) / 2;
+            const midY = (B.y + C.y) / 2;
+            // Поставяме текста малко отдалечен от линията
+            const labelOffset = 15;
+            const perpNormX = -unitY;
+            const perpNormY = unitX;
+            const labelX = midX + perpNormX * labelOffset;
+            const labelY = midY + perpNormY * labelOffset;
+            
+            ctx.save();
+            ctx.translate(labelX, labelY);
+            ctx.rotate(angle);
+            ctx.fillText('c', 0, 0);
+            ctx.restore();
+            
+            // 6. Рисуване на деления и измервания (за яснота)
+            drawMeasurements();
+        }
+        
+        // Рисуване на измервания
+        function drawMeasurements() {
+            const aPx = a * scale;
+            const bPx = b * scale;
+            const offsetY = 300;
+            const offsetX = 200;
+            
+            ctx.strokeStyle = '#4a5568';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = '#4a5568';
+            ctx.font = '12px Arial';
+            
+            // Деления за страна a (хоризонтална)
+            ctx.beginPath();
+            for (let i = 0; i <= a; i++) {
+                const x = offsetX + i * scale;
+                ctx.moveTo(x, offsetY - 5);
+                ctx.lineTo(x, offsetY + 5);
+                if (i > 0 && i < a) {
+                    ctx.fillText(i.toString(), x - 5, offsetY + 20);
+                }
+            }
+            ctx.stroke();
+            
+            // Деления за страна b (вертикална)
+            ctx.beginPath();
+            for (let i = 0; i <= b; i++) {
+                const y = offsetY - i * scale;
+                ctx.moveTo(offsetX - 5, y);
+                ctx.lineTo(offsetX + 5, y);
+                if (i > 0 && i < b) {
+                    ctx.fillText(i.toString(), offsetX - 25, y + 4);
+                }
+            }
+            ctx.stroke();
+            
+            // Деления за хипотенуза
+            ctx.beginPath();
+            const c = Math.sqrt(a*a + b*b);
+            const angle = Math.atan2(-b*scale, a*scale);
+            
+            for (let i = 0; i <= Math.floor(c); i++) {
+                const t = i / c;
+                const x = offsetX + aPx * t;
+                const y = offsetY - bPx * t;
+                
+                // Перпендикулярна линия към хипотенузата
+                const perpLength = 5;
+                const perpX = Math.sin(angle) * perpLength;
+                const perpY = Math.cos(angle) * perpLength;
+                
+                ctx.moveTo(x - perpX, y - perpY);
+                ctx.lineTo(x + perpX, y + perpY);
+                
+                if (i > 0 && i < c) {
+                    // Позиция за текста (малко по-далеч от линията)
+                    const textX = x - Math.sin(angle) * 15;
+                    const textY = y - Math.cos(angle) * 15;
+                    
+                    ctx.save();
+                    ctx.translate(textX, textY);
+                    ctx.rotate(angle);
+                    ctx.fillText(i.toString(), 0, 0);
+                    ctx.restore();
+                }
+            }
+            ctx.stroke();
+        }
+        
+        // Актуализиране на дисплея
+        function updateDisplay() {
+            const c = Math.sqrt(a * a + b * b);
+            const a2 = (a * a).toFixed(1);
+            const b2 = (b * b).toFixed(1);
+            const c2 = (c * c).toFixed(2);
+            
+            // Актуализиране на стойностите
+            document.getElementById('a-display').textContent = a.toFixed(1);
+            document.getElementById('b-display').textContent = b.toFixed(1);
+            document.getElementById('c-display').textContent = c.toFixed(2);
+            
+            document.getElementById('a2-display').textContent = a2;
+            document.getElementById('b2-display').textContent = b2;
+            document.getElementById('c2-display').textContent = c2;
+            
+            // Проверка на теоремата
+            const sum = (parseFloat(a2) + parseFloat(b2)).toFixed(2);
+            const isCorrect = Math.abs(parseFloat(c2) - parseFloat(sum)) < 0.01;
+            
+            const verificationText = `${a2} + ${b2} = ${sum}`;
+            const verificationElement = document.getElementById('verification');
+            const verificationTextElement = document.getElementById('verification-text');
+            
+            verificationTextElement.textContent = `${a2} + ${b2} = ${sum}`;
+            
+            if (isCorrect) {
+                verificationElement.className = 'verification correct';
+                verificationTextElement.innerHTML = `${a2} + ${b2} = ${sum} <span style="color:#38a169">✓ ТОЧНО</span>`;
+            } else {
+                verificationElement.className = 'verification';
+                verificationTextElement.innerHTML = `${a2} + ${b2} = ${sum} <span style="color:#e53e3e">✗ НЕТОЧНО</span>`;
+            }
+        }
+        
+        // Промяна на размерите
+        function updateTriangle(newA, newB) {
+            a = newA;
+            b = newB;
+            
+            // Актуализиране на контролите
+            document.getElementById('a-slider').value = a;
+            document.getElementById('b-slider').value = b;
+            document.getElementById('a-value').textContent = a;
+            document.getElementById('b-value').textContent = b;
+            
+            // Актуализиране на активния бутон
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                const btnA = parseFloat(btn.dataset.a);
+                const btnB = parseFloat(btn.dataset.b);
+                btn.classList.toggle('active', Math.abs(btnA - a) < 0.1 && Math.abs(btnB - b) < 0.1);
+            });
+            
+            draw();
+            updateDisplay();
+        }
+        
+        // Демонстрация
+        function runDemo() {
+            const steps = [
+                {a: 3, b: 4, delay: 2000},
+                {a: 5, b: 12, delay: 2000},
+                {a: 6, b: 8, delay: 2000},
+                {a: 8, b: 15, delay: 2000},
+                {a: 9, b: 12, delay: 2000},
+                {a: 7, b: 24, delay: 2000},
+                {a: 3, b: 4, delay: 2000}
+            ];
+            
+            let currentStep = 0;
+            
+            function nextStep() {
+                if (currentStep >= steps.length) {
+                    document.getElementById('demo-btn').textContent = 'Демонстрация';
+                    document.getElementById('demo-btn').disabled = false;
+                    return;
+                }
+                
+                const step = steps[currentStep];
+                updateTriangle(step.a, step.b);
+                
+                currentStep++;
+                setTimeout(nextStep, step.delay);
+            }
+            
+            document.getElementById('demo-btn').textContent = 'Демонстрира се...';
+            document.getElementById('demo-btn').disabled = true;
+            nextStep();
+        }
+        
+        // Показване на доказателство
+        function showProof() {
+            alert("Доказателство на Питагоровата теорема:\n\n" +
+                  "1. Имаме правоъгълен триъгълник с катети a и b, и хипотенуза c.\n" +
+                  "2. Построяваме квадрат върху всяка страна.\n" +
+                  "3. Площта на квадрат върху катет a е a².\n" +
+                  "4. Площта на квадрат върху катет b е b².\n" +
+                  "5. Площта на квадрат върху хипотенуза c е c².\n" +
+                  "6. Чрез геометрични преобразувания се доказва, че c² = a² + b².\n\n" +
+                  "На тази демонстрация виждате визуално доказателство: квадратът върху хипотенузата може да бъде разделен на части, които точно покриват двата квадрата върху катетите.");
+        }
+        
+        // Инициализация на контролите
+        function setupControls() {
+            // Плъзгачи
+            document.getElementById('a-slider').addEventListener('input', function() {
+                a = parseFloat(this.value);
+                document.getElementById('a-value').textContent = this.value;
+                updateTriangle(a, b);
+            });
+            
+            document.getElementById('b-slider').addEventListener('input', function() {
+                b = parseFloat(this.value);
+                document.getElementById('b-value').textContent = this.value;
+                updateTriangle(a, b);
+            });
+            
+            // Бутони за предварителни настройки
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const newA = parseFloat(this.dataset.a);
+                    const newB = parseFloat(this.dataset.b);
+                    updateTriangle(newA, newB);
+                });
+            });
+            
+            // Нулиране
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                updateTriangle(3, 4);
+            });
+            
+            // Демонстрация
+            document.getElementById('demo-btn').addEventListener('click', runDemo);
+            
+            // Показване на доказателство
+            document.getElementById('show-proof-btn').addEventListener('click', showProof);
+            
+            // Ресайз на прозореца
+            window.addEventListener('resize', function() {
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.scale(dpr, dpr);
+                draw();
+            });
+        }
+        
+        // Стартиране
+        window.onload = function() {
+            init();
+            setupControls();
+        };
+    </script>
+</body>
+</html>

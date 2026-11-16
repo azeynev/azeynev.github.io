@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>WOW Симулация: Антибиотик vs Бактерии</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0d1222; /* По-тъмен фон */
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        canvas {
+            background: radial-gradient(circle at 50% 50%, #1a2a40, #0a0e1a); /* По-дълбок градиент */
+            box-shadow: 0 0 80px rgba(0,0,0,0.7);
+            cursor: crosshair;
+            border-radius: 10px; /* Малки заоблени ъгли за модерна визия */
+        }
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.15); /* По-изразен блур */
+            padding: 25px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.25);
+            width: 300px;
+            z-index: 100; /* Гарантира, че е над платното */
+        }
+        h2 { margin-top: 0; font-size: 22px; color: #66e0ff; text-shadow: 0 0 10px rgba(102, 224, 255, 0.7); }
+        .param { margin-bottom: 20px; }
+        label { display: block; font-size: 14px; margin-bottom: 8px; color: #aaffee; }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #3a4a5e;
+            border-radius: 5px;
+            outline: none;
+            accent-color: #66e0ff;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #66e0ff;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 0 5px rgba(102, 224, 255, 0.8);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(45deg, #66e0ff, #39c7d4);
+            color: #0d1222;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        button:hover {
+            background: linear-gradient(45deg, #39c7d4, #66e0ff);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            transform: translateY(-2px);
+        }
+        .stats {
+            margin-top: 20px;
+            font-weight: bold;
+            font-family: 'Consolas', monospace;
+            font-size: 16px;
+            color: #aaffee;
+        }
+        .hint {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 15px;
+            text-align: center;
+            color: #b0e0ff;
+        }
+
+        /* Particles for explosion effect */
+        .particle-system {
+            position: absolute;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1; /* Под контролите, над платното */
+        }
+        .particle {
+            position: absolute;
+            background: #fff; /* Дефолтен цвят, ще се променя */
+            border-radius: 50%;
+            opacity: 0;
+            animation: particle-fade-out 1s forwards;
+        }
+        @keyframes particle-fade-out {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* Pulsating effect for bacteria */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h2>🔬 Био-Лаборатория 🧬</h2>
+        <div class="param">
+            <label>Интензивност на Антибиотика:</label>
+            <input type="range" id="speed" min="1" max="15" value="5">
+        </div>
+        <div class="param">
+            <label>Бактериална Устойчивост (%):</label>
+            <input type="range" id="resistance" min="0" max="90" value="30">
+        </div>
+        <button id="addBacteria">Добави Нови Бактерии</button>
+        <div class="stats">Живи бактерии: <span id="count">0</span></div>
+        <p class="hint">⚡ Кликни върху екрана, за да инжектираш антибиотик!</p>
+    </div>
+
+    <canvas id="simCanvas"></canvas>
+    <div class="particle-system" id="particleSystem"></div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const countDisplay = document.getElementById('count');
+        const particleSystem = document.getElementById('particleSystem');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let bacteria = [];
+        let antibiotics = [];
+        let decayParticles = []; // For bacteria decay
+        let antibioticExplosionParticles = []; // For antibiotic impact
+
+        // --- Constants for visual tuning ---
+        const BACTERIA_INITIAL_COUNT = 30;
+        const BACTERIA_ADD_COUNT = 15;
+        const ANTIBIOTIC_SHOT_COUNT = 20;
+        const BACTERIA_HEALTH_DRAIN_RATE = 0.5; // How much health is lost per antibiotic hit (adjusted by resistance)
+        const ANTIBIOTIC_LIFE = 150; // How long antibiotic particles last
+        const BACTERIA_PULSE_SPEED = 0.05; // For pulsating effect
+
+        class Bacteria {
+            constructor(x, y) {
+                this.x = x || Math.random() * canvas.width;
+                this.y = y || Math.random() * canvas.height;
+                this.baseRadius = Math.random() * 8 + 6;
+                this.radius = this.baseRadius;
+                this.angle = Math.random() * Math.PI * 2;
+                this.velocity = Math.random() * 1.5 + 0.8;
+                this.health = 100;
+                this.maxHealth = 100;
+                this.color = { r: 100, g: 255, b: 100 }; // Greenish
+                this.hitTime = 0; // Timestamp for hit animation
+                this.pulseOffset = Math.random() * Math.PI * 2; // For unique pulsating
+            }
+
+            draw() {
+                // Pulsating effect
+                const pulseScale = 1 + Math.sin(Date.now() * BACTERIA_PULSE_SPEED + this.pulseOffset) * 0.05;
+                this.radius = this.baseRadius * pulseScale;
+
+                // Health-based color and size
+                const currentGreen = Math.max(50, Math.floor(255 * (this.health / this.maxHealth)));
+                const currentRed = Math.max(0, Math.floor(255 * (1 - this.health / this.maxHealth)));
+                this.color = { r: currentRed, g: currentGreen, b: 100 };
+                
+                // Flash on hit
+                if (Date.now() - this.hitTime < 100) { // Flash for 100ms
+                    this.color = { r: 255, g: 200, b: 0 }; // Yellowish flash
+                }
+
+                ctx.beginPath();
+                ctx.ellipse(this.x, this.y, this.radius, this.radius * 0.7, this.angle, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.health / this.maxHealth * 0.8 + 0.2})`;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.7)`;
+                ctx.fill();
+                ctx.strokeStyle = `rgba(${this.color.r * 0.8}, ${this.color.g * 0.8}, ${this.color.b * 0.8}, ${this.health / this.maxHealth * 0.8 + 0.2})`;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Simple flagellum (tail)
+                ctx.beginPath();
+                ctx.moveTo(this.x + Math.cos(this.angle) * this.radius, this.y + Math.sin(this.angle) * this.radius);
+                ctx.quadraticCurveTo(
+                    this.x + Math.cos(this.angle) * (this.radius + 15), this.y + Math.sin(this.angle) * (this.radius + 15) + 10,
+                    this.x + Math.cos(this.angle) * (this.radius + 25), this.y + Math.sin(this.angle) * (this.radius + 25) - 5
+                );
+                ctx.strokeStyle = `rgba(${this.color.r * 0.6}, ${this.color.g * 0.6}, ${this.color.b * 0.6}, ${this.health / this.maxHealth * 0.8 + 0.2})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            update() {
+                this.x += Math.cos(this.angle) * this.velocity;
+                this.y += Math.sin(this.angle) * this.velocity;
+
+                // Bounce off walls
+                if(this.x < 0 || this.x > canvas.width) this.angle = Math.PI - this.angle;
+                if(this.y < 0 || this.y > canvas.height) this.angle = -this.angle;
+            }
+        }
+
+        class Antibiotic {
+            constructor(x, y, speed) {
+                this.x = x;
+                this.y = y;
+                this.radius = 3;
+                this.dx = (Math.random() - 0.5) * speed * 2;
+                this.dy = (Math.random() - 0.5) * speed * 2;
+                this.life = ANTIBIOTIC_LIFE;
+                this.color = { r: 255, g: 75, b: 43 }; // Reddish
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.life / ANTIBIOTIC_LIFE})`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.7)`;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            update() {
+                this.x += this.dx;
+                this.y += this.dy;
+                this.life--;
+            }
+        }
+
+        // Particle for explosions and decay
+        class EffectParticle {
+            constructor(x, y, color, size, velocityX, velocityY, decayRate = 0.03) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = size;
+                this.vx = velocityX;
+                this.vy = velocityY;
+                this.alpha = 1;
+                this.decayRate = decayRate;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.alpha})`;
+                ctx.fill();
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decayRate;
+                this.size *= 0.98; // Shrink slightly
+            }
+        }
+
+        function createParticles(x, y, count, color, sizeRange, speedRange, decayRate, particleArray) {
+            for (let i = 0; i < count; i++) {
+                const size = Math.random() * (sizeRange[1] - sizeRange[0]) + sizeRange[0];
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * (speedRange[1] - speedRange[0]) + speedRange[0];
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed;
+                particleArray.push(new EffectParticle(x, y, color, size, vx, vy, decayRate));
+            }
+        }
+
+        function init() {
+            for(let i = 0; i < BACTERIA_INITIAL_COUNT; i++) bacteria.push(new Bacteria());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update Bacteria
+            for (let i = bacteria.length - 1; i >= 0; i--) {
+                let b = bacteria[i];
+                b.update();
+                b.draw();
+
+                // Collision with Antibiotic
+                for (let j = antibiotics.length - 1; j >= 0; j--) {
+                    let a = antibiotics[j];
+                    let dist = Math.hypot(b.x - a.x, b.y - a.y);
+                    if(dist < b.radius + a.radius) {
+                        const resistance = document.getElementById('resistance').value / 100;
+                        b.health -= BACTERIA_HEALTH_DRAIN_RATE * (1 - resistance);
+                        b.hitTime = Date.now(); // Mark for hit animation
+
+                        // Create antibiotic hit particles
+                        createParticles(a.x, a.y, 3, {r: 255, g: 200, b: 0}, [1, 3], [1, 3], 0.05, antibioticExplosionParticles);
+
+                        // Remove antibiotic particle
+                        antibiotics.splice(j, 1);
+
+                        if(b.health <= 0) {
+                            // Create decay particles when bacteria dies
+                            createParticles(b.x, b.y, 15, {r: b.color.r, g: b.color.g, b: b.color.b}, [2, 5], [1, 4], 0.02, decayParticles);
+                            bacteria.splice(i, 1);
+                            // Optional: play a "death" sound
+                        }
+                    }
+                }
+            }
+
+            // Update Antibiotics
+            for (let i = antibiotics.length - 1; i >= 0; i--) {
+                let a = antibiotics[i];
+                a.update();
+                a.draw();
+                if(a.life <= 0) antibiotics.splice(i, 1);
+            }
+
+            // Update Decay Particles
+            for (let i = decayParticles.length - 1; i >= 0; i--) {
+                let p = decayParticles[i];
+                p.update();
+                p.draw();
+                if (p.alpha <= 0 || p.size <= 0.5) decayParticles.splice(i, 1);
+            }
+
+            // Update Antibiotic Explosion Particles
+            for (let i = antibioticExplosionParticles.length - 1; i >= 0; i--) {
+                let p = antibioticExplosionParticles[i];
+                p.update();
+                p.draw();
+                if (p.alpha <= 0 || p.size <= 0.5) antibioticExplosionParticles.splice(i, 1);
+            }
+
+
+            countDisplay.innerText = bacteria.length;
+            requestAnimationFrame(animate);
+        }
+
+        canvas.addEventListener('click', (e) => {
+            let speed = document.getElementById('speed').value;
+            // Create a "burst" effect for antibiotic
+            createParticles(e.clientX, e.clientY, ANTIBIOTIC_SHOT_COUNT / 2, {r: 255, g: 150, b: 100}, [2, 5], [2, 7], 0.02, antibioticExplosionParticles);
+            for(let i = 0; i < ANTIBIOTIC_SHOT_COUNT; i++) {
+                antibiotics.push(new Antibiotic(e.clientX, e.clientY, speed));
+            }
+            // Optional: play a "shoot" sound
+        });
+
+        document.getElementById('addBacteria').addEventListener('click', () => {
+            for(let i = 0; i < BACTERIA_ADD_COUNT; i++) bacteria.push(new Bacteria());
+            // Optional: play a "spawn" sound
+        });
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Логистично уравнение със закъснение</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f9ff;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .equation-container {
+            text-align: center;
+            font-size: 1.4rem;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .equation {
+            font-size: 1.6rem;
+            margin: 10px 0;
+        }
+        
+        .equation-description {
+            color: #555;
+            font-size: 1rem;
+            margin-top: 10px;
+            max-width: 800px;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .chart-container {
+            flex: 2;
+            min-width: 500px;
+            height: 400px;
+            position: relative;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .parameter {
+            margin-bottom: 20px;
+        }
+        
+        .parameter label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .slider-container input[type="range"] {
+            flex-grow: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: #dde4e9;
+            outline: none;
+        }
+        
+        .slider-container span {
+            min-width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        
+        #simulateBtn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        #resetBtn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .info h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        @media (max-width: 900px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .chart-container {
+                min-width: 100%;
+                height: 350px;
+            }
+        }
+    </style>
+    <!-- MathJax за рендиране на LaTeX уравнения -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Логистично уравнение със закъснение</h1>
+        <div class="subtitle">Моделиране на популационна динамика със закъснение в отговора</div>
+        
+        <div class="equation-container">
+            <div class="equation" id="equation">
+                $$ \frac{dN}{dt} = rN(t)\left(1 - \frac{N(t - \tau)}{K}\right) $$
+            </div>
+            <div class="equation-description">
+                където \( \dot{N}(t) \) е скоростта на растеж на популацията, \( r \) е скоростта на растеж, 
+                \( K \) е капацитетът на средата, а \( \tau \) е времето закъснение.
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="controls">
+                <div class="parameter">
+                    <label for="r">Скорост на растеж (r): <span id="rValue">0.5</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="r" min="0.1" max="2" step="0.1" value="0.5">
+                    </div>
+                </div>
+                
+                <div class="parameter">
+                    <label for="K">Капацитет на средата (K): <span id="KValue">100</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="K" min="50" max="200" step="10" value="100">
+                    </div>
+                </div>
+                
+                <div class="parameter">
+                    <label for="tau">Закъснение (τ): <span id="tauValue">2</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="tau" min="0" max="10" step="0.5" value="2">
+                    </div>
+                </div>
+                
+                <div class="parameter">
+                    <label for="N0">Начална популация (N₀): <span id="N0Value">10</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="N0" min="1" max="50" step="1" value="10">
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button id="simulateBtn">Симулирай</button>
+                    <button id="resetBtn">Нулирай параметри</button>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="populationChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="info">
+            <h3>Информация за уравнението</h3>
+            <p>Логистичното уравнение със закъснение описва популационна динамика, при която популацията <strong>N(t)</strong> расте със скорост <strong>r</strong>, но отчита капацитета на средата <strong>K</strong> със закъснение <strong>τ</strong>.</p>
+            <p>Този модел демонстрира как закъснението може да доведе до колебания в популацията вместо стабилно приближаване към капацитета. При определени стойности на параметрите може да се наблюдават стабилни трептения или дори хаотично поведение.</p>
+            <p>Уравнението се решава числено с метода на Ойлер с времева стъпка \( \Delta t = 0.1 \).</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Конфигуриране на MathJax
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+        
+        // Референции към DOM елементи
+        const rSlider = document.getElementById('r');
+        const KSlider = document.getElementById('K');
+        const tauSlider = document.getElementById('tau');
+        const N0Slider = document.getElementById('N0');
+        
+        const rValue = document.getElementById('rValue');
+        const KValue = document.getElementById('KValue');
+        const tauValue = document.getElementById('tauValue');
+        const N0Value = document.getElementById('N0Value');
+        
+        const simulateBtn = document.getElementById('simulateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const equationElement = document.getElementById('equation');
+        
+        // Инициализация на графиката
+        const ctx = document.getElementById('populationChart').getContext('2d');
+        let populationChart = null;
+        
+        // Параметри по подразбиране
+        const defaultParams = {
+            r: 0.5,
+            K: 100,
+            tau: 2,
+            N0: 10
+        };
+        
+        // Настройка на Chart.js
+        Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+        Chart.defaults.color = '#555';
+        
+        // Функция за обновяване на стойностите на параметрите
+        function updateParameterValues() {
+            rValue.textContent = parseFloat(rSlider.value).toFixed(1);
+            KValue.textContent = KSlider.value;
+            tauValue.textContent = parseFloat(tauSlider.value).toFixed(1);
+            N0Value.textContent = N0Slider.value;
+            
+            // Обновяване на уравнението с текущите стойности
+            updateEquation();
+        }
+        
+        // Функция за обновяване на уравнението
+        function updateEquation() {
+            const r = parseFloat(rSlider.value).toFixed(1);
+            const K = KSlider.value;
+            const tau = parseFloat(tauSlider.value).toFixed(1);
+            const N0 = N0Slider.value;
+            
+            equationElement.innerHTML = 
+                `$$ \\frac{dN}{dt} = ${r} \\cdot N(t) \\cdot \\left(1 - \\frac{N(t - ${tau})}{${K}}\\right), \\quad N(0) = ${N0} $$`;
+            
+            // Презареждане на MathJax за рендиране на новото уравнение
+            if (window.MathJax) {
+                window.MathJax.typesetPromise([equationElement]).catch(err => console.log('MathJax error:', err));
+            }
+        }
+        
+        // Функция за решаване на логистичното уравнение със закъснение (числен метод)
+        function solveLogisticDelayEquation(r, K, tau, N0, timeSteps = 200, dt = 0.1) {
+            const n = Math.ceil(timeSteps / dt);
+            const N = new Array(n).fill(0);
+            
+            // Инициализиране на популацията за първите tau времеви стъпки
+            const tauSteps = Math.ceil(tau / dt);
+            for (let i = 0; i < tauSteps; i++) {
+                N[i] = N0;
+            }
+            
+            // Числено интегриране с метода на Ойлер
+            for (let i = tauSteps; i < n; i++) {
+                const currentN = N[i-1];
+                const delayedIndex = Math.max(0, i - tauSteps);
+                const delayedN = N[delayedIndex];
+                
+                // Логистично уравнение със закъснение
+                const dN = r * currentN * (1 - delayedN / K);
+                N[i] = currentN + dN * dt;
+                
+                // Не позволява популацията да стане отрицателна
+                if (N[i] < 0) N[i] = 0;
+            }
+            
+            // Създаване на масива от времеви стъпки
+            const time = [];
+            for (let i = 0; i < n; i++) {
+                time.push(i * dt);
+            }
+            
+            return { time, N };
+        }
+        
+        // Функция за чертане на графика
+        function plotSolution(time, N, r, K, tau, N0) {
+            // Унищожаване на старата графика ако съществува
+            if (populationChart) {
+                populationChart.destroy();
+            }
+            
+            // Създаване на нова графика
+            populationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: time.map(t => t.toFixed(1)),
+                    datasets: [{
+                        label: `Популация N(t)`,
+                        data: N,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }, {
+                        label: `Капацитет K = ${K}`,
+                        data: new Array(time.length).fill(K),
+                        borderColor: '#e74c3c',
+                        borderWidth: 1.5,
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Логистично уравнение със закъснение: r=${r}, K=${K}, τ=${tau}, N₀=${N0}`,
+                            font: {
+                                size: 16
+                            },
+                            padding: {
+                                top: 10,
+                                bottom: 20
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.datasetIndex === 0) {
+                                        label += context.parsed.y.toFixed(2);
+                                    } else {
+                                        label += context.parsed.y;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                },
+                                padding: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Време (t)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                maxTicksLimit: 10
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Популация N(t)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            min: 0,
+                            suggestedMax: K * 1.2,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+        
+        // Функция за изпълнение на симулацията
+        function runSimulation() {
+            const r = parseFloat(rSlider.value);
+            const K = parseFloat(KSlider.value);
+            const tau = parseFloat(tauSlider.value);
+            const N0 = parseFloat(N0Slider.value);
+            
+            // Решаване на уравнението
+            const solution = solveLogisticDelayEquation(r, K, tau, N0);
+            
+            // Чертане на графиката
+            plotSolution(solution.time, solution.N, r, K, tau, N0);
+        }
+        
+        // Функция за нулиране на параметрите
+        function resetParameters() {
+            rSlider.value = defaultParams.r;
+            KSlider.value = defaultParams.K;
+            tauSlider.value = defaultParams.tau;
+            N0Slider.value = defaultParams.N0;
+            
+            updateParameterValues();
+            runSimulation();
+        }
+        
+        // Инициализиране на слушатели за събития
+        rSlider.addEventListener('input', () => {
+            updateParameterValues();
+        });
+        
+        KSlider.addEventListener('input', () => {
+            updateParameterValues();
+        });
+        
+        tauSlider.addEventListener('input', () => {
+            updateParameterValues();
+        });
+        
+        N0Slider.addEventListener('input', () => {
+            updateParameterValues();
+        });
+        
+        simulateBtn.addEventListener('click', runSimulation);
+        resetBtn.addEventListener('click', resetParameters);
+        
+        // Инициализиране на приложението
+        updateParameterValues();
+        runSimulation();
+        
+        // Добавяне на слушател за промяна на размера на прозореца за преоразмеряване на графиката
+        window.addEventListener('resize', function() {
+            if (populationChart) {
+                populationChart.resize();
+            }
+        });
+        
+        // След зареждане на страницата, гарантираме че MathJax ще рендира уравненията
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.MathJax) {
+                window.MathJax.typesetPromise().catch(err => console.log('MathJax error:', err));
+            }
+        });
+    </script>
+</body>
+</html>

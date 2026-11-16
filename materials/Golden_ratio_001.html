@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Golden Ratio - Interactive HUD Edition</title>
+    <style>
+        :root { --gold: #ffd700; --bg: #030303; --ui: rgba(10, 10, 10, 0.95); }
+        body { margin: 0; background: var(--bg); color: #eee; font-family: 'Consolas', monospace; display: flex; overflow: hidden; }
+        #ui { width: 320px; background: var(--ui); padding: 25px; border-right: 1px solid #333; height: 100vh; z-index: 10; backdrop-filter: blur(15px); }
+        canvas { flex-grow: 1; }
+        .group { margin-bottom: 20px; }
+        label { display: block; font-size: 11px; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+        input, select { width: 100%; background: #1a1a1a; color: var(--gold); border: 1px solid #333; padding: 8px; border-radius: 5px; }
+        .btn { background: var(--gold); color: #000; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; transition: 0.3s; }
+        .btn:hover { background: #fff; box-shadow: 0 0 20px rgba(255,215,0,0.4); }
+        .btn.active { background: #ff4444; color: #fff; }
+        
+        /* Стил за интерактивния HUD */
+        #hud { 
+            position: absolute; top: 20px; right: 20px; 
+            width: 250px; height: 154px; 
+            border: 2px solid rgba(255,215,0,0.2); 
+            background: rgba(0,0,0,0.7); 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        #hud:hover { border-color: var(--gold); transform: scale(1.05); }
+        .hud-label { position: absolute; font-size: 9px; color: var(--gold); padding: 5px; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <h2 style="color:var(--gold); font-weight: 300; letter-spacing: 2px;">&Phi; COMMAND</h2>
+    
+    <div class="group">
+        <label>Геометрия на частиците</label>
+        <select id="shapeType">
+            <option value="circle">Кръг (Атом)</option>
+            <option value="square">Квадрат (Блок)</option>
+            <option value="star">Звезда (Квант)</option>
+        </select>
+    </div>
+
+    <div class="group">
+        <label>Плътност: <span id="nVal" style="float:right">1200</span></label>
+        <input type="range" id="count" min="100" max="3500" value="1200">
+    </div>
+
+    <div class="group">
+        <label>Златен Ъгъл: <span id="aVal" style="float:right">137.5</span>°</label>
+        <input type="range" id="angle" min="135" max="140" step="0.0001" value="137.508">
+    </div>
+
+    <button id="autoBtn" class="btn">AUTO-SYNC</button>
+    <button id="explodeBtn" class="btn">BIG BANG (Explosion)</button>
+    
+    <div style="margin-top:40px; border-top: 1px solid #333; padding-top:20px;">
+        <label>Текуща Палитра:</label>
+        <div id="paletteName" style="color:var(--gold); font-size:14px; margin-top:5px;">GOLDEN HARMONY</div>
+        <p style="font-size: 10px; color: #555; margin-top:15px;">Кликни върху HUD вдясно, за да смениш темата!</p>
+    </div>
+</div>
+
+<div id="hud">
+    <div class="hud-label" style="bottom:5px; right:5px">CLICK TO MORPH</div>
+    <canvas id="hudCanvas" width="250" height="154"></canvas>
+</div>
+
+<canvas id="mainCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const hudCanvas = document.getElementById('hudCanvas');
+    const hctx = hudCanvas.getContext('2d');
+    
+    let particles = [];
+    let isAuto = false;
+    let isExploding = false;
+    let colorTheme = 0;
+
+    const themes = [
+        { name: "GOLDEN HARMONY", hueStart: 45, hueRange: 20 },
+        { name: "CYBER NEON", hueStart: 280, hueRange: 60 },
+        { name: "DEEP OCEAN", hueStart: 180, hueRange: 40 },
+        { name: "EMERALD NATURE", hueStart: 100, hueRange: 40 }
+    ];
+
+    function resize() {
+        canvas.width = window.innerWidth - 320;
+        canvas.height = window.innerHeight;
+        initParticles();
+    }
+
+    function drawHUD() {
+        hctx.clearRect(0, 0, 250, 154);
+        const phi = (1 + Math.sqrt(5)) / 2;
+        const currentTheme = themes[colorTheme];
+        
+        hctx.strokeStyle = `hsla(${currentTheme.hueStart}, 100%, 50%, 0.6)`;
+        hctx.lineWidth = 2;
+        hctx.strokeRect(5, 5, 240, 144);
+        
+        // Златна спирала в HUD
+        let x = 5, y = 5, w = 240, h = 144;
+        hctx.beginPath();
+        for(let i=0; i<6; i++) {
+            hctx.strokeRect(x, y, w, h);
+            let side = h;
+            hctx.arc(x + side, y + side, side, Math.PI, 1.5 * Math.PI);
+            // Опростена визуализация на разделянето
+            let nextW = w / phi;
+            x += (w - nextW);
+            w = nextW;
+        }
+        hctx.stroke();
+    }
+
+    class Particle {
+        constructor(index) {
+            this.index = index;
+            this.reset();
+        }
+        reset() {
+            this.x = (Math.random() - 0.5) * canvas.width;
+            this.y = (Math.random() - 0.5) * canvas.height;
+            this.vx = 0; this.vy = 0;
+        }
+        update() {
+            const angleVal = parseFloat(document.getElementById('angle').value);
+            const divergence = angleVal * (Math.PI / 180);
+            const r = 9 * Math.sqrt(this.index);
+            const targetX = r * Math.cos(this.index * divergence);
+            const targetY = r * Math.sin(this.index * divergence);
+
+            if (isExploding) {
+                this.x += this.vx; this.y += this.vy;
+                this.vy += 0.15;
+            } else {
+                this.x += (targetX - this.x) * 0.08;
+                this.y += (targetY - this.y) * 0.08;
+            }
+        }
+        draw() {
+            const theme = themes[colorTheme];
+            ctx.fillStyle = `hsla(${(this.index * 0.3 + theme.hueStart) % 360}, 100%, 50%, 0.7)`;
+            ctx.beginPath();
+            const type = document.getElementById('shapeType').value;
+            if(type === 'circle') ctx.arc(this.x, this.y, 3, 0, Math.PI*2);
+            else if(type === 'square') ctx.rect(this.x-3, this.y-3, 6, 6);
+            else {
+                // Малка звезда
+                for(let i=0; i<5; i++) {
+                    ctx.lineTo(this.x + 5 * Math.cos(i*1.25), this.y + 5 * Math.sin(i*1.25));
+                }
+            }
+            ctx.fill();
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        const n = document.getElementById('count').value;
+        for(let i=0; i<n; i++) particles.push(new Particle(i));
+    }
+
+    function loop() {
+        ctx.fillStyle = 'rgba(3, 3, 3, 0.25)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.save();
+        ctx.translate(canvas.width/2, canvas.height/2);
+        particles.forEach(p => { p.update(); p.draw(); });
+        ctx.restore();
+
+        if (isAuto) {
+            let a = document.getElementById('angle');
+            a.value = (parseFloat(a.value) + 0.0015).toFixed(4);
+            if(a.value > 140) a.value = 135;
+        }
+
+        document.getElementById('nVal').innerText = document.getElementById('count').value;
+        document.getElementById('aVal').innerText = document.getElementById('angle').value;
+        document.getElementById('paletteName').innerText = themes[colorTheme].name;
+        document.getElementById('paletteName').style.color = `hsl(${themes[colorTheme].hueStart}, 100%, 50%)`;
+        
+        drawHUD();
+        requestAnimationFrame(loop);
+    }
+
+    // Клик върху HUD сменя темата
+    document.getElementById('hud').onclick = () => {
+        colorTheme = (colorTheme + 1) % themes.length;
+    };
+
+    document.getElementById('autoBtn').onclick = (e) => {
+        isAuto = !isAuto;
+        e.target.classList.toggle('active');
+        e.target.innerText = isAuto ? "SYNC ACTIVE" : "AUTO-SYNC";
+    };
+
+    document.getElementById('explodeBtn').onclick = () => {
+        isExploding = true;
+        particles.forEach(p => {
+            p.vx = (Math.random()-0.5)*40;
+            p.vy = (Math.random()-0.5)*40 - 10;
+        });
+        setTimeout(() => isExploding = false, 2000);
+    };
+
+    document.getElementById('count').oninput = initParticles;
+    window.addEventListener('resize', resize);
+    resize();
+    loop();
+</script>
+</body>
+</html>

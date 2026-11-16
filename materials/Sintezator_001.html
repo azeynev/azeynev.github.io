@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Synth Lab: Физика на Звука</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090919;
+            --panel-glass: rgba(20, 20, 35, 0.7);
+            --accent-cyan: #00f3ff;
+            --accent-pink: #ff00e6;
+            --accent-purple: #8a2be2;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 243, 255, 0.1) 0%, transparent 40%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+        }
+        
+        /* --- LAYOUT --- */
+        .main-console {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            width: 95%;
+            max-width: 1300px;
+            margin-bottom: 25px;
+        }
+
+        .visualizer-container {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: 280px;
+        }
+
+        .controls-container {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        /* --- MODULE PANELS (Glassmorphism) --- */
+        .module-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .module-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            opacity: 0.7;
+        }
+
+        .module-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- VISUALIZERS --- */
+        .viz-box {
+            position: relative;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+        canvas { width: 100%; height: 100%; display: block; border-radius: 12px; }
+        .viz-label {
+            position: absolute; top: 10px; left: 15px;
+            font-size: 0.8em; color: var(--text-secondary); font-family: 'Orbitron', sans-serif;
+            pointer-events: none;
+        }
+
+        /* --- CONTROLS --- */
+        .control-group { margin-bottom: 15px; }
+        label {
+            display: flex; justify-content: space-between; font-size: 0.85em;
+            color: var(--text-secondary); margin-bottom: 8px;
+        }
+        .val-display { font-family: 'Orbitron', monospace; color: var(--accent-cyan); }
+
+        /* Neon Sliders */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px; border: 1px solid rgba(0, 243, 255, 0.3);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
+            background: var(--accent-cyan); margin-top: -7px;
+            box-shadow: 0 0 10px var(--accent-cyan); cursor: pointer;
+        }
+
+        /* Wave Selectors */
+        .wave-selector { display: flex; gap: 8px; }
+        .wave-btn {
+            flex: 1; padding: 10px; background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2); color: var(--text-secondary);
+            font-family: 'Orbitron', sans-serif; font-size: 0.7em; cursor: pointer;
+            border-radius: 6px; transition: 0.3s;
+        }
+        .wave-btn.active {
+            background: rgba(0, 243, 255, 0.2);
+            border-color: var(--accent-cyan); color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        /* --- PIANO --- */
+        .keyboard-panel {
+            width: 95%; max-width: 1300px;
+            display: flex; justify-content: center; gap: 6px; padding: 25px;
+        }
+        .key {
+            width: 60px; height: 180px; background: linear-gradient(to bottom, #eee, #ccc);
+            border-radius: 0 0 8px 8px; cursor: pointer; position: relative;
+            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.3);
+            transition: 0.1s;
+        }
+        .key.black {
+            width: 40px; height: 110px; background: linear-gradient(to bottom, #333, #111);
+            margin-left: -23px; margin-right: -23px; z-index: 2;
+            box-shadow: inset 0 -5px 5px rgba(255,255,255,0.1), 0 3px 5px rgba(0,0,0,0.5);
+        }
+        .key:active, .key.active {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 20px var(--accent-cyan);
+            transform: translateY(3px);
+        }
+
+        /* Start Button Overlay */
+        #startOverlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(9, 9, 25, 0.9); z-index: 100;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+        }
+        #startBtn {
+            padding: 20px 40px; font-family: 'Orbitron', sans-serif; font-size: 1.5em;
+            background: transparent; color: var(--accent-cyan);
+            border: 3px solid var(--accent-cyan); border-radius: 12px;
+            cursor: pointer; transition: 0.3s; text-shadow: 0 0 10px var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+        #startBtn:hover { background: var(--accent-cyan); color: var(--bg-dark); }
+
+    </style>
+</head>
+<body>
+
+    <div id="startOverlay">
+        <h1 style="margin-bottom: 30px;">Акустична Лаборатория</h1>
+        <button id="startBtn">ВКЛЮЧИ СИСТЕМАТА</button>
+        <p style="color: var(--text-secondary); margin-top: 20px;">Натиснете бутона, за да активирате аудио двигателя</p>
+    </div>
+
+    <h1>Quantum Synth Lab: Физика на Звука</h1>
+
+    <div class="main-console">
+        <div class="visualizer-container">
+            <div class="module-panel viz-box">
+                <div class="viz-label">ОСЦИЛОСКОП (Форма на вълната / Време)</div>
+                <canvas id="scopeCanvas"></canvas>
+            </div>
+            <div class="module-panel viz-box">
+                <div class="viz-label">СПЕКТРАЛЕН АНАЛИЗАТОР (Честотен състав)</div>
+                <canvas id="spectrumCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="controls-container">
+            <div class="module-panel">
+                <div class="module-title">1. Генератор (Източник)</div>
+                <div class="control-group">
+                    <label>Форма на вълната:</label>
+                    <div class="wave-selector">
+                        <button class="wave-btn active" data-type="sine">SINE</button>
+                        <button class="wave-btn" data-type="square">SQUARE</button>
+                        <button class="wave-btn" data-type="sawtooth">SAW</button>
+                        <button class="wave-btn" data-type="triangle">TRI</button>
+                    </div>
+                </div>
+                <div class="control-group" style="margin-top: 25px;">
+                     <label>Основна честота (Pitch Offset): <span class="val-display" id="valFreq">0</span> Hz</label>
+                     <input type="range" id="detune" min="-100" max="100" value="0" step="1">
+                </div>
+            </div>
+
+             <div class="module-panel">
+                <div class="module-title">2. Филтър (Тон/Цвят)</div>
+                <div class="control-group">
+                    <label>Cutoff Честота (LPF): <span class="val-display" id="valCut">3000</span> Hz</label>
+                    <input type="range" id="filterCut" min="200" max="8000" value="3000" step="10">
+                </div>
+                <div class="control-group">
+                    <label>Резонанс (Q): <span class="val-display" id="valQ">1.0</span></label>
+                    <input type="range" id="filterQ" min="0.1" max="15" value="1" step="0.1">
+                </div>
+                <p style="font-size: 0.8em; color: var(--text-secondary); font-style: italic;">*Работи най-добре със SAW или SQUARE вълни.</p>
+            </div>
+
+            <div class="module-panel">
+                <div class="module-title">3. Обвивка (Време)</div>
+                <div class="control-group">
+                    <label>Attack (Атака): <span class="val-display" id="valA">0.05</span> s</label>
+                    <input type="range" id="envA" min="0.01" max="2" step="0.01" value="0.05">
+                </div>
+                <div class="control-group">
+                    <label>Release (Затихване): <span class="val-display" id="valR">0.30</span> s</label>
+                    <input type="range" id="envR" min="0.1" max="3" step="0.01" value="0.3">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="module-panel keyboard-panel" id="piano">
+        </div>
+
+
+    <script>
+        // --- АУДИО ИНЖЕНЕРИНГ ---
+        let audioCtx;
+        let masterGain;
+        let filter;
+        let analyser;
+        let currentWave = 'sine';
+        let isAudioStarted = false;
+
+        const scopeCanvas = document.getElementById('scopeCanvas');
+        const ctxScope = scopeCanvas.getContext('2d');
+        const spectrumCanvas = document.getElementById('spectrumCanvas');
+        const ctxSpectrum = spectrumCanvas.getContext('2d');
+
+        // Инициализация на аудио системата
+        function initAudio() {
+            if (isAudioStarted) return;
+            
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 2048; // Резолюция на анализа
+            
+            filter = audioCtx.createBiquadFilter();
+            filter.type = "lowpass";
+            
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.4;
+
+            // Верига: Filter -> Analyser -> MasterGain -> Speakers
+            filter.connect(analyser);
+            analyser.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
+
+            isAudioStarted = true;
+            document.getElementById('startOverlay').style.opacity = '0';
+            setTimeout(() => document.getElementById('startOverlay').style.display = 'none', 500);
+            
+            // Стартиране на визуализациите
+            drawScope();
+            drawSpectrum();
+            updateParameters(); // Първоначално прилагане на настройките
+        }
+
+        // Изсвирване на нота
+        function playNote(freq, keyElement) {
+            if (!audioCtx) return;
+            
+            const osc = audioCtx.createOscillator();
+            const noteGain = audioCtx.createGain();
+
+            osc.type = currentWave;
+            // Добавяме леко разстройване (detune) от плъзгача
+            const detuneValue = parseInt(document.getElementById('detune').value);
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.detune.setValueAtTime(detuneValue, audioCtx.currentTime);
+
+            // ADSR Обвивка
+            const attack = parseFloat(document.getElementById('envA').value);
+            const release = parseFloat(document.getElementById('envR').value);
+            const now = audioCtx.currentTime;
+
+            noteGain.gain.cancelScheduledValues(now);
+            noteGain.gain.setValueAtTime(0, now);
+            // Линейна атака
+            noteGain.gain.linearRampToValueAtTime(1, now + attack);
+            // Експоненциално затихване
+            noteGain.gain.exponentialRampToValueAtTime(0.001, now + attack + release);
+
+            // Свързване: Osc -> NoteGain -> Filter (който вече е свързан към останалото)
+            osc.connect(noteGain);
+            noteGain.connect(filter);
+
+            osc.start(now);
+            osc.stop(now + attack + release + 0.1);
+
+            // Визуален ефект на клавиша
+            keyElement.classList.add('active');
+            setTimeout(() => keyElement.classList.remove('active'), attack * 1000 + 100);
+        }
+
+        // --- ВИЗУАЛИЗАЦИИ ---
+        
+        // 1. Осцилоскоп (Форма на вълната)
+        function drawScope() {
+            requestAnimationFrame(drawScope);
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteTimeDomainData(dataArray);
+
+            ctxScope.fillStyle = 'rgba(9, 9, 25, 0.2)'; // Лека следа за "motion blur" ефект
+            ctxScope.fillRect(0, 0, scopeCanvas.width, scopeCanvas.height);
+            ctxScope.lineWidth = 3;
+            ctxScope.strokeStyle = '#00f3ff';
+            ctxScope.shadowColor = '#00f3ff';
+            ctxScope.shadowBlur = 10;
+            ctxScope.beginPath();
+
+            const sliceWidth = scopeCanvas.width * 1.0 / bufferLength;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                const v = dataArray[i] / 128.0; // Нормализиране около центъра (128 е 0)
+                const y = v * scopeCanvas.height / 2;
+                if (i === 0) ctxScope.moveTo(x, y); else ctxScope.lineTo(x, y);
+                x += sliceWidth;
+            }
+            ctxScope.lineTo(scopeCanvas.width, scopeCanvas.height / 2);
+            ctxScope.stroke();
+            ctxScope.shadowBlur = 0;
+        }
+
+        // 2. Спектрален Анализатор (Честоти)
+        function drawSpectrum() {
+            requestAnimationFrame(drawSpectrum);
+            const bufferLength = analyser.frequencyBinCount;
+            // Използваме по-малко стълбчета за по-чист вид
+            const barsToShow = bufferLength / 4; 
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+
+            ctxSpectrum.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
+            
+            const barWidth = (spectrumCanvas.width / barsToShow) * 0.8;
+            let x = 0;
+
+            for(let i = 0; i < barsToShow; i++) {
+                // Логаритмично скалиране на височината за по-добра видимост
+                const barHeight = (dataArray[i] / 255) * spectrumCanvas.height;
+                
+                // Градиент за цвета на стълбчетата (от циан към лилаво)
+                let gradient = ctxSpectrum.createLinearGradient(0, spectrumCanvas.height, 0, spectrumCanvas.height - barHeight);
+                gradient.addColorStop(0, '#00f3ff');
+                gradient.addColorStop(1, '#8a2be2');
+                
+                ctxSpectrum.fillStyle = gradient;
+                // Рисуваме заоблени стълбчета
+                ctxSpectrum.beginPath();
+                ctxSpectrum.roundRect(x, spectrumCanvas.height - barHeight, barWidth, barHeight, [5, 5, 0, 0]);
+                ctxSpectrum.fill();
+                
+                x += barWidth + 2;
+            }
+        }
+
+
+        // --- UI И СЪБИТИЯ ---
+
+        // Обновяване на параметрите в реално време
+        function updateParameters() {
+            if (!filter) return;
+            filter.frequency.value = document.getElementById('filterCut').value;
+            filter.Q.value = document.getElementById('filterQ').value;
+            
+            // Обновяване на текстовите дисплеи
+            document.getElementById('valCut').innerText = document.getElementById('filterCut').value;
+            document.getElementById('valQ').innerText = document.getElementById('filterQ').value;
+            document.getElementById('valA').innerText = document.getElementById('envA').value;
+            document.getElementById('valR').innerText = document.getElementById('envR').value;
+            document.getElementById('valFreq').innerText = document.getElementById('detune').value > 0 ? "+" + document.getElementById('detune').value : document.getElementById('detune').value;
+        }
+        // Слушаме за промени във всички плъзгачи
+        document.querySelectorAll('input[type="range"]').forEach(inp => {
+            inp.addEventListener('input', updateParameters);
+        });
+
+        // Избор на вълна
+        document.querySelectorAll('.wave-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.wave-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentWave = e.target.dataset.type;
+            });
+        });
+
+        // Бутон за старт
+        document.getElementById('startBtn').addEventListener('click', initAudio);
+
+        // Ресайз на канвасите
+        function resizeCanvas() {
+            scopeCanvas.width = scopeCanvas.offsetWidth;
+            scopeCanvas.height = scopeCanvas.offsetHeight;
+            spectrumCanvas.width = spectrumCanvas.offsetWidth;
+            spectrumCanvas.height = spectrumCanvas.offsetHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // --- ГЕНЕРИРАНЕ НА КЛАВИАТУРА ---
+        const notes = [
+            { note: 'C3', freq: 261.63, type: 'white' }, { note: 'C#3', freq: 277.18, type: 'black' },
+            { note: 'D3', freq: 293.66, type: 'white' }, { note: 'D#3', freq: 311.13, type: 'black' },
+            { note: 'E3', freq: 329.63, type: 'white' },
+            { note: 'F3', freq: 349.23, type: 'white' }, { note: 'F#3', freq: 369.99, type: 'black' },
+            { note: 'G3', freq: 392.00, type: 'white' }, { note: 'G#3', freq: 415.30, type: 'black' },
+            { note: 'A3', freq: 440.00, type: 'white' }, { note: 'A#3', freq: 466.16, type: 'black' },
+            { note: 'B3', freq: 493.88, type: 'white' },
+            { note: 'C4', freq: 523.25, type: 'white' }, { note: 'C#4', freq: 554.37, type: 'black' },
+            { note: 'D4', freq: 587.33, type: 'white' }
+        ];
+
+        const pianoContainer = document.getElementById('piano');
+        notes.forEach(n => {
+            const key = document.createElement('div');
+            key.classList.add('key');
+            if (n.type === 'black') key.classList.add('black');
+            key.dataset.freq = n.freq;
+            key.addEventListener('mousedown', () => {
+                if (!isAudioStarted) initAudio();
+                playNote(n.freq, key);
+            });
+            pianoContainer.appendChild(key);
+        });
+
+        // Първоначален ресайз
+        resizeCanvas();
+    </script>
+</body>
+</html>

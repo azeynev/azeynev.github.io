@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏫 ПРОФЕСИОНАЛЕН SWOT АНАЛИЗАТОР | Училища и НПО</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container { max-width: 1800px; margin: 0 auto; }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            background: rgba(0,0,0,0.2);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p { font-size: 1.1rem; opacity: 0.9; }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .step.active { color: #667eea; }
+        .step.completed { color: #27ae60; }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step.active .step-number { background: #667eea; color: white; }
+        .step.completed .step-number { background: #27ae60; color: white; }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            height: fit-content;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .sidebar::-webkit-scrollbar { width: 8px; }
+        .sidebar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .sidebar::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
+
+        .param-category {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 20px;
+        }
+
+        .param-category h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .param-group { margin-bottom: 12px; }
+
+        .param-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .param-group input, .param-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .param-group input:focus, .param-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .param-group input[type="range"] { padding: 0; margin-top: 5px; }
+
+        .range-value {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .param-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        #analyze_btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 20px 0 10px 0;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+            letter-spacing: 0.5px;
+        }
+
+        #analyze_btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102,126,234,0.6); }
+        #analyze_btn i { margin-right: 8px; }
+        #analyze_btn:active { transform: translateY(0); }
+        #analyze_btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .main-content { display: flex; flex-direction: column; gap: 20px; }
+
+        .swot-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .swot-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .swot-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid;
+        }
+
+        .swot-header i { font-size: 1.5rem; }
+        .swot-header h3 { font-size: 1.2rem; font-weight: 700; }
+
+        .strengths .swot-header { border-color: #27ae60; color: #27ae60; }
+        .weaknesses .swot-header { border-color: #e74c3c; color: #e74c3c; }
+        .opportunities .swot-header { border-color: #3498db; color: #3498db; }
+        .threats .swot-header { border-color: #f39c12; color: #f39c12; }
+
+        .swot-items { max-height: 250px; overflow-y: auto; margin-bottom: 10px; }
+        .swot-items::-webkit-scrollbar { width: 5px; }
+        .swot-items::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 5px; }
+        .swot-items::-webkit-scrollbar-thumb { background: #667eea; border-radius: 5px; }
+
+        .swot-item {
+            background: #f8f9fa;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid;
+        }
+
+        .strengths .swot-item { border-left-color: #27ae60; }
+        .weaknesses .swot-item { border-left-color: #e74c3c; }
+        .opportunities .swot-item { border-left-color: #3498db; }
+        .threats .swot-item { border-left-color: #f39c12; }
+
+        .item-actions { display: flex; gap: 5px; }
+
+        .item-actions button {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 2px 5px;
+            transition: color 0.3s;
+        }
+
+        .item-actions button:hover { color: #333; }
+
+        .add-item-form { display: flex; gap: 5px; margin-top: 10px; }
+
+        .add-item-form input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .add-item-form input:focus { outline: none; border-color: #667eea; }
+
+        .add-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.3s;
+        }
+
+        .add-btn:hover { background: #5a6fd8; }
+
+        .score-badge {
+            font-size: 0.7rem;
+            color: #666;
+            margin-left: 5px;
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 12px;
+        }
+
+        .analysis-tabs {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #999;
+            border-radius: 30px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn:hover { background: #f0f0f0; }
+        .tab-btn.active { background: #667eea; color: white; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 5px 0 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .chart-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .chart-card h4 {
+            margin-bottom: 15px;
+            color: #555;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .chart-container { height: 200px; position: relative; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #667eea40;
+            transition: transform 0.3s;
+        }
+
+        .metric-card:hover { transform: translateY(-2px); }
+
+        .metric-value { font-size: 2rem; font-weight: 800; color: #667eea; }
+        .metric-label { font-size: 0.8rem; color: #777; margin-top: 5px; }
+
+        .strategy-box {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid;
+            transition: transform 0.3s;
+        }
+
+        .strategy-box:hover { transform: translateX(5px); }
+        .strategy-box.so { border-color: #27ae60; }
+        .strategy-box.st { border-color: #f39c12; }
+        .strategy-box.wo { border-color: #3498db; }
+        .strategy-box.wt { border-color: #e74c3c; }
+
+        .strategy-box h4 {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .strategy-list { list-style: none; padding: 0; }
+
+        .strategy-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .strategy-list li:last-child { border-bottom: none; }
+        .strategy-list i { width: 16px; font-size: 0.8rem; }
+
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+        .export-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .export-pdf { background: #e74c3c; color: white; }
+        .export-excel { background: #27ae60; color: white; }
+        .export-word { background: #3498db; color: white; }
+        .export-json { background: #f39c12; color: white; }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 50px;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 6px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #institutionProfile {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        #institutionProfile h4 { margin-bottom: 8px; font-size: 1rem; }
+
+        #profileText { font-size: 0.9rem; line-height: 1.5; color: #555; }
+
+        @media (max-width: 1200px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .sidebar { max-height: none; }
+            .swot-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8rem; }
+            .swot-grid { grid-template-columns: 1fr; }
+            .progress-steps { flex-direction: column; border-radius: 20px; }
+            .tabs-header { justify-content: center; }
+            .export-buttons { justify-content: center; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-school"></i> ПРОФЕСИОНАЛЕН SWOT АНАЛИЗАТОР</h1>
+            <p>Интелигентен анализ за училища, НПО и образователни институции</p>
+        </div>
+
+        <div class="progress-steps">
+            <div class="step active" id="step1">
+                <span class="step-number">1</span>
+                <span>Въвеждане на данни</span>
+            </div>
+            <div class="step" id="step2">
+                <span class="step-number">2</span>
+                <span>SWOT елементи</span>
+            </div>
+            <div class="step" id="step3">
+                <span class="step-number">3</span>
+                <span>Стратегически анализ</span>
+            </div>
+            <div class="step" id="step4">
+                <span class="step-number">4</span>
+                <span>Препоръки</span>
+            </div>
+            <div class="step" id="step5">
+                <span class="step-number">5</span>
+                <span>Експорт</span>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <div class="sidebar">
+                <h2 style="margin-bottom: 15px; color: #667eea; font-size: 1.2rem;">
+                    <i class="fas fa-sliders-h"></i> Параметри
+                </h2>
+
+                <div class="param-category">
+                    <h3><i class="fas fa-building"></i> 1. Основни данни</h3>
+
+                    <div class="param-group">
+                        <label>Име на институцията</label>
+                        <input type="text" id="param_name" value="СУ Св. Паисий Хилендарски">
+                    </div>
+
+                    <div class="param-group">
+                        <label>Тип институция</label>
+                        <select id="param_type">
+                            <option value="primary">Начално училище</option>
+                            <option value="middle">Основно училище</option>
+                            <option value="high" selected>Средно училище</option>
+                            <option value="vocational">Професионална гимназия</option>
+                            <option value="university">Университет</option>
+                            <option value="kindergarten">Детска градина</option>
+                            <option value="ngo">НПО</option>
+                        </select>
+                    </div>
+
+                    <div class="param-group">
+                        <label>Населено място</label>
+                        <select id="param_location">
+                            <option value="capital">Столица</option>
+                            <option value="big_city">Голям град</option>
+                            <option value="city" selected>Град</option>
+                            <option value="town">Градче</option>
+                            <option value="village">Село</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="param-category">
+                    <h3><i class="fas fa-users"></i> 2. Ученици и персонал</h3>
+
+                    <div class="param-group">
+                        <label>Брой ученици</label>
+                        <input type="number" id="param_students" value="850" min="0" max="5000">
+                    </div>
+
+                    <div class="param-group">
+                        <label>Брой учители</label>
+                        <input type="number" id="param_teachers" value="45" min="0" max="500">
+                    </div>
+
+                    <div class="param-group">
+                        <label>Съотношение ученици/учители</label>
+                        <div class="param-stats">
+                            <span id="student_teacher_ratio">18.9</span>
+                        </div>
+                    </div>
+
+                    <div class="param-group">
+                        <label>Текучество на кадри (1-10)</label>
+                        <input type="range" id="param_turnover" min="1" max="10" value="4">
+                        <span class="range-value" id="turnover_value">4/10</span>
+                    </div>
+                </div>
+
+                <div class="param-category">
+                    <h3><i class="fas fa-coins"></i> 3. Финанси</h3>
+
+                    <div class="param-group">
+                        <label>Годишен бюджет (лв.)</label>
+                        <input type="number" id="param_budget" value="1200000" step="100000">
+                    </div>
+
+                    <div class="param-group">
+                        <label>Бюджет на ученик (лв.)</label>
+                        <div class="param-stats">
+                            <span id="budget_per_student">1412</span>
+                        </div>
+                    </div>
+
+                    <div class="param-group">
+                        <label>Финансова стабилност (1-10)</label>
+                        <input type="range" id="param_financial_stability" min="1" max="10" value="6">
+                        <span class="range-value" id="stability_value">6/10</span>
+                    </div>
+
+                    <div class="param-group">
+                        <label>Задължения (лв.)</label>
+                        <input type="number" id="param_debts" value="50000" step="10000">
+                    </div>
+                </div>
+
+                <div class="param-category">
+                    <h3><i class="fas fa-building"></i> 4. Материална база</h3>
+
+                    <div class="param-group">
+                        <label>Брой компютри</label>
+                        <input type="number" id="param_computers" value="80" min="0" max="500">
+                    </div>
+
+                    <div class="param-group">
+                        <label>Състояние на сградата (1-10)</label>
+                        <input type="range" id="param_building_condition" min="1" max="10" value="7">
+                        <span class="range-value" id="building_value">7/10</span>
+                    </div>
+                </div>
+
+                <div class="param-category">
+                    <h3><i class="fas fa-graduation-cap"></i> 5. Образование</h3>
+
+                    <div class="param-group">
+                        <label>Среден успех (1-10)</label>
+                        <input type="range" id="param_academic_success" min="1" max="10" value="7">
+                        <span class="range-value" id="academic_value">7/10</span>
+                    </div>
+
+                    <div class="param-group">
+                        <label>Издържани матури (%)</label>
+                        <input type="number" id="param_exam_pass" value="85" min="0" max="100">
+                    </div>
+
+                    <div class="param-group">
+                        <label>Отпаднали ученици (%)</label>
+                        <input type="number" id="param_dropout" value="2" min="0" max="50">
+                    </div>
+                </div>
+
+                <div class="param-category">
+                    <h3><i class="fas fa-chalkboard-teacher"></i> 6. Квалификация</h3>
+
+                    <div class="param-group">
+                        <label>Учители с висше образование (%)</label>
+                        <input type="number" id="param_higher_edu" value="95" min="0" max="100">
+                    </div>
+
+                    <div class="param-group">
+                        <label>Компютърна грамотност (1-10)</label>
+                        <input type="range" id="param_computer_skills" min="1" max="10" value="7">
+                        <span class="range-value" id="computer_value">7/10</span>
+                    </div>
+                </div>
+
+                <div class="param-category">
+                    <h3><i class="fas fa-laptop"></i> 7. Дигитализация</h3>
+
+                    <div class="param-group">
+                        <label>Ниво на дигитализация (1-10)</label>
+                        <input type="range" id="param_digitalization" min="1" max="10" value="6">
+                        <span class="range-value" id="digital_value">6/10</span>
+                    </div>
+                </div>
+
+                <div class="param-category">
+                    <h3><i class="fas fa-globe"></i> 8. Външна среда</h3>
+
+                    <div class="param-group">
+                        <label>Конкуренция (брой училища)</label>
+                        <input type="number" id="param_competitors" value="3" min="0" max="20">
+                    </div>
+
+                    <div class="param-group">
+                        <label>Демографска тенденция</label>
+                        <select id="param_demographics">
+                            <option value="declining">Намаляваща</option>
+                            <option value="stable" selected>Стабилна</option>
+                            <option value="growing">Нарастваща</option>
+                        </select>
+                    </div>
+
+                    <div class="param-group">
+                        <label>Икономическа ситуация</label>
+                        <select id="param_economy">
+                            <option value="poor">Лоша</option>
+                            <option value="average" selected>Средна</option>
+                            <option value="good">Добра</option>
+                        </select>
+                    </div>
+
+                    <div class="param-group">
+                        <label>Подкрепа от общината (1-10)</label>
+                        <input type="range" id="param_municipality_support" min="1" max="10" value="6">
+                        <span class="range-value" id="municipality_value">6/10</span>
+                    </div>
+
+                    <div class="param-group">
+                        <label>Подкрепа от бизнеса (1-10)</label>
+                        <input type="range" id="param_business_support" min="1" max="10" value="4">
+                        <span class="range-value" id="business_value">4/10</span>
+                    </div>
+                </div>
+
+                <div class="param-category">
+                    <h3><i class="fas fa-heart"></i> 9. Социални фактори</h3>
+
+                    <div class="param-group">
+                        <label>Включване на родители (1-10)</label>
+                        <input type="range" id="param_parent_involvement" min="1" max="10" value="5">
+                        <span class="range-value" id="parent_value">5/10</span>
+                    </div>
+                </div>
+
+                <button id="analyze_btn">
+                    <i class="fas fa-chart-line"></i> ГЕНЕРИРАЙ SWOT АНАЛИЗ
+                </button>
+            </div>
+
+            <div class="main-content">
+                <div class="swot-grid">
+                    <div class="swot-card strengths">
+                        <div class="swot-header">
+                            <i class="fas fa-plus-circle"></i>
+                            <h3>СИЛНИ СТРАНИ</h3>
+                        </div>
+                        <div class="swot-items" id="strengthsList"></div>
+                        <div class="add-item-form">
+                            <input type="text" id="strengthInput" placeholder="Нова силна страна...">
+                            <button class="add-btn" onclick="addItem('strength')"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="swot-card weaknesses">
+                        <div class="swot-header">
+                            <i class="fas fa-minus-circle"></i>
+                            <h3>СЛАБИ СТРАНИ</h3>
+                        </div>
+                        <div class="swot-items" id="weaknessesList"></div>
+                        <div class="add-item-form">
+                            <input type="text" id="weaknessInput" placeholder="Нова слаба страна...">
+                            <button class="add-btn" onclick="addItem('weakness')"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="swot-card opportunities">
+                        <div class="swot-header">
+                            <i class="fas fa-external-link-alt"></i>
+                            <h3>ВЪЗМОЖНОСТИ</h3>
+                        </div>
+                        <div class="swot-items" id="opportunitiesList"></div>
+                        <div class="add-item-form">
+                            <input type="text" id="opportunityInput" placeholder="Нова възможност...">
+                            <button class="add-btn" onclick="addItem('opportunity')"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="swot-card threats">
+                        <div class="swot-header">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>ЗАПЛАХИ</h3>
+                        </div>
+                        <div class="swot-items" id="threatsList"></div>
+                        <div class="add-item-form">
+                            <input type="text" id="threatInput" placeholder="Нова заплаха...">
+                            <button class="add-btn" onclick="addItem('threat')"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-tabs">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" onclick="switchTab('overview')">📊 Общ преглед</button>
+                        <button class="tab-btn" onclick="switchTab('strategies')">🎯 Стратегии</button>
+                        <button class="tab-btn" onclick="switchTab('recommendations')">📋 Препоръки</button>
+                        <button class="tab-btn" onclick="switchTab('benchmark')">📈 Бенчмарк</button>
+                        <button class="tab-btn" onclick="switchTab('charts')">📉 Графики</button>
+                    </div>
+
+                    <div class="tab-content active" id="overviewTab">
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-value" id="strengthScore">0.0</div>
+                                <div class="metric-label">Средна сила</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="weaknessScore">0.0</div>
+                                <div class="metric-label">Средна слабост</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="opportunityScore">0.0</div>
+                                <div class="metric-label">Средна възможност</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="threatScore">0.0</div>
+                                <div class="metric-label">Средна заплаха</div>
+                            </div>
+                        </div>
+
+                        <div id="institutionProfile">
+                            <h4>🏫 Профил на институцията</h4>
+                            <p id="profileText">Генериране на профил...</p>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="strategiesTab">
+                        <div class="strategy-box so">
+                            <h4><i class="fas fa-rocket" style="color:#27ae60;"></i> SO СТРАТЕГИИ</h4>
+                            <ul class="strategy-list" id="soList"></ul>
+                        </div>
+
+                        <div class="strategy-box st">
+                            <h4><i class="fas fa-shield-alt" style="color:#f39c12;"></i> ST СТРАТЕГИИ</h4>
+                            <ul class="strategy-list" id="stList"></ul>
+                        </div>
+
+                        <div class="strategy-box wo">
+                            <h4><i class="fas fa-sync-alt" style="color:#3498db;"></i> WO СТРАТЕГИИ</h4>
+                            <ul class="strategy-list" id="woList"></ul>
+                        </div>
+
+                        <div class="strategy-box wt">
+                            <h4><i class="fas fa-times-circle" style="color:#e74c3c;"></i> WT СТРАТЕГИИ</h4>
+                            <ul class="strategy-list" id="wtList"></ul>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="recommendationsTab">
+                        <div style="background:#f8f9fa; border-radius:12px; padding:15px; margin:10px 0;">
+                            <h4 style="margin-bottom:10px;"><i class="fas fa-clock" style="color:#667eea;"></i> Краткосрочни (1-2 години)</h4>
+                            <ul class="strategy-list" id="shortTermList"></ul>
+                        </div>
+
+                        <div style="background:#f8f9fa; border-radius:12px; padding:15px; margin:10px 0;">
+                            <h4 style="margin-bottom:10px;"><i class="fas fa-calendar-alt" style="color:#667eea;"></i> Средносрочни (3-5 години)</h4>
+                            <ul class="strategy-list" id="mediumTermList"></ul>
+                        </div>
+
+                        <div style="background:#f8f9fa; border-radius:12px; padding:15px; margin:10px 0;">
+                            <h4 style="margin-bottom:10px;"><i class="fas fa-infinity" style="color:#667eea;"></i> Дългосрочни (5+ години)</h4>
+                            <ul class="strategy-list" id="longTermList"></ul>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="benchmarkTab">
+                        <div style="margin:15px 0;">
+                            <h4 style="margin-bottom:15px;">Сравнение със средни стойности</h4>
+
+                            <div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                    <span>Успех</span>
+                                    <span id="benchmarkAcademic">0%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill" id="barAcademic"></div></div>
+                            </div>
+
+                            <div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                    <span>Материална база</span>
+                                    <span id="benchmarkFacilities">0%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill" id="barFacilities"></div></div>
+                            </div>
+
+                            <div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                    <span>Дигитализация</span>
+                                    <span id="benchmarkDigital">0%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill" id="barDigital"></div></div>
+                            </div>
+
+                            <div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                    <span>Квалификация</span>
+                                    <span id="benchmarkTeachers">0%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill" id="barTeachers"></div></div>
+                            </div>
+
+                            <div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                    <span>Финанси</span>
+                                    <span id="benchmarkFinancial">0%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill" id="barFinancial"></div></div>
+                            </div>
+                        </div>
+
+                        <div style="margin:15px 0; padding:15px; background:#f8f9fa; border-radius:12px;">
+                            <h4 style="margin-bottom:10px;">🏆 Конкурентни предимства</h4>
+                            <ul class="strategy-list" id="competitiveAdvantages"></ul>
+                        </div>
+
+                        <div style="margin:15px 0; padding:15px; background:#f8f9fa; border-radius:12px;">
+                            <h4 style="margin-bottom:10px;">⚠️ Области за подобрение</h4>
+                            <ul class="strategy-list" id="improvementAreas"></ul>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="chartsTab">
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <h4>SWOT баланс</h4>
+                                <div class="chart-container">
+                                    <canvas id="swotChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="chart-card">
+                                <h4>Сравнителен анализ</h4>
+                                <div class="chart-container">
+                                    <canvas id="comparisonChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="chart-card">
+                                <h4>Тенденции</h4>
+                                <div class="chart-container">
+                                    <canvas id="trendsChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="chart-card">
+                                <h4>Бюджет</h4>
+                                <div class="chart-container">
+                                    <canvas id="budgetChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="export-buttons">
+                    <button class="export-btn export-pdf" onclick="exportAnalysis('pdf')">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                    <button class="export-btn export-excel" onclick="exportAnalysis('excel')">
+                        <i class="fas fa-file-excel"></i> Excel (CSV)
+                    </button>
+                    <button class="export-btn export-word" onclick="exportAnalysis('word')">
+                        <i class="fas fa-file-word"></i> Word
+                    </button>
+                    <button class="export-btn export-json" onclick="exportAnalysis('json')">
+                        <i class="fas fa-file-code"></i> JSON
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <i class="fas fa-school"></i> Професионален SWOT Анализатор v3.2
+        </footer>
+    </div>
+
+    <script>
+        let swotData = {
+            strengths: [],
+            weaknesses: [],
+            opportunities: [],
+            threats: []
+        };
+
+        let swotChart, budgetChart, trendsChart, comparisonChart;
+
+        function initializeData() {
+            updateSwotFromParameters();
+        }
+
+        function updateSwotFromParameters() {
+            try {
+                const params = getAllParameters();
+
+                swotData.strengths = [];
+                swotData.weaknesses = [];
+                swotData.opportunities = [];
+                swotData.threats = [];
+
+                const studentTeacherRatio = params.students / params.teachers;
+                if (studentTeacherRatio < 16) {
+                    swotData.strengths.push({ text: 'Отлично съотношение ученици/учители', score: 9 });
+                } else if (studentTeacherRatio < 20) {
+                    swotData.strengths.push({ text: 'Добро съотношение ученици/учители', score: 7 });
+                }
+
+                const budgetPerStudent = params.budget / params.students;
+                if (budgetPerStudent > 2000) {
+                    swotData.strengths.push({ text: 'Висок бюджет на ученик', score: 9 });
+                } else if (budgetPerStudent > 1400) {
+                    swotData.strengths.push({ text: 'Добър бюджет на ученик', score: 7 });
+                }
+
+                if (params.academic > 8) {
+                    swotData.strengths.push({ text: 'Много висок успех', score: 9 });
+                } else if (params.academic > 6) {
+                    swotData.strengths.push({ text: 'Добър успех', score: 7 });
+                }
+
+                if (params.exam > 90) {
+                    swotData.strengths.push({ text: 'Отлични матури', score: 9 });
+                } else if (params.exam > 75) {
+                    swotData.strengths.push({ text: 'Добри матури', score: 7 });
+                }
+
+                if (params.digital > 8) {
+                    swotData.strengths.push({ text: 'Висока дигитализация', score: 9 });
+                } else if (params.digital > 6) {
+                    swotData.strengths.push({ text: 'Добра дигитализация', score: 7 });
+                }
+
+                if (params.qualification > 90) {
+                    swotData.strengths.push({ text: 'Висококвалифициран състав', score: 9 });
+                } else if (params.qualification > 75) {
+                    swotData.strengths.push({ text: 'Квалифициран състав', score: 7 });
+                }
+
+                if (params.municipality > 7) {
+                    swotData.strengths.push({ text: 'Силна общинска подкрепа', score: 8 });
+                }
+
+                const computers = safeParseInt(document.getElementById('param_computers')?.value, 80);
+                const computersPerStudent = params.students > 0 ? computers / params.students : 0;
+
+                if (computersPerStudent > 0.15) {
+                    swotData.strengths.push({ text: 'Добра компютърна обезпеченост', score: 8 });
+                } else if (computersPerStudent < 0.05) {
+                    swotData.weaknesses.push({ text: 'Недостатъчно компютри', score: 8 });
+                }
+
+                if (studentTeacherRatio > 25) {
+                    swotData.weaknesses.push({ text: 'Лошо съотношение ученици/учители', score: 9 });
+                } else if (studentTeacherRatio > 20) {
+                    swotData.weaknesses.push({ text: 'Натовареност на учителите', score: 7 });
+                }
+
+                if (budgetPerStudent < 1000) {
+                    swotData.weaknesses.push({ text: 'Нисък бюджет на ученик', score: 9 });
+                } else if (budgetPerStudent < 1400) {
+                    swotData.weaknesses.push({ text: 'Ограничен бюджет', score: 7 });
+                }
+
+                if (params.academic < 4) {
+                    swotData.weaknesses.push({ text: 'Много нисък успех', score: 9 });
+                } else if (params.academic < 6) {
+                    swotData.weaknesses.push({ text: 'Нисък успех', score: 7 });
+                }
+
+                if (params.dropouts > 10) {
+                    swotData.weaknesses.push({ text: 'Висок % отпадащи', score: 9 });
+                } else if (params.dropouts > 5) {
+                    swotData.weaknesses.push({ text: 'Риск от отпадане', score: 7 });
+                }
+
+                if (params.digital < 4) {
+                    swotData.weaknesses.push({ text: 'Сериозно изоставане в дигитализацията', score: 9 });
+                } else if (params.digital < 6) {
+                    swotData.weaknesses.push({ text: 'Ниска дигитализация', score: 7 });
+                }
+
+                if (params.competitors > 5) {
+                    swotData.weaknesses.push({ text: 'Силна конкуренция', score: 8 });
+                }
+
+                if (params.business < 3) {
+                    swotData.weaknesses.push({ text: 'Липса на бизнес подкрепа', score: 8 });
+                }
+
+                const buildingCondition = safeParseInt(document.getElementById('param_building_condition')?.value, 7);
+                if (buildingCondition < 4) {
+                    swotData.weaknesses.push({ text: 'Лошо състояние на сградата', score: 9 });
+                } else if (buildingCondition < 6) {
+                    swotData.weaknesses.push({ text: 'Нужда от ремонт', score: 7 });
+                }
+
+                const turnover = safeParseInt(document.getElementById('param_turnover')?.value, 4);
+                if (turnover > 7) {
+                    swotData.weaknesses.push({ text: 'Високо текучество', score: 8 });
+                }
+
+                if (params.location === 'capital' || params.location === 'big_city') {
+                    swotData.opportunities.push({ text: 'Партньорство с университети', score: 9 });
+                    swotData.opportunities.push({ text: 'Европейски програми', score: 8 });
+                }
+
+                if (params.demographics === 'growing') {
+                    swotData.opportunities.push({ text: 'Нарастващ брой ученици', score: 9 });
+                }
+
+                if (params.municipality > 7) {
+                    swotData.opportunities.push({ text: 'Общински програми', score: 8 });
+                }
+
+                if (params.business > 7) {
+                    swotData.opportunities.push({ text: 'Бизнес спонсорство', score: 8 });
+                }
+
+                if (params.digital < 5) {
+                    swotData.opportunities.push({ text: 'Дигитална трансформация', score: 8 });
+                }
+
+                swotData.opportunities.push({ text: 'Кандидатстване по проекти', score: 7 });
+                swotData.opportunities.push({ text: 'STEM програми', score: 7 });
+
+                if (params.demographics === 'declining') {
+                    swotData.threats.push({ text: 'Намаляващ брой ученици', score: 9 });
+                }
+
+                if (params.economy === 'poor') {
+                    swotData.threats.push({ text: 'Лоша икономическа ситуация', score: 9 });
+                }
+
+                if (params.competitors > 5) {
+                    swotData.threats.push({ text: 'Засилена конкуренция', score: 8 });
+                }
+
+                const financialStability = safeParseInt(document.getElementById('param_financial_stability')?.value, 6);
+                if (financialStability < 4) {
+                    swotData.threats.push({ text: 'Финансова нестабилност', score: 9 });
+                }
+
+                const debts = safeParseInt(document.getElementById('param_debts')?.value, 50000);
+                if (debts > 100000) {
+                    swotData.threats.push({ text: 'Сериозни задължения', score: 9 });
+                } else if (debts > 50000) {
+                    swotData.threats.push({ text: 'Наличие на задължения', score: 7 });
+                }
+
+                swotData.threats.push({ text: 'Промени в образователната политика', score: 7 });
+
+                swotData.strengths = swotData.strengths.slice(0, 5);
+                swotData.weaknesses = swotData.weaknesses.slice(0, 5);
+                swotData.opportunities = swotData.opportunities.slice(0, 5);
+                swotData.threats = swotData.threats.slice(0, 5);
+
+                ensureMinimumItems();
+
+                renderLists();
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function ensureMinimumItems() {
+            const hasText = (arr, text) => arr.some(item => item.text === text);
+
+            if (swotData.strengths.length < 2) {
+                if (!hasText(swotData.strengths, 'Ангажиран учителски колектив'))
+                    swotData.strengths.push({ text: 'Ангажиран учителски колектив', score: 7 });
+                if (!hasText(swotData.strengths, 'Добра локация'))
+                    swotData.strengths.push({ text: 'Добра локация', score: 7 });
+            }
+
+            if (swotData.weaknesses.length < 2) {
+                if (!hasText(swotData.weaknesses, 'Нужда от обновяване на базата'))
+                    swotData.weaknesses.push({ text: 'Нужда от обновяване на базата', score: 7 });
+                if (!hasText(swotData.weaknesses, 'Ограничени извънкласни дейности'))
+                    swotData.weaknesses.push({ text: 'Ограничени извънкласни дейности', score: 7 });
+            }
+
+            if (swotData.opportunities.length < 2) {
+                if (!hasText(swotData.opportunities, 'Европейски проекти'))
+                    swotData.opportunities.push({ text: 'Европейски проекти', score: 7 });
+                if (!hasText(swotData.opportunities, 'Дигитално развитие'))
+                    swotData.opportunities.push({ text: 'Дигитално развитие', score: 7 });
+            }
+
+            if (swotData.threats.length < 2) {
+                if (!hasText(swotData.threats, 'Демографска криза'))
+                    swotData.threats.push({ text: 'Демографска криза', score: 7 });
+                if (!hasText(swotData.threats, 'Политически промени'))
+                    swotData.threats.push({ text: 'Политически промени', score: 7 });
+            }
+        }
+
+        function getAllParameters() {
+            return {
+                name: document.getElementById('param_name')?.value || 'Институция',
+                type: document.getElementById('param_type')?.value || 'high',
+                location: document.getElementById('param_location')?.value || 'city',
+                students: safeParseInt(document.getElementById('param_students')?.value, 850),
+                teachers: safeParseInt(document.getElementById('param_teachers')?.value, 45),
+                budget: safeParseInt(document.getElementById('param_budget')?.value, 1200000),
+                academic: safeParseInt(document.getElementById('param_academic_success')?.value, 7),
+                exam: safeParseInt(document.getElementById('param_exam_pass')?.value, 85),
+                digital: safeParseInt(document.getElementById('param_digitalization')?.value, 6),
+                qualification: safeParseInt(document.getElementById('param_higher_edu')?.value, 95),
+                dropouts: safeParseInt(document.getElementById('param_dropout')?.value, 2),
+                competitors: safeParseInt(document.getElementById('param_competitors')?.value, 3),
+                municipality: safeParseInt(document.getElementById('param_municipality_support')?.value, 6),
+                business: safeParseInt(document.getElementById('param_business_support')?.value, 4),
+                parents: safeParseInt(document.getElementById('param_parent_involvement')?.value, 5),
+                demographics: document.getElementById('param_demographics')?.value || 'stable',
+                economy: document.getElementById('param_economy')?.value || 'average'
+            };
+        }
+
+        function safeParseInt(value, defaultValue) {
+            if (value === null || value === undefined) return defaultValue;
+            const parsed = parseInt(value);
+            return isNaN(parsed) ? defaultValue : parsed;
+        }
+
+        function renderLists() {
+            renderList('strengths', swotData.strengths);
+            renderList('weaknesses', swotData.weaknesses);
+            renderList('opportunities', swotData.opportunities);
+            renderList('threats', swotData.threats);
+        }
+
+        function renderList(type, items) {
+            const list = document.getElementById(`${type}List`);
+            if (!list) return;
+
+            list.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'swot-item';
+                itemDiv.innerHTML = `
+                    <span>${item.text} <span class="score-badge">${item.score}/10</span></span>
+                    <div class="item-actions">
+                        <button onclick="editItem('${type}', ${index})"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteItem('${type}', ${index})"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                list.appendChild(itemDiv);
+            });
+        }
+
+        window.addItem = function(type) {
+            const input = document.getElementById(`${type}Input`);
+            const text = input.value.trim();
+
+            if (!text) {
+                alert('Моля, въведете текст!');
+                return;
+            }
+
+            swotData[`${type}s`].push({ text: text, score: 5 });
+            input.value = '';
+            renderLists();
+            updateAnalysis();
+        };
+
+        window.editItem = function(type, index) {
+            const newText = prompt('Редактирай:', swotData[`${type}s`][index].text);
+            if (newText && newText.trim()) {
+                swotData[`${type}s`][index].text = newText.trim();
+                renderLists();
+                updateAnalysis();
+            }
+        };
+
+        window.deleteItem = function(type, index) {
+            if (confirm('Сигурни ли сте?')) {
+                swotData[`${type}s`].splice(index, 1);
+                renderLists();
+                updateAnalysis();
+            }
+        };
+
+        window.switchTab = function(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            const tabs = { overview: 0, strategies: 1, recommendations: 2, benchmark: 3, charts: 4 };
+            const index = tabs[tab] || 0;
+
+            document.querySelectorAll('.tab-btn')[index].classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+
+            if (tab === 'charts') {
+                updateCharts(getAllParameters());
+            }
+        };
+
+        function averageScore(items) {
+            if (items.length === 0) return 5;
+            return items.reduce((sum, item) => sum + item.score, 0) / items.length;
+        }
+
+        function updateAnalysis() {
+            try {
+                const params = getAllParameters();
+
+                const typeNames = { primary: 'начално училище', middle: 'основно училище', high: 'средно училище', vocational: 'професионална гимназия' };
+                const locationNames = { capital: 'столицата', big_city: 'голям град', city: 'град', town: 'градче', village: 'село' };
+
+                const profileElement = document.getElementById('profileText');
+                if (profileElement) {
+                    profileElement.innerHTML = `
+                        <strong>${params.name}</strong> е ${typeNames[params.type] || 'училище'} в ${locationNames[params.location] || 'населено място'}.
+                        ${params.teachers} учители за ${params.students} ученици. Бюджет: ${params.budget.toLocaleString()} лв.
+                        Успех: ${params.academic}/10, Матури: ${params.exam}%.
+                    `;
+                }
+
+                document.getElementById('strengthScore').innerText = averageScore(swotData.strengths).toFixed(1);
+                document.getElementById('weaknessScore').innerText = averageScore(swotData.weaknesses).toFixed(1);
+                document.getElementById('opportunityScore').innerText = averageScore(swotData.opportunities).toFixed(1);
+                document.getElementById('threatScore').innerText = averageScore(swotData.threats).toFixed(1);
+
+                updateProgressSteps();
+                updateStrategies(params);
+                updateRecommendations(params);
+                updateBenchmark(params);
+
+                if (document.getElementById('chartsTab')?.classList.contains('active')) {
+                    updateCharts(params);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function updateProgressSteps() {
+            const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+            let completed = 1;
+
+            if (swotData.strengths.length > 0 && swotData.weaknesses.length > 0) completed = 2;
+            if (completed >= 2 && swotData.opportunities.length > 0 && swotData.threats.length > 0) completed = 3;
+            if (completed >= 3) completed = 4;
+            if (completed >= 4) completed = 5;
+
+            steps.forEach((step, index) => {
+                const el = document.getElementById(step);
+                if (el) {
+                    if (index + 1 <= completed) {
+                        el.classList.add('completed');
+                        el.classList.remove('active');
+                    } else if (index + 1 === completed + 1) {
+                        el.classList.add('active');
+                        el.classList.remove('completed');
+                    } else {
+                        el.classList.remove('active', 'completed');
+                    }
+                }
+            });
+        }
+
+        function updateStrategies(params) {
+            const avgS = averageScore(swotData.strengths);
+            const avgW = averageScore(swotData.weaknesses);
+            const avgO = averageScore(swotData.opportunities);
+            const avgT = averageScore(swotData.threats);
+
+            const soList = document.getElementById('soList');
+            if (soList) {
+                soList.innerHTML = '';
+                if (avgS > 7 && avgO > 7) {
+                    soList.innerHTML += '<li><i class="fas fa-check" style="color:#27ae60;"></i> Разширяване на иновативните програми</li>';
+                    soList.innerHTML += '<li><i class="fas fa-check" style="color:#27ae60;"></i> Кандидатстване по европейски проекти</li>';
+                    soList.innerHTML += '<li><i class="fas fa-check" style="color:#27ae60;"></i> Създаване на център за върхови постижения</li>';
+                } else {
+                    soList.innerHTML += '<li><i class="fas fa-check" style="color:#27ae60;"></i> Развитие на партньорства</li>';
+                    soList.innerHTML += '<li><i class="fas fa-check" style="color:#27ae60;"></i> Въвеждане на нови дисциплини</li>';
+                }
+            }
+
+            const stList = document.getElementById('stList');
+            if (stList) {
+                stList.innerHTML = '';
+                if (avgS > 7 && avgT > 7) {
+                    stList.innerHTML += '<li><i class="fas fa-shield-alt" style="color:#f39c12;"></i> Изграждане на силна марка</li>';
+                    stList.innerHTML += '<li><i class="fas fa-shield-alt" style="color:#f39c12;"></i> Активен маркетинг</li>';
+                } else {
+                    stList.innerHTML += '<li><i class="fas fa-shield-alt" style="color:#f39c12;"></i> Диверсификация на финансирането</li>';
+                    stList.innerHTML += '<li><i class="fas fa-shield-alt" style="color:#f39c12;"></i> Активна връзка с общината</li>';
+                }
+            }
+
+            const woList = document.getElementById('woList');
+            if (woList) {
+                woList.innerHTML = '';
+                if (avgW > 7 && avgO > 7) {
+                    woList.innerHTML += '<li><i class="fas fa-sync-alt" style="color:#3498db;"></i> Обновяване на базата чрез проекти</li>';
+                    woList.innerHTML += '<li><i class="fas fa-sync-alt" style="color:#3498db;"></i> Инвестиране в квалификация</li>';
+                } else {
+                    woList.innerHTML += '<li><i class="fas fa-sync-alt" style="color:#3498db;"></i> Постепенно обновяване</li>';
+                    woList.innerHTML += '<li><i class="fas fa-sync-alt" style="color:#3498db;"></i> Менторска програма</li>';
+                }
+            }
+
+            const wtList = document.getElementById('wtList');
+            if (wtList) {
+                wtList.innerHTML = '';
+                if (avgW > 7 && avgT > 7) {
+                    wtList.innerHTML += '<li><i class="fas fa-times-circle" style="color:#e74c3c;"></i> План за действие при криза</li>';
+                    wtList.innerHTML += '<li><i class="fas fa-times-circle" style="color:#e74c3c;"></i> Фокус върху запазване на учениците</li>';
+                } else {
+                    wtList.innerHTML += '<li><i class="fas fa-times-circle" style="color:#e74c3c;"></i> Мониторинг на заплахите</li>';
+                    wtList.innerHTML += '<li><i class="fas fa-times-circle" style="color:#e74c3c;"></i> Работа с родители</li>';
+                }
+            }
+        }
+
+        function updateRecommendations(params) {
+            const shortList = document.getElementById('shortTermList');
+            if (shortList) {
+                shortList.innerHTML = '';
+
+                if (params.digital < 5) {
+                    shortList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Подобряване на интернет и компютри</li>';
+                }
+                if (params.parents < 4) {
+                    shortList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Активизиране на родителите</li>';
+                }
+                if (params.qualification < 80) {
+                    shortList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Квалификационни курсове</li>';
+                }
+                if (params.dropouts > 3) {
+                    shortList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Програма за превенция на отпадането</li>';
+                }
+
+                if (shortList.innerHTML === '') {
+                    shortList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Поддържане на доброто състояние</li>';
+                }
+            }
+
+            const mediumList = document.getElementById('mediumTermList');
+            if (mediumList) {
+                mediumList.innerHTML = '';
+                mediumList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Европейски програми за инфраструктура</li>';
+                mediumList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Партньорства с университети и бизнес</li>';
+                mediumList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Въвеждане на STEM програми</li>';
+            }
+
+            const longList = document.getElementById('longTermList');
+            if (longList) {
+                longList.innerHTML = '';
+                longList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Специализирани кабинети</li>';
+                longList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Център за кариерно развитие</li>';
+                longList.innerHTML += '<li><i class="fas fa-arrow-right" style="color:#667eea;"></i> Международни партньорства</li>';
+            }
+        }
+
+        function updateBenchmark(params) {
+            const nationalAvg = { academic: 82, facilities: 65, digital: 55, teachers: 75, financial: 60 };
+
+            const academicPct = params.academic * 10;
+            const facilitiesPct = Math.min(100, params.digital * 10 + 10);
+            const digitalPct = params.digital * 10;
+            const teachersPct = params.qualification;
+            const financialPct = Math.min(100, Math.round(params.budget / 20000));
+
+            document.getElementById('benchmarkAcademic').innerHTML = `${academicPct}% (срв. ${nationalAvg.academic}%)`;
+            document.getElementById('barAcademic').style.width = academicPct + '%';
+            document.getElementById('barAcademic').style.backgroundColor = academicPct >= nationalAvg.academic ? '#27ae60' : '#e74c3c';
+
+            document.getElementById('benchmarkFacilities').innerHTML = `${facilitiesPct}% (срв. ${nationalAvg.facilities}%)`;
+            document.getElementById('barFacilities').style.width = facilitiesPct + '%';
+            document.getElementById('barFacilities').style.backgroundColor = facilitiesPct >= nationalAvg.facilities ? '#27ae60' : '#e74c3c';
+
+            document.getElementById('benchmarkDigital').innerHTML = `${digitalPct}% (срв. ${nationalAvg.digital}%)`;
+            document.getElementById('barDigital').style.width = digitalPct + '%';
+            document.getElementById('barDigital').style.backgroundColor = digitalPct >= nationalAvg.digital ? '#27ae60' : '#e74c3c';
+
+            document.getElementById('benchmarkTeachers').innerHTML = `${teachersPct}% (срв. ${nationalAvg.teachers}%)`;
+            document.getElementById('barTeachers').style.width = teachersPct + '%';
+            document.getElementById('barTeachers').style.backgroundColor = teachersPct >= nationalAvg.teachers ? '#27ae60' : '#e74c3c';
+
+            document.getElementById('benchmarkFinancial').innerHTML = `${financialPct}% (срв. ${nationalAvg.financial}%)`;
+            document.getElementById('barFinancial').style.width = financialPct + '%';
+            document.getElementById('barFinancial').style.backgroundColor = financialPct >= nationalAvg.financial ? '#27ae60' : '#e74c3c';
+
+            const advantages = document.getElementById('competitiveAdvantages');
+            if (advantages) {
+                advantages.innerHTML = '';
+                if (academicPct > nationalAvg.academic) {
+                    advantages.innerHTML += '<li><i class="fas fa-trophy" style="color:#f1c40f;"></i> Над среден успех</li>';
+                }
+                if (teachersPct > nationalAvg.teachers) {
+                    advantages.innerHTML += '<li><i class="fas fa-trophy" style="color:#f1c40f;"></i> Висококвалифицирани учители</li>';
+                }
+                if (params.municipality > 7) {
+                    advantages.innerHTML += '<li><i class="fas fa-trophy" style="color:#f1c40f;"></i> Силна общинска подкрепа</li>';
+                }
+                if (advantages.innerHTML === '') {
+                    advantages.innerHTML += '<li>Няма изявени предимства</li>';
+                }
+            }
+
+            const improvements = document.getElementById('improvementAreas');
+            if (improvements) {
+                improvements.innerHTML = '';
+                if (digitalPct < nationalAvg.digital) {
+                    improvements.innerHTML += '<li><i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> Изоставане в дигитализацията</li>';
+                }
+                if (params.dropouts > 5) {
+                    improvements.innerHTML += '<li><i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> Висок % отпадащи</li>';
+                }
+                if (params.business < 4) {
+                    improvements.innerHTML += '<li><i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> Слаба бизнес подкрепа</li>';
+                }
+                if (improvements.innerHTML === '') {
+                    improvements.innerHTML += '<li>Няма критични области</li>';
+                }
+            }
+        }
+
+        function updateCharts(params) {
+            try {
+                const avgS = averageScore(swotData.strengths);
+                const avgW = averageScore(swotData.weaknesses);
+                const avgO = averageScore(swotData.opportunities);
+                const avgT = averageScore(swotData.threats);
+
+                const swotCtx = document.getElementById('swotChart')?.getContext('2d');
+                if (swotCtx) {
+                    if (swotChart) swotChart.destroy();
+                    swotChart = new Chart(swotCtx, {
+                        type: 'radar',
+                        data: {
+                            labels: ['Силни', 'Слаби', 'Възможности', 'Заплахи'],
+                            datasets: [{
+                                data: [avgS * 10, avgW * 10, avgO * 10, avgT * 10],
+                                backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                                borderColor: '#667eea'
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } }
+                    });
+                }
+
+                const comparisonCtx = document.getElementById('comparisonChart')?.getContext('2d');
+                if (comparisonCtx) {
+                    if (comparisonChart) comparisonChart.destroy();
+                    comparisonChart = new Chart(comparisonCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Успех', 'База', 'Дигитално', 'Квалиф.'],
+                            datasets: [{
+                                label: 'Нашите',
+                                data: [params.academic * 10, params.digital * 10 + 10, params.digital * 10, params.qualification],
+                                backgroundColor: '#667eea'
+                            }, {
+                                label: 'Средно',
+                                data: [82, 65, 55, 75],
+                                backgroundColor: '#95a5a6'
+                            }]
+                        }
+                    });
+                }
+
+                const trendsCtx = document.getElementById('trendsChart')?.getContext('2d');
+                if (trendsCtx) {
+                    if (trendsChart) trendsChart.destroy();
+                    const years = ['2022', '2023', '2024', '2025', '2026'];
+                    trendsChart = new Chart(trendsCtx, {
+                        type: 'line',
+                        data: {
+                            labels: years,
+                            datasets: [{
+                                label: 'Успех',
+                                data: [6.5, 7.0, 7.2, 7.5, params.academic],
+                                borderColor: '#27ae60'
+                            }]
+                        }
+                    });
+                }
+
+                const budgetCtx = document.getElementById('budgetChart')?.getContext('2d');
+                if (budgetCtx) {
+                    if (budgetChart) budgetChart.destroy();
+                    budgetChart = new Chart(budgetCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Заплати', 'Материална', 'Учебни', 'Извънкл.'],
+                            datasets: [{
+                                data: [65, 20, 10, 5],
+                                backgroundColor: ['#667eea', '#27ae60', '#f39c12', '#e74c3c']
+                            }]
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Chart error:', error);
+            }
+        }
+
+        document.getElementById('analyze_btn').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+
+            btn.innerHTML = '<span class="loading"></span> Генериране...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                updateSwotFromParameters();
+                updateAnalysis();
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 500);
+        });
+
+        document.getElementById('param_turnover')?.addEventListener('input', function() {
+            document.getElementById('turnover_value').innerText = this.value + '/10';
+        });
+
+        document.getElementById('param_financial_stability')?.addEventListener('input', function() {
+            document.getElementById('stability_value').innerText = this.value + '/10';
+        });
+
+        document.getElementById('param_building_condition')?.addEventListener('input', function() {
+            document.getElementById('building_value').innerText = this.value + '/10';
+        });
+
+        document.getElementById('param_academic_success')?.addEventListener('input', function() {
+            document.getElementById('academic_value').innerText = this.value + '/10';
+        });
+
+        document.getElementById('param_computer_skills')?.addEventListener('input', function() {
+            document.getElementById('computer_value').innerText = this.value + '/10';
+        });
+
+        document.getElementById('param_digitalization')?.addEventListener('input', function() {
+            document.getElementById('digital_value').innerText = this.value + '/10';
+        });
+
+        document.getElementById('param_municipality_support')?.addEventListener('input', function() {
+            document.getElementById('municipality_value').innerText = this.value + '/10';
+        });
+
+        document.getElementById('param_business_support')?.addEventListener('input', function() {
+            document.getElementById('business_value').innerText = this.value + '/10';
+        });
+
+        document.getElementById('param_parent_involvement')?.addEventListener('input', function() {
+            document.getElementById('parent_value').innerText = this.value + '/10';
+        });
+
+        document.getElementById('param_students')?.addEventListener('input', updateRatios);
+        document.getElementById('param_teachers')?.addEventListener('input', updateRatios);
+        document.getElementById('param_budget')?.addEventListener('input', updateRatios);
+        document.getElementById('param_computers')?.addEventListener('input', updateRatios);
+
+        function updateRatios() {
+            const students = safeParseInt(document.getElementById('param_students')?.value, 850);
+            const teachers = safeParseInt(document.getElementById('param_teachers')?.value, 45);
+            const budget = safeParseInt(document.getElementById('param_budget')?.value, 1200000);
+
+            const ratioElement = document.getElementById('student_teacher_ratio');
+            if (ratioElement && teachers > 0) {
+                ratioElement.innerText = (students / teachers).toFixed(1);
+            }
+
+            const budgetElement = document.getElementById('budget_per_student');
+            if (budgetElement && students > 0) {
+                budgetElement.innerText = Math.round(budget / students);
+            }
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        window.exportAnalysis = function(format) {
+            const params = getAllParameters();
+            const name = params.name || 'институция';
+            const safeName = name.replace(/[^\wа-яА-Я\s]/g, '').replace(/\s+/g, '_');
+            const date = new Date().toLocaleDateString('bg-BG');
+
+            if (format === 'json') {
+                const data = {
+                    institution: name,
+                    date: date,
+                    parameters: params,
+                    swot: swotData
+                };
+                downloadFile(
+                    JSON.stringify(data, null, 2),
+                    `swot_${safeName}.json`,
+                    'application/json;charset=utf-8'
+                );
+
+            } else if (format === 'pdf') {
+                window.print();
+
+            } else if (format === 'excel') {
+                // CSV с UTF-8 BOM за правилен български в Excel
+                let csv = '\uFEFF';
+                csv += `SWOT АНАЛИЗ\n`;
+                csv += `Институция,${name}\n`;
+                csv += `Дата,${date}\n\n`;
+
+                csv += `ПАРАМЕТРИ\n`;
+                csv += `Показател,Стойност\n`;
+                csv += `Тип,${params.type}\n`;
+                csv += `Населено място,${params.location}\n`;
+                csv += `Ученици,${params.students}\n`;
+                csv += `Учители,${params.teachers}\n`;
+                csv += `Бюджет (лв.),${params.budget}\n`;
+                csv += `Среден успех,${params.academic}\n`;
+                csv += `Матури (%),${params.exam}\n`;
+                csv += `Дигитализация,${params.digital}\n`;
+                csv += `Квалификация (%),${params.qualification}\n`;
+                csv += `Отпаднали (%),${params.dropouts}\n\n`;
+
+                csv += `СИЛНИ СТРАНИ\n`;
+                csv += `Описание,Оценка\n`;
+                swotData.strengths.forEach(item => {
+                    csv += `"${item.text.replace(/"/g, '""')}",${item.score}\n`;
+                });
+                csv += `\n`;
+
+                csv += `СЛАБИ СТРАНИ\n`;
+                csv += `Описание,Оценка\n`;
+                swotData.weaknesses.forEach(item => {
+                    csv += `"${item.text.replace(/"/g, '""')}",${item.score}\n`;
+                });
+                csv += `\n`;
+
+                csv += `ВЪЗМОЖНОСТИ\n`;
+                csv += `Описание,Оценка\n`;
+                swotData.opportunities.forEach(item => {
+                    csv += `"${item.text.replace(/"/g, '""')}",${item.score}\n`;
+                });
+                csv += `\n`;
+
+                csv += `ЗАПЛАХИ\n`;
+                csv += `Описание,Оценка\n`;
+                swotData.threats.forEach(item => {
+                    csv += `"${item.text.replace(/"/g, '""')}",${item.score}\n`;
+                });
+                csv += `\n`;
+
+                csv += `СРЕДНИ ОЦЕНКИ\n`;
+                csv += `Категория,Стойност\n`;
+                csv += `Силни страни,${averageScore(swotData.strengths).toFixed(1)}\n`;
+                csv += `Слаби страни,${averageScore(swotData.weaknesses).toFixed(1)}\n`;
+                csv += `Възможности,${averageScore(swotData.opportunities).toFixed(1)}\n`;
+                csv += `Заплахи,${averageScore(swotData.threats).toFixed(1)}\n`;
+
+                downloadFile(csv, `swot_${safeName}.csv`, 'text/csv;charset=utf-8');
+
+            } else if (format === 'word') {
+                // HTML документ с .doc разширение – отваря се в Word
+                let html = `
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office'
+                          xmlns:w='urn:schemas-microsoft-com:office:word'
+                          xmlns='http://www.w3.org/TR/REC-html40'>
+                    <head>
+                        <meta charset="utf-8">
+                        <title>SWOT Анализ - ${name}</title>
+                        <style>
+                            body { font-family: Calibri, Arial, sans-serif; margin: 30px; }
+                            h1 { color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+                            h2 { color: #764ba2; margin-top: 25px; }
+                            table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+                            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+                            th { background: #667eea; color: white; }
+                            .strengths h2 { color: #27ae60; }
+                            .weaknesses h2 { color: #e74c3c; }
+                            .opportunities h2 { color: #3498db; }
+                            .threats h2 { color: #f39c12; }
+                            .score { display: inline-block; background: #e0e0e0; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>SWOT АНАЛИЗ</h1>
+                        <p><strong>Институция:</strong> ${name}</p>
+                        <p><strong>Дата:</strong> ${date}</p>
+
+                        <h2>Параметри</h2>
+                        <table>
+                            <tr><th>Показател</th><th>Стойност</th></tr>
+                            <tr><td>Тип</td><td>${params.type}</td></tr>
+                            <tr><td>Населено място</td><td>${params.location}</td></tr>
+                            <tr><td>Ученици</td><td>${params.students}</td></tr>
+                            <tr><td>Учители</td><td>${params.teachers}</td></tr>
+                            <tr><td>Бюджет (лв.)</td><td>${params.budget.toLocaleString()}</td></tr>
+                            <tr><td>Среден успех</td><td>${params.academic}/10</td></tr>
+                            <tr><td>Матури (%)</td><td>${params.exam}%</td></tr>
+                            <tr><td>Дигитализация</td><td>${params.digital}/10</td></tr>
+                            <tr><td>Квалификация (%)</td><td>${params.qualification}%</td></tr>
+                            <tr><td>Отпаднали (%)</td><td>${params.dropouts}%</td></tr>
+                        </table>
+
+                        <div class="strengths">
+                            <h2>💪 СИЛНИ СТРАНИ</h2>
+                            <table>
+                                <tr><th>Описание</th><th>Оценка</th></tr>
+                                ${swotData.strengths.map(item => `<tr><td>${item.text}</td><td><span class="score">${item.score}/10</span></td></tr>`).join('')}
+                            </table>
+                        </div>
+
+                        <div class="weaknesses">
+                            <h2>⚠️ СЛАБИ СТРАНИ</h2>
+                            <table>
+                                <tr><th>Описание</th><th>Оценка</th></tr>
+                                ${swotData.weaknesses.map(item => `<tr><td>${item.text}</td><td><span class="score">${item.score}/10</span></td></tr>`).join('')}
+                            </table>
+                        </div>
+
+                        <div class="opportunities">
+                            <h2>🚀 ВЪЗМОЖНОСТИ</h2>
+                            <table>
+                                <tr><th>Описание</th><th>Оценка</th></tr>
+                                ${swotData.opportunities.map(item => `<tr><td>${item.text}</td><td><span class="score">${item.score}/10</span></td></tr>`).join('')}
+                            </table>
+                        </div>
+
+                        <div class="threats">
+                            <h2>⚡ ЗАПЛАХИ</h2>
+                            <table>
+                                <tr><th>Описание</th><th>Оценка</th></tr>
+                                ${swotData.threats.map(item => `<tr><td>${item.text}</td><td><span class="score">${item.score}/10</span></td></tr>`).join('')}
+                            </table>
+                        </div>
+
+                        <h2>📊 Средни оценки</h2>
+                        <table>
+                            <tr><th>Категория</th><th>Стойност</th></tr>
+                            <tr><td>Силни страни</td><td>${averageScore(swotData.strengths).toFixed(1)}/10</td></tr>
+                            <tr><td>Слаби страни</td><td>${averageScore(swotData.weaknesses).toFixed(1)}/10</td></tr>
+                            <tr><td>Възможности</td><td>${averageScore(swotData.opportunities).toFixed(1)}/10</td></tr>
+                            <tr><td>Заплахи</td><td>${averageScore(swotData.threats).toFixed(1)}/10</td></tr>
+                        </table>
+                    </body>
+                    </html>
+                `;
+                downloadFile(html, `swot_${safeName}.doc`, 'application/msword;charset=utf-8');
+            }
+        };
+
+        window.onload = function() {
+            initializeData();
+            updateRatios();
+            updateAnalysis();
+        };
+    </script>
+</body>
+</html>

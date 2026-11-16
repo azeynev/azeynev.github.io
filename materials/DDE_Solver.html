@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Симулатор за диференциални уравнения със закъснения</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 350px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .visualization-section {
+            flex: 2;
+            min-width: 600px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        #plot {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .examples {
+            margin-top: 25px;
+            background-color: var(--light-color);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .examples h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        
+        .example-btn {
+            display: inline-block;
+            background-color: white;
+            color: var(--dark-color);
+            border: 1px solid #ced4da;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .example-btn:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+        
+        .help-text {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .error {
+            color: var(--danger-color);
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8d7da;
+            border-radius: 5px;
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .success {
+            color: var(--success-color);
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #d4edda;
+            border-radius: 5px;
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .info-box {
+            background-color: #d1ecf1;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .initial-function-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .method-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .method-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .method-option.selected {
+            background-color: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+        
+        .parameters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .parameters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                flex-direction: column;
+            }
+            
+            .input-section, .visualization-section {
+                min-width: 100%;
+            }
+        }
+        
+        .equation-preview {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px dashed #ccc;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .delay-indicator {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        
+        .latex-help {
+            background-color: #fff3cd;
+            border-left: 4px solid var(--warning-color);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        
+        .latex-examples {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .latex-example {
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .latex-example:hover {
+            background-color: #e9ecef;
+        }
+        
+        .latex-symbol {
+            font-family: monospace;
+            color: var(--primary-color);
+        }
+        
+        .latex-preview {
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .input-with-preview {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .input-with-preview input {
+            flex: 1;
+        }
+        
+        .preview-box {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Симулатор за диференциални уравнения със закъснения</h1>
+    
+    <div class="info-box">
+        <strong>Информация:</strong> Този симулатор решава диференциални уравнения от вида 
+        \( y'(t) = f(t, y(t), y(t-\tau)) \) с начално условие \( y(t) = \varphi(t) \) за \( t \in [t_0-\tau, t_0] \).
+        Поддържа въвеждане на уравнения с LaTeX синтаксис.
+    </div>
+    
+    <div class="container">
+        <div class="input-section">
+            <h2>Параметри на уравнението</h2>
+            
+            <div class="form-group">
+                <label for="equation">Диференциално уравнение:</label>
+                <textarea id="equation" rows="3" placeholder="Въведете уравнението, напр.: \frac{dy}{dt} = -y(t-\tau)">\frac{dy}{dt} = -y(t-\tau)</textarea>
+                <div class="help-text">Можете да използвате LaTeX синтаксис или обикновен текст</div>
+                <div class="equation-preview" id="equationPreview">\( \frac{dy}{dt} = -y(t-\tau) \)</div>
+            </div>
+            
+            <div class="parameters-grid">
+                <div class="form-group">
+                    <label for="delay">Закъснение (\(\tau\)):</label>
+                    <input type="number" id="delay" step="0.1" value="1" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="initialTime">Начален момент (\(t_0\)):</label>
+                    <input type="number" id="initialTime" value="0" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="finalTime">Краен момент (\(t_{\text{max}}\)):</label>
+                    <input type="number" id="finalTime" value="10" step="0.1" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="stepSize">Стъпка на интегриране (\(h\)):</label>
+                    <input type="number" id="stepSize" value="0.01" step="0.001" min="0.001">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Метод на интегриране:</label>
+                <div class="method-selector">
+                    <div class="method-option selected" data-method="euler">Ойлер</div>
+                    <div class="method-option" data-method="heun">Хойн</div>
+                    <div class="method-option" data-method="rk4">Рунге-Кута 4</div>
+                </div>
+            </div>
+            
+            <h3>Начални условия</h3>
+            <div class="initial-function-section">
+                <div class="form-group">
+                    <label for="initialFunction">Начална функция \(\varphi(t)\) за \(t \in [t_0-\tau, t_0]\):</label>
+                    <div class="input-with-preview">
+                        <input type="text" id="initialFunction" value="1" placeholder="Напр.: 1, \sin(t), t^2">
+                        <div class="preview-box" id="initialFunctionPreview">\(1\)</div>
+                    </div>
+                    <div class="help-text">Функция, дефинираща \(y(t)\) за \(t \leq t_0\)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="initialIntervalStart">Начало на интервала:</label>
+                    <input type="number" id="initialIntervalStart" value="-1" step="0.1">
+                    <div class="help-text">\(t_{\text{min}} = t_0 - \tau = -1\)</div>
+                </div>
+            </div>
+            
+            <button id="solveBtn">Реши уравнението</button>
+            
+            <div id="message"></div>
+            
+            <div class="latex-help">
+                <h4>Помощ за LaTeX синтаксис:</h4>
+                <div class="latex-examples">
+                    <div class="latex-example" data-latex="\frac{dy}{dt}">
+                        <div class="latex-symbol">\frac{dy}{dt}</div>
+                        <div class="latex-preview">\(\frac{dy}{dt}\)</div>
+                    </div>
+                    <div class="latex-example" data-latex="\alpha, \beta, \gamma">
+                        <div class="latex-symbol">\alpha, \beta, \gamma</div>
+                        <div class="latex-preview">\(\alpha, \beta, \gamma\)</div>
+                    </div>
+                    <div class="latex-example" data-latex="e^{t}">
+                        <div class="latex-symbol">e^{t}</div>
+                        <div class="latex-preview">\(e^{t}\)</div>
+                    </div>
+                    <div class="latex-example" data-latex="y(t-\tau)">
+                        <div class="latex-symbol">y(t-\tau)</div>
+                        <div class="latex-preview">\(y(t-\tau)\)</div>
+                    </div>
+                    <div class="latex-example" data-latex="\sin(t), \cos(t)">
+                        <div class="latex-symbol">\sin(t), \cos(t)</div>
+                        <div class="latex-preview">\(\sin(t), \cos(t)\)</div>
+                    </div>
+                    <div class="latex-example" data-latex="\int y(t) dt">
+                        <div class="latex-symbol">\int y(t) dt</div>
+                        <div class="latex-preview">\(\int y(t) dt\)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="examples">
+                <h3>Учебни примери:</h3>
+                <div class="example-btn" data-eq="\frac{dy}{dt} = -y(t-\tau)" data-delay="1" data-init="1" data-start="-1">\(\frac{dy}{dt} = -y(t-\tau)\)</div>
+                <div class="example-btn" data-eq="\frac{dy}{dt} = -0.5y(t-2)" data-delay="2" data-init="1" data-start="-2">\(\frac{dy}{dt} = -0.5y(t-2)\)</div>
+                <div class="example-btn" data-eq="\frac{dy}{dt} = y(t)(1 - y(t-\tau))" data-delay="1" data-init="0.5" data-start="-1">Логистично с закъснение</div>
+                <div class="example-btn" data-eq="\frac{dy}{dt} = -y(t-0.5) + \sin(t)" data-delay="0.5" data-init="0" data-start="-0.5">С външно въздействие</div>
+                <div class="example-btn" data-eq="\frac{dy}{dt} = -0.2y(t) - 0.5y(t-2)" data-delay="2" data-init="1" data-start="-2">Смесено закъснение</div>
+            </div>
+        </div>
+        
+        <div class="visualization-section">
+            <h2>Визуализация на решението</h2>
+            <div id="plot"></div>
+            
+            <div class="parameters-grid">
+                <div class="form-group">
+                    <label for="plotTitle">Заглавие на графиката:</label>
+                    <input type="text" id="plotTitle" value="Решение на диференциално уравнение със закъснение">
+                </div>
+                
+                <div class="form-group">
+                    <label for="xAxisLabel">Етикет на оста x:</label>
+                    <input type="text" id="xAxisLabel" value="Време \(t\)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="yAxisLabel">Етикет на оста y:</label>
+                    <input type="text" id="yAxisLabel" value="\(y(t)\)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="showInitial">Покажи начална функция:</label>
+                    <select id="showInitial">
+                        <option value="yes">Да</option>
+                        <option value="no">Не</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Конфигуриране на MathJax
+            window.MathJax = {
+                tex: {
+                    inlineMath: [['$', '$'], ['\\(', '\\)']],
+                    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                    processEscapes: true,
+                    processEnvironments: true
+                },
+                options: {
+                    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+                }
+            };
+            
+            const solveBtn = document.getElementById('solveBtn');
+            const messageDiv = document.getElementById('message');
+            const plotDiv = document.getElementById('plot');
+            const equationInput = document.getElementById('equation');
+            const delayInput = document.getElementById('delay');
+            const initialTimeInput = document.getElementById('initialTime');
+            const initialIntervalStartInput = document.getElementById('initialIntervalStart');
+            const equationPreview = document.getElementById('equationPreview');
+            const initialFunctionInput = document.getElementById('initialFunction');
+            const initialFunctionPreview = document.getElementById('initialFunctionPreview');
+            let selectedMethod = 'euler';
+            
+            // Инициализиране на MathJax
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise();
+            }
+            
+            // Промяна на началния интервал при промяна на t0 или τ
+            function updateInitialInterval() {
+                const t0 = parseFloat(initialTimeInput.value) || 0;
+                const delay = parseFloat(delayInput.value) || 1;
+                initialIntervalStartInput.value = (t0 - delay).toFixed(1);
+            }
+            
+            initialTimeInput.addEventListener('change', updateInitialInterval);
+            delayInput.addEventListener('change', updateInitialInterval);
+            
+            // Промяна на preview на уравнението
+            equationInput.addEventListener('input', function() {
+                updateEquationPreview();
+            });
+            
+            // Промяна на preview на началната функция
+            initialFunctionInput.addEventListener('input', function() {
+                updateInitialFunctionPreview();
+            });
+            
+            function updateEquationPreview() {
+                const eq = equationInput.value;
+                let previewText = eq;
+                
+                // Автоматично преобразуване на обикновен текст към LaTeX
+                if (!eq.includes('\\')) {
+                    previewText = convertToLatex(eq);
+                }
+                
+                equationPreview.innerHTML = `\\( ${previewText} \\)`;
+                
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    window.MathJax.typesetPromise([equationPreview]);
+                }
+            }
+            
+            function updateInitialFunctionPreview() {
+                const func = initialFunctionInput.value;
+                let previewText = func;
+                
+                // Автоматично преобразуване на обикновен текст към LaTeX
+                if (!func.includes('\\')) {
+                    previewText = convertToLatex(func);
+                }
+                
+                initialFunctionPreview.innerHTML = `\\( ${previewText} \\)`;
+                
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    window.MathJax.typesetPromise([initialFunctionPreview]);
+                }
+            }
+            
+            // Функция за автоматично преобразуване на обикновен текст към LaTeX
+            function convertToLatex(text) {
+                return text
+                    .replace(/\bdy\/dt\b/g, '\\frac{dy}{dt}')
+                    .replace(/\bdx\/dt\b/g, '\\frac{dx}{dt}')
+                    .replace(/\bdy\/dx\b/g, '\\frac{dy}{dx}')
+                    .replace(/\bsin\b/g, '\\sin')
+                    .replace(/\bcos\b/g, '\\cos')
+                    .replace(/\btan\b/g, '\\tan')
+                    .replace(/\bexp\b/g, '\\exp')
+                    .replace(/\blog\b/g, '\\log')
+                    .replace(/\bln\b/g, '\\ln')
+                    .replace(/\bsqrt\b/g, '\\sqrt')
+                    .replace(/\bpi\b/g, '\\pi')
+                    .replace(/\balpha\b/g, '\\alpha')
+                    .replace(/\bbeta\b/g, '\\beta')
+                    .replace(/\bgamma\b/g, '\\gamma')
+                    .replace(/\btau\b/g, '\\tau')
+                    .replace(/\btheta\b/g, '\\theta')
+                    .replace(/\bphi\b/g, '\\phi')
+                    .replace(/\bvarphi\b/g, '\\varphi')
+                    .replace(/\binf\b/g, '\\infty')
+                    .replace(/\bint\b/g, '\\int')
+                    .replace(/\^(\w+)/g, '^{$1}')
+                    .replace(/\^(\d+)/g, '^{$1}')
+                    .replace(/\^\(([^)]+)\)/g, '^{$1}');
+            }
+            
+            // LaTeX помощ - при клик на пример
+            document.querySelectorAll('.latex-example').forEach(example => {
+                example.addEventListener('click', function() {
+                    const latex = this.getAttribute('data-latex');
+                    equationInput.value = latex;
+                    updateEquationPreview();
+                });
+            });
+            
+            // Избор на метод за интегриране
+            document.querySelectorAll('.method-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.method-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    selectedMethod = this.getAttribute('data-method');
+                });
+            });
+            
+            // Примерни уравнения
+            document.querySelectorAll('.example-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('equation').value = this.getAttribute('data-eq');
+                    document.getElementById('delay').value = this.getAttribute('data-delay');
+                    document.getElementById('initialFunction').value = this.getAttribute('data-init');
+                    document.getElementById('initialIntervalStart').value = this.getAttribute('data-start');
+                    
+                    // Актуализиране на preview
+                    updateEquationPreview();
+                    updateInitialFunctionPreview();
+                    
+                    // Актуализиране на t0
+                    const delay = parseFloat(this.getAttribute('data-delay'));
+                    const start = parseFloat(this.getAttribute('data-start'));
+                    document.getElementById('initialTime').value = (start + delay).toFixed(1);
+                });
+            });
+            
+            solveBtn.addEventListener('click', solveDDE);
+            
+            function solveDDE() {
+                // Изчистване на съобщенията
+                messageDiv.innerHTML = '';
+                messageDiv.className = '';
+                
+                try {
+                    // Вземане на параметрите от формата
+                    const equation = document.getElementById('equation').value;
+                    const delay = parseFloat(document.getElementById('delay').value);
+                    const t0 = parseFloat(document.getElementById('initialTime').value);
+                    const tMax = parseFloat(document.getElementById('finalTime').value);
+                    const h = parseFloat(document.getElementById('stepSize').value);
+                    const initialFunctionStr = document.getElementById('initialFunction').value;
+                    const initialIntervalStart = parseFloat(document.getElementById('initialIntervalStart').value);
+                    
+                    // Проверка на входните данни
+                    if (!equation) {
+                        throw new Error('Моля, въведете уравнението!');
+                    }
+                    if (delay < 0) {
+                        throw new Error('Закъснението трябва да е неотрицателно число!');
+                    }
+                    if (tMax <= t0) {
+                        throw new Error('Крайният момент трябва да е по-голям от началния!');
+                    }
+                    if (h <= 0) {
+                        throw new Error('Стъпката на интегриране трябва да е положителна!');
+                    }
+                    if (initialIntervalStart >= t0) {
+                        throw new Error('Началото на интервала трябва да е по-малко от началния момент!');
+                    }
+                    
+                    // Парсване на уравнението
+                    const parsedEquation = parseEquation(equation);
+                    
+                    // Дефиниране на началната функция
+                    const initialFunction = createInitialFunction(initialFunctionStr);
+                    
+                    // Решаване на уравнението
+                    const solution = solveDelayDifferentialEquation(
+                        parsedEquation, delay, t0, tMax, h, initialFunction, 
+                        initialIntervalStart, selectedMethod
+                    );
+                    
+                    // Визуализация на резултата
+                    visualizeSolution(solution, initialIntervalStart, t0);
+                    
+                    // Показване на съобщение за успех
+                    messageDiv.textContent = 'Уравнението е решено успешно!';
+                    messageDiv.className = 'success';
+                    
+                } catch (error) {
+                    messageDiv.textContent = 'Грешка: ' + error.message;
+                    messageDiv.className = 'error';
+                    console.error(error);
+                }
+            }
+            
+            function parseEquation(equationStr) {
+                // Опитваме се да парснем уравнението
+                // Очакваме формат: dy/dt = израз
+                const parts = equationStr.split('=');
+                if (parts.length !== 2) {
+                    throw new Error('Невалиден формат на уравнението. Използвайте: dy/dt = израз');
+                }
+                
+                let rightSide = parts[1].trim();
+                
+                // Преобразуване на LaTeX към математически израз
+                rightSide = convertLatexToMath(rightSide);
+                
+                // Създаваме функция от дясната страна
+                try {
+                    // Заменяме специални означения с математически изрази
+                    let expr = rightSide
+                        .replace(/y\(t-(\d+\.?\d*)\)/g, 'y_t_minus_$1')  // y(t-τ)
+                        .replace(/y\(t\)/g, 'y_t')  // y(t)
+                        .replace(/\^/g, '**');  // Степенуване
+                    
+                    // Създаваме функция, която изчислява дясната страна
+                    return (t, y_t, y_t_minus_tau) => {
+                        const scope = {
+                            t: t,
+                            y_t: y_t,
+                            y_t_minus_tau: y_t_minus_tau,
+                            sin: Math.sin,
+                            cos: Math.cos,
+                            exp: Math.exp,
+                            log: Math.log,
+                            sqrt: Math.sqrt,
+                            abs: Math.abs,
+                            PI: Math.PI,
+                            E: Math.E
+                        };
+                        
+                        // Заменяме специфичните закъснения
+                        expr = expr.replace(/y_t_minus_(\d+\.?\d*)/g, 'y_t_minus_tau');
+                        
+                        try {
+                            return math.evaluate(expr, scope);
+                        } catch (e) {
+                            throw new Error(`Грешка при оценка на израза: ${expr}. Проверете синтаксиса.`);
+                        }
+                    };
+                } catch (e) {
+                    throw new Error(`Грешка при парсване на уравнението: ${e.message}`);
+                }
+            }
+            
+            function convertLatexToMath(latexStr) {
+                return latexStr
+                    .replace(/\\frac{([^}]+)}{([^}]+)}/g, '($1)/($2)')
+                    .replace(/\\sin/g, 'sin')
+                    .replace(/\\cos/g, 'cos')
+                    .replace(/\\tan/g, 'tan')
+                    .replace(/\\exp/g, 'exp')
+                    .replace(/\\log/g, 'log')
+                    .replace(/\\ln/g, 'log')
+                    .replace(/\\sqrt{([^}]+)}/g, 'sqrt($1)')
+                    .replace(/\\pi/g, 'PI')
+                    .replace(/\\alpha/g, 'alpha')
+                    .replace(/\\beta/g, 'beta')
+                    .replace(/\\gamma/g, 'gamma')
+                    .replace(/\\tau/g, 'tau')
+                    .replace(/\\theta/g, 'theta')
+                    .replace(/\\phi/g, 'phi')
+                    .replace(/\\varphi/g, 'phi')
+                    .replace(/\\infty/g, 'Infinity')
+                    .replace(/\\int/g, 'integral')
+                    .replace(/\{/g, '(')
+                    .replace(/\}/g, ')')
+                    .replace(/\\left\(/g, '(')
+                    .replace(/\\right\)/g, ')')
+                    .replace(/\\cdot/g, '*')
+                    .replace(/\\times/g, '*');
+            }
+            
+            function createInitialFunction(initialFunctionStr) {
+                try {
+                    // Преобразуване на LaTeX към математически израз
+                    const mathStr = convertLatexToMath(initialFunctionStr);
+                    
+                    // Създаваме функция от низ
+                    return (t) => {
+                        const scope = {
+                            t: t,
+                            sin: Math.sin,
+                            cos: Math.cos,
+                            exp: Math.exp,
+                            log: Math.log,
+                            sqrt: Math.sqrt,
+                            abs: Math.abs,
+                            PI: Math.PI,
+                            E: Math.E
+                        };
+                        
+                        let expr = mathStr.replace(/\^/g, '**');
+                        return math.evaluate(expr, scope);
+                    };
+                } catch (e) {
+                    throw new Error(`Грешка при създаване на началната функция: ${e.message}`);
+                }
+            }
+            
+            function solveDelayDifferentialEquation(equation, delay, t0, tMax, h, initialFunction, initialIntervalStart, method) {
+                // Брой стъпки
+                const n = Math.ceil((tMax - t0) / h);
+                
+                // Масиви за резултатите
+                const tValues = new Array(n + 1);
+                const yValues = new Array(n + 1);
+                
+                // Инициализиране на началните условия
+                for (let i = 0; i <= n; i++) {
+                    const t = t0 + i * h;
+                    tValues[i] = t;
+                    
+                    // За t ≤ t0 използваме началната функция
+                    if (t <= t0) {
+                        yValues[i] = initialFunction(t);
+                    } else {
+                        yValues[i] = 0; // Ще бъде изчислено
+                    }
+                }
+                
+                // Числено решаване
+                for (let i = 0; i < n; i++) {
+                    const t = tValues[i];
+                    const y_t = yValues[i];
+                    
+                    // Намиране на закъснялата стойност y(t-τ)
+                    const t_delayed = t - delay;
+                    let y_t_minus_tau;
+                    
+                    if (t_delayed <= t0) {
+                        // Ако закъснението е преди началния момент, използваме началната функция
+                        y_t_minus_tau = initialFunction(t_delayed);
+                    } else {
+                        // Интерполираме за стойности между възлите
+                        const index = Math.floor((t_delayed - t0) / h);
+                        const alpha = (t_delayed - tValues[index]) / h;
+                        
+                        if (index + 1 < yValues.length) {
+                            // Линейна интерполация
+                            y_t_minus_tau = yValues[index] + alpha * (yValues[index + 1] - yValues[index]);
+                        } else {
+                            y_t_minus_tau = yValues[index];
+                        }
+                    }
+                    
+                    // Изчисляване на производната и следващата стойност според избрания метод
+                    let y_next;
+                    
+                    switch(method) {
+                        case 'euler':
+                            // Метод на Ойлер
+                            const derivative = equation(t, y_t, y_t_minus_tau);
+                            y_next = y_t + h * derivative;
+                            break;
+                            
+                        case 'heun':
+                            // Метод на Хойн (подобрен Ойлер)
+                            const k1 = equation(t, y_t, y_t_minus_tau);
+                            const k2 = equation(t + h, y_t + h * k1, getDelayedValue(t + h, delay, t0, h, tValues, yValues, initialFunction));
+                            y_next = y_t + h * (k1 + k2) / 2;
+                            break;
+                            
+                        case 'rk4':
+                            // Метод на Рунге-Кута 4-ти порядък
+                            const k1_rk = equation(t, y_t, y_t_minus_tau);
+                            const k2_rk = equation(
+                                t + h/2, 
+                                y_t + h * k1_rk / 2, 
+                                getDelayedValue(t + h/2, delay, t0, h, tValues, yValues, initialFunction)
+                            );
+                            const k3_rk = equation(
+                                t + h/2, 
+                                y_t + h * k2_rk / 2, 
+                                getDelayedValue(t + h/2, delay, t0, h, tValues, yValues, initialFunction)
+                            );
+                            const k4_rk = equation(
+                                t + h, 
+                                y_t + h * k3_rk, 
+                                getDelayedValue(t + h, delay, t0, h, tValues, yValues, initialFunction)
+                            );
+                            y_next = y_t + h * (k1_rk + 2*k2_rk + 2*k3_rk + k4_rk) / 6;
+                            break;
+                            
+                        default:
+                            throw new Error('Неизвестен метод за интегриране');
+                    }
+                    
+                    yValues[i + 1] = y_next;
+                }
+                
+                return {
+                    t: tValues,
+                    y: yValues,
+                    initial: {
+                        t: Array.from({length: Math.ceil((t0 - initialIntervalStart) / h) + 1}, 
+                                     (_, i) => initialIntervalStart + i * h),
+                        y: Array.from({length: Math.ceil((t0 - initialIntervalStart) / h) + 1}, 
+                                     (_, i) => initialFunction(initialIntervalStart + i * h))
+                    }
+                };
+            }
+            
+            function getDelayedValue(t, delay, t0, h, tValues, yValues, initialFunction) {
+                const t_delayed = t - delay;
+                
+                if (t_delayed <= t0) {
+                    return initialFunction(t_delayed);
+                } else {
+                    const index = Math.floor((t_delayed - t0) / h);
+                    const alpha = (t_delayed - tValues[index]) / h;
+                    
+                    if (index + 1 < yValues.length) {
+                        return yValues[index] + alpha * (yValues[index + 1] - yValues[index]);
+                    } else {
+                        return yValues[index];
+                    }
+                }
+            }
+            
+            function visualizeSolution(solution, initialIntervalStart, t0) {
+                const plotTitle = document.getElementById('plotTitle').value;
+                const xAxisLabel = document.getElementById('xAxisLabel').value;
+                const yAxisLabel = document.getElementById('yAxisLabel').value;
+                const showInitial = document.getElementById('showInitial').value === 'yes';
+                
+                const traces = [];
+                
+                // Добавяне на началната функция
+                if (showInitial) {
+                    traces.push({
+                        x: solution.initial.t,
+                        y: solution.initial.y,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Начална функция φ(t)',
+                        line: {
+                            color: 'green',
+                            width: 2,
+                            dash: 'dash'
+                        }
+                    });
+                }
+                
+                // Добавяне на решението
+                traces.push({
+                    x: solution.t,
+                    y: solution.y,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Решение y(t)',
+                    line: {
+                        color: 'blue',
+                        width: 3
+                    }
+                });
+                
+                // Добавяне на вертикална линия за t0
+                traces.push({
+                    x: [t0, t0],
+                    y: [Math.min(...solution.y), Math.max(...solution.y)],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Начален момент t₀',
+                    line: {
+                        color: 'red',
+                        width: 2,
+                        dash: 'dot'
+                    }
+                });
+                
+                const layout = {
+                    title: plotTitle,
+                    xaxis: {
+                        title: xAxisLabel
+                    },
+                    yaxis: {
+                        title: yAxisLabel
+                    },
+                    showlegend: true,
+                    legend: {
+                        x: 0,
+                        y: 1,
+                        bgcolor: 'rgba(255,255,255,0.8)'
+                    }
+                };
+                
+                Plotly.newPlot(plotDiv, traces, layout);
+            }
+            
+            // Автоматично решаване при зареждане на страницата
+            updateInitialInterval();
+            updateEquationPreview();
+            updateInitialFunctionPreview();
+            solveDDE();
+        });
+    </script>
+</body>
+</html>

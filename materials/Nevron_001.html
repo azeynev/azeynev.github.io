@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Симулация: Невронна мрежа (интерактивна визуализация + обучение)</title>
+<style>
+  :root{
+    --bg:#0f1724; --panel:#0b1220; --accent:#38bdf8; --muted:#94a3b8; --good:#34d399; --bad:#fb7185;
+    --card:#071021; --glass:rgba(255,255,255,0.03);
+  }
+  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Arial;background:linear-gradient(180deg,#001219,#021827);color:#e6eef6}
+  .app{display:grid;grid-template-columns:620px 380px;gap:16px;padding:18px;max-width:1200px;margin:0 auto}
+  .panel{background:linear-gradient(180deg,var(--panel),#05111b);border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 40px rgba(2,6,23,0.6)}
+  h2{margin:0 0 8px 0;font-size:16px;color:var(--accent)}
+  .canvasWrap{position:relative;background:linear-gradient(180deg,#08202b,#05202a);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+  #field{display:block;width:100%;height:520px;background:#08121a;cursor:crosshair}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .controls > *{font-weight:700;padding:8px 10px;border-radius:8px;border:0;cursor:pointer}
+  .btnPrimary{background:var(--accent);color:#012f3b}
+  .btnGhost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--accent)}
+  label{display:block;font-size:13px;margin:6px 0;color:var(--muted)}
+  input[type=range]{width:100%}
+  .row{display:flex;gap:8px;align-items:center}
+  .col{display:flex;flex-direction:column;gap:6px}
+  .small{font-size:13px;color:var(--muted)}
+  .sideTop{display:flex;gap:8px;align-items:center;justify-content:space-between}
+  canvas.network{width:100%;height:300px;background:transparent}
+  #lossChart{width:100%;height:160px;background:linear-gradient(180deg,#021223,#041826);border-radius:6px;border:1px solid rgba(255,255,255,0.03)}
+  .flexCol{display:flex;flex-direction:column;gap:8px}
+  select,input[type=number]{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted)}
+  .info{font-size:12px;color:var(--muted)}
+  .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.02);font-weight:700;color:var(--muted)}
+  .footer{font-size:12px;color:var(--muted);margin-top:8px}
+  a.link{color:var(--accent);text-decoration:none}
+  /* decision boundary overlay */
+  #overlay{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+  /* legend */
+  .legend{display:flex;gap:8px;align-items:center}
+  .dot{width:14px;height:14px;border-radius:50%}
+  .dotA{background:#2563eb}
+  .dotB{background:#ec4899}
+  .controlsRow{display:flex;gap:8px;align-items:center}
+  .fileInput{display:none}
+  .kbd{background:#02111a;padding:6px 8px;border-radius:6px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+  <div class="app">
+    <!-- left: field + network visualization -->
+    <div class="panel">
+      <div class="sideTop">
+        <h2>Интерактивно поле — Data & Decision Boundary</h2>
+        <div class="legend">
+          <div class="dot dotA"></div><div class="small">Клас 0</div>
+          <div class="dot dotB" style="margin-left:8px"></div><div class="small">Клас 1</div>
+        </div>
+      </div>
+
+      <div class="canvasWrap" style="margin-top:10px">
+        <canvas id="field" width="620" height="520"></canvas>
+        <canvas id="overlay" width="620" height="520"></canvas>
+      </div>
+
+      <div style="margin-top:10px" class="controls">
+        <button id="btnGenerate" class="btnGhost">Генерирай примерни данни</button>
+        <button id="btnClear" class="btnGhost">Изчисти данни</button>
+        <button id="btnTrain" class="btnPrimary">Train</button>
+        <button id="btnPause" class="btnGhost">Pause</button>
+        <button id="btnStep" class="btnGhost">Single step</button>
+        <button id="btnSave" class="btnGhost">Запази тегла</button>
+        <label for="fileLoad" class="btnGhost" style="padding:8px 10px;cursor:pointer">Зареди тегла</label>
+        <input id="fileLoad" class="fileInput" type="file" accept="application/json">
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:10px">
+        <div style="flex:1">
+          <label class="small">Learning rate</label>
+          <input id="lr" type="range" min="0.001" max="1" step="0.001" value="0.05">
+          <div class="small">LR: <span id="lrVal">0.05</span></div>
+        </div>
+        <div style="width:120px">
+          <label class="small">Batch</label>
+          <input id="batch" type="number" min="1" value="16">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+        <div style="flex:1">
+          <label class="small">Activation</label>
+          <select id="activation">
+            <option value="sigmoid">Sigmoid</option>
+            <option value="tanh">tanh</option>
+            <option value="relu">ReLU</option>
+          </select>
+        </div>
+        <div style="width:120px">
+          <label class="small">Hidden1</label>
+          <input id="h1" type="number" min="0" max="64" value="8">
+        </div>
+        <div style="width:120px">
+          <label class="small">Hidden2</label>
+          <input id="h2" type="number" min="0" max="64" value="0">
+        </div>
+        <div style="width:60px">
+          <label class="small">Epochs</label>
+          <input id="epochs" type="number" min="1" value="1">
+        </div>
+      </div>
+
+      <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+        <div class="kbd">Ляв клик: клас 0</div>
+        <div class="kbd">Десен клик: клас 1</div>
+        <div style="flex:1"></div>
+        <div class="info">Points: <span id="countP">0</span></div>
+        <div style="width:12px"></div>
+      </div>
+    </div>
+
+    <!-- right: network + loss -->
+    <div class="panel">
+      <h2>Невронна мрежа — визуализация</h2>
+      <canvas id="network" class="network" width="340" height="300"></canvas>
+
+      <div style="margin-top:10px">
+        <div class="small">Loss (реално време)</div>
+        <canvas id="lossChart" width="340" height="160"></canvas>
+      </div>
+
+      <div style="margin-top:12px" class="flexCol">
+        <div class="info">Статус: <strong id="trainStatus">idle</strong></div>
+        <div class="info">Последен loss: <strong id="lastLoss">-</strong></div>
+        <div class="info">Мрежа: <span id="archLabel">2 → 8 → 0 → 1</span></div>
+      </div>
+
+      <div style="margin-top:12px" class="footer">
+        <div>Запазвай/загружавай тегла за демонстрации. Мрежата тренира на клиента (браузъра) с прост backprop — за учебни цели.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ---------------------------
+  Simple MLP implementation (feedforward + backprop) in JS
+  - Small, clear code for teaching/demo
+  - Uses Mean Squared Error for binary classification (works for visualization)
+  - Supports activation: sigmoid, tanh, relu
+-----------------------------*/
+
+// Utility
+const rand = (a,b)=>a+(b-a)*Math.random();
+const zeros = n=>Array(n).fill(0);
+const now = ()=>new Date().getTime();
+
+// Activation functions
+const Activations = {
+  sigmoid: {
+    f: x => 1/(1+Math.exp(-x)),
+    df: y => y*(1-y) // derivative using output y = sigmoid(x)
+  },
+  tanh: {
+    f: x => Math.tanh(x),
+    df: y => 1 - y*y
+  },
+  relu: {
+    f: x => Math.max(0,x),
+    df: y => y>0?1:0
+  }
+};
+
+// Simple MLP class
+class MLP {
+  constructor(layerSizes, actName='sigmoid'){
+    this.sizes = layerSizes.slice(); // e.g. [2,8,1]
+    this.layers = this.sizes.length;
+    this.actName = actName;
+    this.act = Activations[actName];
+    this.initWeights();
+  }
+  initWeights(){
+    this.weights = []; this.biases = [];
+    for(let l=1;l<this.sizes.length;l++){
+      const inN = this.sizes[l-1], outN = this.sizes[l];
+      const w = Array(outN).fill(0).map(()=>Array(inN).fill(0).map(()=>rand(-1,1) * Math.sqrt(2/(inN+outN))));
+      const b = Array(outN).fill(0).map(()=>0);
+      this.weights.push(w);
+      this.biases.push(b);
+    }
+  }
+  // forward returns activations per layer (including input)
+  forward(x){
+    let a = x.slice(); // input array
+    const acts = [a];
+    for(let l=0;l<this.weights.length;l++){
+      const w = this.weights[l], b = this.biases[l];
+      const z = w.map((row,i)=> {
+        let s = b[i];
+        for(let j=0;j<row.length;j++) s += row[j]*a[j];
+        return s;
+      });
+      // apply activation (for output also)
+      a = z.map(zv => {
+        if(this.actName==='relu') return this.act.f(zv);
+        return this.act.f(zv);
+      });
+      acts.push(a);
+    }
+    return acts;
+  }
+  // single sample backprop (MSE) - returns squared error
+  trainSample(x,y,lr=0.05){
+    // forward
+    const acts = this.forward(x);
+    const outputs = acts[acts.length-1];
+    // compute error (MSE) and delta at output
+    // y may be scalar or array
+    const target = Array.isArray(y)?y:[y];
+    const deltas = [];
+    const L = this.weights.length;
+    const outDelta = outputs.map((o,i)=>{
+      const err = o - target[i];
+      const deriv = this.act.df(o);
+      return err * deriv * 2; // derivative of MSE* (no 1/2)
+    });
+    deltas[L-1] = outDelta;
+    // backpropagate
+    for(let l=L-2;l>=0;l--){
+      const wNext = this.weights[l+1];
+      const a = acts[l+1]; // activation of layer l+1
+      const delta = Array(this.sizes[l+1]).fill(0).map((_,i)=>{
+        let sum = 0;
+        for(let k=0;k<wNext.length;k++) sum += wNext[k][i]*deltas[l+1][k];
+        return sum * this.act.df(a[i]);
+      });
+      deltas[l] = delta;
+    }
+    // update weights & biases (gradient descent)
+    for(let l=0;l<this.weights.length;l++){
+      const w = this.weights[l];
+      const b = this.biases[l];
+      const aPrev = acts[l];
+      for(let i=0;i<w.length;i++){
+        for(let j=0;j<w[i].length;j++){
+          w[i][j] -= lr * deltas[l][i] * aPrev[j];
+        }
+        b[i] -= lr * deltas[l][i];
+      }
+    }
+    const mse = outputs.reduce((acc,o,i)=>acc + Math.pow(o - target[i],2),0) / outputs.length;
+    return mse;
+  }
+  // predict class probability (single scalar)
+  predict(x){
+    const acts = this.forward(x);
+    return acts[acts.length-1];
+  }
+  toJSON(){
+    return {sizes:this.sizes, actName:this.actName, weights:this.weights, biases:this.biases};
+  }
+  loadJSON(obj){
+    if(!obj || !obj.sizes) return false;
+    this.sizes = obj.sizes.slice();
+    this.actName = obj.actName || this.actName;
+    this.act = Activations[this.actName];
+    this.weights = obj.weights;
+    this.biases = obj.biases;
+    return true;
+  }
+}
+
+/* --------------------------
+  UI & Visualization
+---------------------------*/
+const canvas = document.getElementById('field');
+const ctx = canvas.getContext('2d');
+const overlay = document.getElementById('overlay');
+const octx = overlay.getContext('2d');
+
+const netCanvas = document.getElementById('network');
+const nctx = netCanvas.getContext('2d');
+
+const lossCanvas = document.getElementById('lossChart');
+const lctx = lossCanvas.getContext('2d');
+
+const btnGenerate = document.getElementById('btnGenerate');
+const btnClear = document.getElementById('btnClear');
+const btnTrain = document.getElementById('btnTrain');
+const btnPause = document.getElementById('btnPause');
+const btnStep = document.getElementById('btnStep');
+const btnSave = document.getElementById('btnSave');
+const fileLoad = document.getElementById('fileLoad');
+
+const lrSlider = document.getElementById('lr'), lrVal = document.getElementById('lrVal');
+const batchInp = document.getElementById('batch');
+const activationSel = document.getElementById('activation');
+const h1Inp = document.getElementById('h1'), h2Inp = document.getElementById('h2');
+const epochsInp = document.getElementById('epochs');
+
+const trainStatus = document.getElementById('trainStatus');
+const lastLossEl = document.getElementById('lastLoss');
+const archLabel = document.getElementById('archLabel');
+const countP = document.getElementById('countP');
+
+lrSlider.addEventListener('input', ()=>{lrVal.textContent = Number(lrSlider.value).toFixed(3)});
+
+// Data store: array of {x:[x0,x1], y:0|1}
+let dataset = [];
+function toNDCoords(px,py){
+  // convert pixel coords to normalized [-1,1] space
+  return [(px / canvas.width) * 2 - 1, (py / canvas.height) * 2 - 1];
+}
+function toPixel(x,y){
+  return [(x+1)/2 * canvas.width, (y+1)/2 * canvas.height];
+}
+
+// generate two gaussian blobs
+function generateData(n=200, spread=0.15){
+  dataset = [];
+  for(let i=0;i<n/2;i++){
+    const x = rand(-0.6,-0.2) + rand(-spread,spread);
+    const y = rand(-0.3,0.3) + rand(-spread,spread);
+    dataset.push({x:[x,y], y:0});
+  }
+  for(let i=0;i<n/2;i++){
+    const x = rand(0.2,0.6) + rand(-spread,spread);
+    const y = rand(-0.3,0.3) + rand(-spread,spread);
+    dataset.push({x:[x,y], y:1});
+  }
+  updateCount();
+  draw();
+}
+
+// draw dataset and decision boundary
+function drawDecisionBoundary(net){
+  const w = canvas.width, h = canvas.height;
+  const img = octx.createImageData(w,h);
+  const data = img.data;
+  // sample grid
+  for(let py=0;py<h;py++){
+    for(let px=0;px<w;px++){
+      const nx = (px/w)*2 - 1;
+      const ny = (py/h)*2 - 1;
+      let prob = 0.5;
+      if(net){
+        const out = net.predict([nx,ny])[0];
+        prob = out;
+      }
+      const idx = (py*w + px)*4;
+      // blend colors
+      const r = Math.floor(236 * prob + 37 * (1-prob));
+      const g = Math.floor(72 * prob + 49 * (1-prob));
+      const b = Math.floor(153 * prob + 61 * (1-prob));
+      // make transparent
+      data[idx] = r; data[idx+1] = g; data[idx+2] = b; data[idx+3] = 60;
+    }
+  }
+  octx.putImageData(img,0,0);
+}
+
+// draw points
+function drawPoints(){
+  for(const p of dataset){
+    const [px,py] = toPixel(p.x[0], p.x[1]);
+    ctx.beginPath();
+    ctx.arc(px,py,5,0,Math.PI*2);
+    ctx.fillStyle = p.y===0? '#2563eb' : '#ec4899';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.stroke();
+  }
+}
+
+// redraw whole field
+function draw(){
+  // clear
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  octx.clearRect(0,0,overlay.width,overlay.height);
+  // background grid
+  ctx.fillStyle = '#04121a';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  // draw decision boundary (if trained or initial)
+  drawDecisionBoundary(netInstance);
+  // draw axes
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height/2); ctx.lineTo(canvas.width, canvas.height/2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(canvas.width/2,0); ctx.lineTo(canvas.width/2, canvas.height); ctx.stroke();
+  drawPoints();
+}
+
+// draw network (nodes and weight lines)
+function drawNetwork(net){
+  nctx.clearRect(0,0,netCanvas.width,netCanvas.height);
+  nctx.fillStyle = '#071524'; nctx.fillRect(0,0,netCanvas.width, netCanvas.height);
+  if(!net) return;
+  const sizes = net.sizes;
+  const layers = sizes.length;
+  const margin = 20;
+  const w = netCanvas.width; const h = netCanvas.height;
+  const layerX = (i)=> margin + i*( (w - margin*2) / (layers-1) );
+  // compute y positions
+  const maxNeurons = Math.max(...sizes);
+  const neuronY = (layer,i)=> {
+    const cnt = sizes[layer];
+    const spacing = (h - 40) / (cnt+1);
+    return 20 + (i+1)*spacing;
+  };
+  // draw weights as lines
+  for(let l=0;l<net.weights.length;l++){
+    const wmat = net.weights[l];
+    for(let i=0;i<wmat.length;i++){
+      for(let j=0;j<wmat[i].length;j++){
+        const weight = wmat[i][j];
+        const x1 = layerX(l), y1 = neuronY(l,j);
+        const x2 = layerX(l+1), y2 = neuronY(l+1,i);
+        const alpha = Math.min(1, Math.abs(weight)/2);
+        const col = weight>0 ? `rgba(52,211,153,${alpha})` : `rgba(249,115,22,${alpha})`;
+        nctx.strokeStyle = col;
+        nctx.lineWidth = Math.max(0.5, Math.abs(weight)*2);
+        nctx.beginPath(); nctx.moveTo(x1,y1); nctx.lineTo(x2,y2); nctx.stroke();
+      }
+    }
+  }
+  // draw neurons
+  for(let l=0;l<sizes.length;l++){
+    for(let i=0;i<sizes[l];i++){
+      const x = layerX(l), y = neuronY(l,i);
+      // activation: compute with a dummy forward? We'll use last forward stored activations
+      let val = 0;
+      // radius
+      const r = 8 + (l===0?2:0);
+      nctx.beginPath();
+      const act = (nlActivations && nlActivations[l] && nlActivations[l][i]) || 0;
+      const color = actToColor(act);
+      nctx.fillStyle = color;
+      nctx.arc(x,y,r,0,Math.PI*2); nctx.fill();
+      nctx.strokeStyle='rgba(255,255,255,0.06)'; nctx.stroke();
+    }
+  }
+}
+
+// map activation [-1..1] or [0..1] => color
+function actToColor(v){
+  // assume v in [-1,1] or [0,1]
+  let t = v;
+  if(t>1) t=1; if(t<-1) t=-1;
+  // map to blue (0) => pink (1)
+  const p = (t+1)/2; // normalize 0..1
+  const r = Math.round(236*p + 37*(1-p));
+  const g = Math.round(72*p + 49*(1-p));
+  const b = Math.round(153*p + 61*(1-p));
+  return `rgba(${r},${g},${b},0.95)`;
+}
+
+/* -----------------------------
+  Training loop & controls
+------------------------------*/
+let netInstance = null;
+let nlActivations = null; // store last forward activations for node coloring
+let lossHistory = [];
+let training = {running:false, paused:false, iter:0};
+
+// initialize default network
+function createNetwork(){
+  const h1 = Math.max(0, parseInt(h1Inp.value)||0);
+  const h2 = Math.max(0, parseInt(h2Inp.value)||0);
+  const act = activationSel.value;
+  const layer = [2];
+  if(h1>0) layer.push(h1);
+  if(h2>0) layer.push(h2);
+  layer.push(1);
+  netInstance = new MLP(layer, act);
+  archLabel.textContent = `${layer.join(' → ')}`;
+  // initial draw
+  drawNetwork(netInstance);
+  drawDecisionBoundary(netInstance);
+}
+createNetwork();
+
+// compute batch loss
+function computeLossBatch(batch){
+  let s=0;
+  for(const p of batch){
+    const out = netInstance.predict(p.x)[0];
+    s += Math.pow(out - p.y, 2);
+  }
+  return s / batch.length;
+}
+
+// train step: one epoch over a small batch (stochastic)
+function trainStep(){
+  if(!netInstance || dataset.length===0) return;
+  const batchSize = Math.min(dataset.length, Math.max(1, parseInt(batchInp.value)||16));
+  // sample random batch
+  const batch = [];
+  for(let i=0;i<batchSize;i++){
+    batch.push(dataset[Math.floor(Math.random()*dataset.length)]);
+  }
+  const lr = parseFloat(lrSlider.value);
+  // train on batch, accumulate loss average
+  let lossSum = 0;
+  for(const p of batch){
+    const mse = netInstance.trainSample(p.x, p.y, lr);
+    lossSum += mse;
+  }
+  const avgLoss = lossSum / batch.length;
+  lossHistory.push(avgLoss);
+  lastLossEl.textContent = avgLoss.toFixed(4);
+  // update activations (for visual)
+  const sample = dataset[Math.floor(Math.random()*dataset.length)];
+  nlActivations = netInstance.forward(sample.x);
+  drawNetwork(netInstance);
+  drawDecisionBoundary(netInstance);
+  draw(); // redraw points + boundary
+}
+
+// training loop
+let trainInterval = null;
+function startTraining(){
+  if(training.running) return;
+  if(!netInstance) createNetwork();
+  training.running = true;
+  training.paused = false;
+  trainStatus.textContent = 'training';
+  // run iterations per second depending on epochs setting
+  const ticksPerSec = 40; // speed
+  trainInterval = setInterval(()=>{
+    if(training.paused) return;
+    // perform 'epochs' micro-iterations per tick
+    const steps = Math.max(1, parseInt(epochsInp.value)||1);
+    for(let s=0;s<steps;s++) trainStep();
+  }, 1000 / ticksPerSec);
+}
+
+function pauseTraining(){
+  training.paused = !training.paused;
+  trainStatus.textContent = training.paused ? 'paused' : (training.running ? 'training' : 'idle');
+}
+
+function stopTraining(){
+  training.running = false;
+  training.paused = false;
+  trainStatus.textContent = 'stopped';
+  if(trainInterval) { clearInterval(trainInterval); trainInterval = null; }
+}
+
+/* Loss chart draw */
+function drawLoss(){
+  const w = lossCanvas.width, h = lossCanvas.height;
+  lctx.clearRect(0,0,w,h);
+  lctx.fillStyle = '#021b24'; lctx.fillRect(0,0,w,h);
+  if(lossHistory.length<2) return;
+  const maxL = Math.max(...lossHistory.slice(-200));
+  const minL = Math.min(...lossHistory.slice(-200));
+  // draw grid
+  lctx.strokeStyle = 'rgba(255,255,255,0.03)'; lctx.lineWidth=1;
+  for(let i=0;i<4;i++){
+    lctx.beginPath(); lctx.moveTo(0, i*h/4); lctx.lineTo(w, i*h/4); lctx.stroke();
+  }
+  // draw line
+  lctx.beginPath();
+  const start = Math.max(0, lossHistory.length-200);
+  for(let i=start;i<lossHistory.length;i++){
+    const x = ((i-start)/(Math.max(1, lossHistory.length-start-1))) * (w-8) + 4;
+    let v = lossHistory[i];
+    const norm = (v - minL) / Math.max(1e-9, (maxL-minL));
+    const y = h - (norm*(h-8) + 4);
+    if(i===start) lctx.moveTo(x,y); else lctx.lineTo(x,y);
+  }
+  lctx.strokeStyle = 'rgba(56,189,248,0.95)'; lctx.lineWidth = 2; lctx.stroke();
+}
+
+/* UI events */
+btnGenerate.addEventListener('click', ()=>{ generateData(300, 0.08); draw(); });
+btnClear.addEventListener('click', ()=>{ dataset = []; updateCount(); draw(); });
+btnTrain.addEventListener('click', ()=>{ createNetwork(); startTraining(); });
+btnPause.addEventListener('click', ()=>{ pauseTraining(); btnPause.textContent = training.paused ? 'Resume' : 'Pause'; });
+btnStep.addEventListener('click', ()=>{ trainStep(); drawLoss(); });
+btnSave.addEventListener('click', ()=>{
+  if(!netInstance) return alert('Няма мрежа');
+  const data = netInstance.toJSON();
+  const blob = new Blob([JSON.stringify(data)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download = 'mlp_weights.json'; a.click(); URL.revokeObjectURL(url);
+});
+fileLoad.addEventListener('change', (ev)=>{
+  const f = ev.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=> {
+    try{
+      const obj = JSON.parse(r.result);
+      const net = new MLP([2,1], 'sigmoid');
+      if(net.loadJSON(obj)){ netInstance = net; archLabel.textContent = net.sizes.join(' → '); drawNetwork(netInstance); drawDecisionBoundary(netInstance); draw(); }
+      else alert('Невалиден файл');
+    }catch(e){ alert('Грешка при зареждането'); }
+  };
+  r.readAsText(f);
+});
+
+// canvas mouse to add points or preview prediction
+canvas.addEventListener('contextmenu', e=> e.preventDefault());
+canvas.addEventListener('mousedown', (e)=>{
+  const rect = canvas.getBoundingClientRect();
+  const px = e.clientX - rect.left, py = e.clientY - rect.top;
+  const pos = toNDCoords(px,py);
+  if(e.button === 0){ // left => class 0
+    dataset.push({x:pos, y:0});
+  } else { // right => class 1
+    dataset.push({x:pos, y:1});
+  }
+  updateCount();
+  draw();
+});
+canvas.addEventListener('mousemove', (e)=>{
+  const rect = canvas.getBoundingClientRect();
+  const px = e.clientX - rect.left, py = e.clientY - rect.top;
+  const pos = toNDCoords(px,py);
+  // preview prediction
+  octx.clearRect(0,0,overlay.width,overlay.height);
+  if(netInstance){
+    const out = netInstance.predict(pos)[0];
+    // circle
+    octx.beginPath(); octx.arc(px,py,10,0,Math.PI*2);
+    const col = out>0.5 ? 'rgba(236,72,153,0.6)' : 'rgba(37,99,235,0.6)';
+    octx.fillStyle = col; octx.fill();
+  }
+});
+
+// on activation change -> rebuild network
+activationSel.addEventListener('change', ()=> createNetwork());
+h1Inp.addEventListener('change', ()=> createNetwork());
+h2Inp.addEventListener('change', ()=> createNetwork());
+
+// update count
+function updateCount(){ countP.textContent = dataset.length; }
+
+// animation loop for visuals
+function loop(){
+  drawLoss();
+  drawNetwork(netInstance);
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* initial demo data */
+generateData(200,0.08);
+draw();
+
+</script>
+</body>
+</html>

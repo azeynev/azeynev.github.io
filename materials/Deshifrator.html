@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Експертен Дешифратор - Учебен Симулатор</title>
+    <style>
+        :root {
+            --bg: #0a0f1e;
+            --panel: #161e32;
+            --accent: #38bdf8;
+            --success: #22c55e;
+            --text: #f1f5f9;
+            --wire-off: #334155;
+            --wire-on: #22c55e;
+            --border: rgba(255,255,255,0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0; padding: 20px;
+            display: flex; flex-direction: column; height: 100vh;
+        }
+
+        .header { text-align: center; margin-bottom: 20px; }
+        h1 { color: var(--accent); font-weight: 300; margin: 0; }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr 350px;
+            gap: 20px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout { grid-template-columns: 1fr; overflow-y: auto; }
+        }
+
+        .column { display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+
+        .section {
+            background: var(--panel);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        h3 { margin-top: 0; color: var(--accent); font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+
+        /* Controls */
+        .control-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
+        select { background: #0f172a; color: white; border: 1px solid var(--accent); padding: 5px; border-radius: 4px; }
+
+        /* Switch */
+        .switch { position: relative; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background: #475569; transition: .3s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background: var(--success); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* SVG */
+        #circuit-container { background: #00000030; border-radius: 8px; overflow: auto; display: flex; justify-content: center; }
+        .wire { fill: none; stroke-width: 2; transition: 0.3s; }
+        
+        /* Help & Formulas */
+        .formula-item { font-family: 'Courier New', monospace; font-size: 0.85rem; padding: 5px; border-radius: 4px; margin: 2px 0; }
+        .formula-item.active { background: rgba(34, 197, 94, 0.15); color: var(--success); font-weight: bold; }
+        .overline { text-decoration: overline; }
+
+        .help-box { font-size: 0.88rem; line-height: 1.5; color: #cbd5e1; }
+        .help-box b { color: var(--accent); }
+        .help-box ul { padding-left: 18px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        th, td { border: 1px solid var(--border); padding: 5px; text-align: center; }
+        .active-row { background: rgba(34, 197, 94, 0.2); }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Лабораторен Симулатор: Логически Дешифратор</h1>
+</div>
+
+<div class="main-layout">
+    <div class="column">
+        <div class="section">
+            <h3>Входове и Контрол</h3>
+            <div class="control-row">
+                <span>Брой входове (n):</span>
+                <select id="nSel" onchange="initApp()">
+                    <option value="2">2 към 4</option>
+                    <option value="3" selected>3 към 8</option>
+                    <option value="4">4 към 16</option>
+                </select>
+            </div>
+            <div class="control-row">
+                <b>Enable (Разрешение)</b>
+                <label class="switch">
+                    <input type="checkbox" id="en" checked onchange="update()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div id="inpCont"></div>
+        </div>
+
+        <div class="section">
+            <h3>Таблица за истинност</h3>
+            <table id="tt">
+                <thead><tr id="ttH"></tr></thead>
+                <tbody id="ttB"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" style="display:flex; flex-direction:column;">
+        <h3>Пълна Схемна Реализация</h3>
+        <div id="circuit-container" style="flex-grow:1;">
+            <svg id="svg" width="600" height="700"></svg>
+        </div>
+    </div>
+
+    <div class="column">
+        <div class="section">
+            <h3>Булеви уравнения</h3>
+            <div id="fArea"></div>
+        </div>
+
+        <div class="section">
+            <h3>Помощно описание</h3>
+            <div class="help-box">
+                <b>Какво е дешифратор?</b>
+                <p>Логическа схема, която преобразува n-разряден двоичен код в сигнал на един от своите 2<sup>n</sup> изхода.</p>
+                
+                <b>Елементи на схемата:</b>
+                <ul>
+                    <li><b>Входове (A<sub>i</sub>):</b> Адресни линии. Кодът върху тях определя кой изход ще бъде активен.</li>
+                    <li><b>NOT гейтове:</b> Инвертират входния сигнал, за да се получат комбинациите за всеки изход.</li>
+                    <li><b>AND гейтове:</b> Всеки изход Y<sub>i</sub> се активира само при една специфична комбинация на входовете.</li>
+                    <li><b>Enable (E):</b> Главният ключ. Ако E=0, всички изходи са блокирани (0).</li>
+                </ul>
+                
+                <b>Задача за ученика:</b>
+                <p>Наблюдавайте как при промяна на входовете "пътят" на сигнала се променя в зелено и как това съответства на подчертания ред в таблицата.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let n = 3;
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    function initApp() {
+        n = parseInt(document.getElementById('nSel').value);
+        buildUI();
+        drawCircuit();
+        update();
+    }
+
+    function buildUI() {
+        const inp = document.getElementById('inpCont');
+        inp.innerHTML = '';
+        for (let i = n-1; i >= 0; i--) {
+            inp.innerHTML += `<div class="control-row"><span>Вход A${i}</span><label class="switch"><input type="checkbox" class="b-in" data-bit="${i}" onchange="update()"><span class="slider"></span></label></div>`;
+        }
+
+        const h = document.getElementById('ttH');
+        h.innerHTML = '<th>E</th>' + Array.from({length:n}, (_,i)=>`<th>A${n-1-i}</th>`).join('') + '<th>Y</th>';
+        const b = document.getElementById('ttB');
+        b.innerHTML = '';
+        for (let i=0; i<Math.pow(2,n); i++) {
+            let bin = i.toString(2).padStart(n,'0');
+            b.innerHTML += `<tr id="tr-${i}"><td>1</td>${bin.split('').map(x=>`<td>${x}</td>`).join('')}<td>Y${i}</td></tr>`;
+        }
+
+        const fa = document.getElementById('fArea');
+        fa.innerHTML = '';
+        for (let i=0; i<Math.pow(2,n); i++) {
+            let bin = i.toString(2).padStart(n,'0');
+            let t = bin.split('').map((x,idx)=> x==='1' ? `A${n-1-idx}` : `<span class="overline">A${n-1-idx}</span>`).join('·');
+            fa.innerHTML += `<div class="formula-item" id="f-${i}">Y${i} = ${t} · E</div>`;
+        }
+    }
+
+    function drawCircuit() {
+        const svg = document.getElementById('svg');
+        const numOut = Math.pow(2, n);
+        const width = 600;
+        const height = Math.max(600, numOut * 40 + 100);
+        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        svg.innerHTML = '';
+
+        for (let i = 0; i < n; i++) {
+            let xBase = 50 + i * 50;
+            drawText(svg, xBase, 25, `A${n-1-i}`, "var(--accent)");
+            drawLine(svg, xBase, 40, xBase, height-30, `line-t-${i}`);
+            drawLine(svg, xBase+25, 80, xBase+25, height-30, `line-c-${i}`);
+            
+            // NOT Gate
+            const g = document.createElementNS(SVG_NS, "path");
+            g.setAttribute("d", `M${xBase-6},45 L${xBase+6},45 L${xBase},60 Z`);
+            g.setAttribute("fill", "none"); g.setAttribute("stroke", "#475569");
+            svg.appendChild(g);
+            drawCircle(svg, xBase, 63, 3, "none", "#475569");
+            drawLine(svg, xBase, 63, xBase+25, 63, `wire-not-${i}`);
+        }
+
+        const xEn = 50 + n * 50;
+        drawText(svg, xEn, 25, "E", "var(--success)");
+        drawLine(svg, xEn, 40, xEn, height-30, "line-e");
+
+        for (let i = 0; i < numOut; i++) {
+            const y = 110 + i * 40;
+            const bin = i.toString(2).padStart(n, '0');
+            for (let j = 0; j < n; j++) {
+                const isTrue = bin[j] === '1';
+                const xConn = isTrue ? (50 + j * 50) : (50 + j * 50 + 25);
+                drawLine(svg, xConn, y, 350, y, `h-line-${i}-${j}`);
+                drawCircle(svg, xConn, y, 3, "var(--wire-off)", "none", `dot-${i}-${j}`);
+            }
+            drawLine(svg, xEn, y, 350, y, `h-line-e-${i}`);
+            drawCircle(svg, xEn, y, 3, "var(--wire-off)", "none", `dot-e-${i}`);
+
+            const gate = document.createElementNS(SVG_NS, "rect");
+            Object.entries({x:350, y:y-15, width:60, height:30, rx:5, fill: "#1e293b", stroke: "#475569", id: `gate-${i}`}).forEach(([k,v])=>gate.setAttribute(k,v));
+            svg.appendChild(gate);
+            drawText(svg, 365, y+5, "AND", "white", "10px");
+            drawLine(svg, 410, y, 460, y, `out-wire-${i}`);
+            drawText(svg, 470, y+5, `Y${i}`, "#94a3b8", "12px");
+        }
+    }
+
+    function drawLine(svg, x1, y1, x2, y2, id) {
+        const l = document.createElementNS(SVG_NS, "line");
+        l.setAttribute("x1", x1); l.setAttribute("y1", y1); l.setAttribute("x2", x2); l.setAttribute("y2", y2);
+        l.id = id; l.classList.add("wire"); l.setAttribute("stroke", "var(--wire-off)");
+        svg.appendChild(l);
+    }
+
+    function drawCircle(svg, cx, cy, r, fill, stroke, id) {
+        const c = document.createElementNS(SVG_NS, "circle");
+        c.setAttribute("cx", cx); c.setAttribute("cy", cy); c.setAttribute("r", r);
+        if(id) c.id = id; c.setAttribute("fill", fill);
+        if(stroke !== "none") c.setAttribute("stroke", stroke);
+        svg.appendChild(c);
+    }
+
+    function drawText(svg, x, y, txt, color, size="12px") {
+        const t = document.createElementNS(SVG_NS, "text");
+        t.setAttribute("x", x); t.setAttribute("y", y); t.setAttribute("fill", color);
+        t.style.fontSize = size; t.textContent = txt;
+        svg.appendChild(t);
+    }
+
+    function update() {
+        const isEn = document.getElementById('en').checked;
+        const inputs = Array.from(document.querySelectorAll('.b-in')).reverse();
+        const inputVals = inputs.map(i => i.checked);
+        let decVal = 0;
+        inputVals.forEach((v, i) => { if(v) decVal += Math.pow(2, i); });
+
+        document.querySelectorAll('.wire').forEach(w => w.setAttribute("stroke", "var(--wire-off)"));
+        document.querySelectorAll('circle').forEach(c => c.setAttribute("fill", "var(--wire-off)"));
+        document.querySelectorAll('rect').forEach(r => r.setAttribute("stroke", "#475569"));
+        document.querySelectorAll('.formula-item, tr').forEach(el => el.classList.remove('active', 'active-row'));
+
+        inputVals.reverse().forEach((v, i) => {
+            document.getElementById(`line-t-${i}`).setAttribute("stroke", v ? "var(--wire-on)" : "var(--wire-off)");
+            document.getElementById(`line-c-${i}`).setAttribute("stroke", !v ? "var(--wire-on)" : "var(--wire-off)");
+            document.getElementById(`wire-not-${i}`).setAttribute("stroke", !v ? "var(--wire-on)" : "var(--wire-off)");
+        });
+        document.getElementById('line-e').setAttribute("stroke", isEn ? "var(--success)" : "var(--wire-off)");
+
+        if (isEn) {
+            document.getElementById(`f-${decVal}`).classList.add('active');
+            document.getElementById(`tr-${decVal}`).classList.add('active-row');
+            document.getElementById(`gate-${decVal}`).setAttribute("stroke", "var(--wire-on)");
+            document.getElementById(`out-wire-${decVal}`).setAttribute("stroke", "var(--wire-on)");
+            for(let j=0; j<n; j++) {
+                document.getElementById(`h-line-${decVal}-${j}`).setAttribute("stroke", "var(--wire-on)");
+                document.getElementById(`dot-${decVal}-${j}`).setAttribute("fill", "var(--wire-on)");
+            }
+            document.getElementById(`h-line-e-${decVal}`).setAttribute("stroke", "var(--wire-on)");
+            document.getElementById(`dot-e-${decVal}`).setAttribute("fill", "var(--wire-on)");
+        }
+    }
+
+    initApp();
+</script>
+</body>
+</html>

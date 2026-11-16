@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Industrial Logic Lab Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0f14;
+            --panel: rgba(22, 27, 34, 0.98);
+            --cyan: #00f2fe;
+            --magenta: #ff00ff;
+            --low: #1e293b;
+            --high: #00f2fe;
+            --gate-bg: #161b22;
+        }
+
+        body {
+            background: var(--bg); color: #e6edf3; font-family: 'JetBrains Mono', monospace;
+            margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+        }
+
+        /* --- HEADER --- */
+        .top-nav {
+            height: 60px; background: #161b22; border-bottom: 2px solid var(--cyan);
+            display: flex; align-items: center; padding: 0 30px; justify-content: space-between;
+        }
+        .logo { font-family: 'Orbitron'; font-weight: 700; color: var(--cyan); letter-spacing: 2px; }
+
+        /* --- MAIN LAYOUT --- */
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+
+        /* Left Controls */
+        .sidebar {
+            width: 280px; background: var(--panel); border-right: 1px solid #30363d;
+            padding: 20px; display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .control-group { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border: 1px solid #30363d; }
+        .label { font-size: 0.7rem; color: #8b949e; text-transform: uppercase; margin-bottom: 8px; display: block; }
+
+        .btn-toggle {
+            width: 100%; padding: 10px; border: 1px solid var(--cyan); background: transparent;
+            color: var(--cyan); cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s;
+        }
+        .btn-toggle.active { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
+
+        /* Logic Canvas */
+        .canvas-area { flex: 1; position: relative; background: radial-gradient(circle, #1c212e 0%, #0d0f14 100%); }
+
+        svg { width: 100%; height: 100%; }
+
+        .gate { fill: var(--gate-bg); stroke: #30363d; stroke-width: 2; }
+        .gate-label { font-family: 'Orbitron'; font-size: 10px; fill: #8b949e; text-anchor: middle; }
+
+        /* Logic States */
+        .wire { fill: none; stroke: var(--low); stroke-width: 3; transition: stroke 0.2s; }
+        .wire.high { stroke: var(--high); filter: drop-shadow(0 0 5px var(--high)); }
+
+        .node-circle { r: 6; fill: var(--low); stroke: #30363d; stroke-width: 2; cursor: pointer; }
+        .node-circle.high { fill: var(--high); box-shadow: 0 0 10px var(--high); }
+
+        /* --- INFO PANEL --- */
+        .info-panel {
+            height: 180px; background: #161b22; border-top: 1px solid #30363d;
+            display: grid; grid-template-columns: 1.5fr 1fr 1fr; padding: 15px; gap: 20px;
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; text-align: center; }
+        th, td { border: 1px solid #30363d; padding: 5px; }
+        tr.active-row { background: rgba(0, 242, 254, 0.15); color: var(--cyan); }
+
+        .equation-box { font-family: 'JetBrains Mono'; font-size: 0.9rem; color: var(--cyan); background: #0d1117; padding: 15px; border-radius: 5px; border-left: 4px solid var(--magenta); }
+    </style>
+</head>
+<body>
+
+<div class="top-nav">
+    <div class="logo">LOGIC MASTER PRO v3.0</div>
+    <div style="display: flex; gap: 20px;">
+        <div id="status-display" style="color: var(--cyan); font-size: 0.8rem;">SYSTEM READY</div>
+        <div style="font-size: 0.8rem; color: #8b949e;">MODE: <span id="mode-text" style="color: #fff;">MULTIPLEXER</span></div>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="sidebar">
+        <div class="control-group">
+            <span class="label">Operating Mode</span>
+            <div style="display: flex; gap: 5px;">
+                <button class="btn-toggle active" id="m-mux" onclick="setMode('MUX')">MUX</button>
+                <button class="btn-toggle" id="m-demux" onclick="setMode('DEMUX')">DEMUX</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <span class="label">System Enable (EN)</span>
+            <button class="btn-toggle active" id="en-btn" onclick="toggleEnable()">ENABLE: HIGH</button>
+        </div>
+
+        <div class="control-group">
+            <span class="label">Selector Lines (Address)</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn-toggle" id="s1-btn" onclick="toggleBit('s1')">S1: 0</button>
+                <button class="btn-toggle" id="s0-btn" onclick="toggleBit('s0')">S0: 0</button>
+            </div>
+        </div>
+
+        <div id="input-controls">
+            </div>
+    </div>
+
+    <div class="canvas-area">
+        <svg id="logic-svg" viewBox="0 0 800 500">
+            </svg>
+    </div>
+</div>
+
+<div class="info-panel">
+    <div>
+        <span class="label">Truth Table (Active States)</span>
+        <table id="truth-table">
+            <thead><tr><th>EN</th><th>S1</th><th>S0</th><th>Active Ch</th><th>Output Logic</th></tr></thead>
+            <tbody>
+                <tr id="tr-0"><td>1</td><td>0</td><td>0</td><td>CH 0</td><td>D &middot; /S1 &middot; /S0</td></tr>
+                <tr id="tr-1"><td>1</td><td>0</td><td>1</td><td>CH 1</td><td>D &middot; /S1 &middot; S0</td></tr>
+                <tr id="tr-2"><td>1</td><td>1</td><td>0</td><td>CH 2</td><td>D &middot; S1 &middot; /S0</td></tr>
+                <tr id="tr-3"><td>1</td><td>1</td><td>1</td><td>CH 3</td><td>D &middot; S1 &middot; S0</td></tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div>
+        <span class="label">Current Logic Equation</span>
+        <div class="equation-box" id="eq-box">
+            $$Y = (I_0 \cdot \overline{S_1} \cdot \overline{S_0}) \cdot EN$$
+        </div>
+    </div>
+
+    <div>
+        <span class="label">Component Monitor</span>
+        <div style="font-size: 0.7rem; color: #8b949e;">
+            <p>Propagation: <span style="color: var(--cyan);">10ns (Simulated)</span></p>
+            <p>Gate Count: <span style="color: var(--cyan);">4x AND, 1x OR, 2x NOT</span></p>
+            <p>Voltage: <span style="color: var(--cyan);">+5V (TTL Logic)</span></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let config = { mode: 'MUX', en: 1, s1: 0, s0: 0, inputs: [1, 0, 0, 0], dataIn: 1 };
+
+    function init() {
+        renderInputs();
+        drawSchematic();
+        update();
+    }
+
+    function setMode(m) {
+        config.mode = m;
+        document.getElementById('m-mux').classList.toggle('active', m === 'MUX');
+        document.getElementById('m-demux').classList.toggle('active', m === 'DEMUX');
+        document.getElementById('mode-text').innerText = m === 'MUX' ? 'MULTIPLEXER' : 'DEMULTIPLEXER';
+        renderInputs();
+        update();
+    }
+
+    function toggleEnable() {
+        config.en = config.en ? 0 : 1;
+        document.getElementById('en-btn').innerText = `ENABLE: ${config.en ? 'HIGH' : 'LOW'}`;
+        document.getElementById('en-btn').classList.toggle('active', config.en === 1);
+        update();
+    }
+
+    function toggleBit(bit) {
+        config[bit] = config[bit] ? 0 : 1;
+        document.getElementById(`${bit}-btn`).innerText = `${bit.toUpperCase()}: ${config[bit]}`;
+        document.getElementById(`${bit}-btn`).classList.toggle('active', config[bit] === 1);
+        update();
+    }
+
+    function renderInputs() {
+        const cont = document.getElementById('input-controls');
+        cont.innerHTML = '<span class="label">Signal Sources</span>';
+        if(config.mode === 'MUX') {
+            for(let i=0; i<4; i++) {
+                cont.innerHTML += `<button class="btn-toggle ${config.inputs[i]?'active':''}" onclick="toggleIn(${i})">INPUT I${i}: ${config.inputs[i]}</button><div style="height:5px;"></div>`;
+            }
+        } else {
+            cont.innerHTML += `<button class="btn-toggle ${config.dataIn?'active':''}" onclick="toggleDataIn()">DATA IN: ${config.dataIn}</button>`;
+        }
+    }
+
+    function toggleIn(i) { config.inputs[i] = config.inputs[i] ? 0 : 1; renderInputs(); update(); }
+    function toggleDataIn() { config.dataIn = config.dataIn ? 0 : 1; renderInputs(); update(); }
+
+    function update() {
+        const sel = (config.s1 << 1) | config.s0;
+        
+        // Highlight Table
+        for(let i=0; i<4; i++) {
+            document.getElementById('tr-'+i).className = (i === sel && config.en) ? 'active-row' : '';
+        }
+
+        // Logic Calculation
+        let result = 0;
+        if(config.en) {
+            if(config.mode === 'MUX') result = config.inputs[sel];
+            else result = config.dataIn;
+        }
+
+        // Update Equation (Simple MathJax-like text)
+        const eq = document.getElementById('eq-box');
+        if(config.mode === 'MUX') {
+            eq.innerHTML = `Y = (I<sub>${sel}</sub> &middot; S1<sub>${config.s1?1:0}</sub> &middot; S0<sub>${config.s0?1:0}</sub>) &middot; EN<sub>${config.en}</sub> = <b>${result}</b>`;
+        } else {
+            eq.innerHTML = `Y<sub>${sel}</sub> = (D &middot; S1<sub>${config.s1?1:0}</sub> &middot; S0<sub>${config.s0?1:0}</sub>) &middot; EN<sub>${config.en}</sub> = <b>${result}</b>`;
+        }
+
+        drawSchematic(sel, result);
+    }
+
+    function drawSchematic(activeIdx, result) {
+        const svg = document.getElementById('logic-svg');
+        svg.innerHTML = '';
+
+        // Draw Gates
+        for(let i=0; i<4; i++) {
+            const isActive = (i === activeIdx && config.en);
+            const y = 80 + (i * 100);
+            
+            // AND Gate
+            svg.innerHTML += `<path d="M 400 ${y-20} L 430 ${y-20} A 20 20 0 0 1 430 ${y+20} L 400 ${y+20} Z" class="gate"/>`;
+            svg.innerHTML += `<text x="415" y="${y+5}" class="gate-label">AND</text>`;
+
+            // Wires from Inputs
+            const wireClass = (config.mode === 'MUX' && config.inputs[i] === 1) ? 'wire high' : 'wire';
+            svg.innerHTML += `<path d="M 50 ${y} L 400 ${y}" class="${wireClass}"/>`;
+            svg.innerHTML += `<circle cx="50" cy="${y}" r="4" class="${wireClass}"/>`;
+            svg.innerHTML += `<text x="30" y="${y+5}" fill="#8b949e" font-size="12">I${i}</text>`;
+
+            // Wires to Output
+            const outWireClass = (isActive && ((config.mode==='MUX'?config.inputs[i]:config.dataIn))) ? 'wire high' : 'wire';
+            if(config.mode === 'MUX') {
+                svg.innerHTML += `<path d="M 450 ${y} L 600 250" class="${outWireClass}"/>`;
+            } else {
+                svg.innerHTML += `<path d="M 450 ${y} L 750 ${y}" class="${outWireClass}"/>`;
+                svg.innerHTML += `<circle cx="750" cy="${y}" r="6" class="${outWireClass}"/>`;
+            }
+        }
+
+        if(config.mode === 'MUX') {
+            svg.innerHTML += `<circle cx="750" cy="250" r="10" class="node-circle ${result?'high':''}"/>`;
+            svg.innerHTML += `<text x="770" y="255" fill="var(--cyan)" font-weight="bold">OUT Y</text>`;
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>

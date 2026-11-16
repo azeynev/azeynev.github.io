@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Невро-Симулатор Про 2026</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --neon: #00f2fe; --danger: #ff4b2b; --panel-bg: rgba(6, 12, 24, 0.95); }
+        body { margin: 0; background: #02050a; color: #fff; font-family: 'Inter', sans-serif; height: 100vh; display: flex; overflow: hidden; }
+        
+        /* Професионален сайдбар */
+        .sidebar { width: 380px; background: var(--panel-bg); border-right: 1px solid #1a2a40; padding: 25px; display: flex; flex-direction: column; z-index: 10; }
+        .main-view { flex: 1; position: relative; display: flex; flex-direction: column; background: radial-gradient(circle at center, #0a192f 0%, #02050a 100%); }
+        
+        /* Елементи на интерфейса */
+        .header { margin-bottom: 30px; }
+        .header h1 { font-size: 1.4rem; color: var(--neon); text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+        .header p { font-size: 0.8rem; color: #607d8b; margin-top: 5px; }
+
+        .control-section { margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+        .label-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 10px; color: #b0bec5; }
+        .val { color: var(--neon); font-weight: bold; }
+
+        input[type="range"] { width: 100%; height: 2px; background: #263238; appearance: none; outline: none; margin-bottom: 15px; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 12px; height: 12px; background: var(--neon); border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px var(--neon); }
+
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { background: transparent; border: 1px solid #37474f; color: #fff; padding: 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: 0.3s; text-align: left; }
+        .btn:hover { border-color: var(--neon); background: rgba(0, 242, 254, 0.05); }
+        .btn i { margin-right: 8px; color: var(--neon); }
+
+        /* Централен изглед и ЕЕГ */
+        #canvas-container { flex: 1; cursor: crosshair; }
+        .eeg-monitor { height: 120px; border-top: 1px solid #1a2a40; background: rgba(0,0,0,0.5); padding: 10px; position: relative; }
+        .eeg-label { position: absolute; top: 10px; left: 10px; font-size: 0.7rem; color: #4caf50; font-family: monospace; }
+
+        /* Информационен панел */
+        #info-overlay { position: absolute; top: 20px; right: 20px; width: 280px; background: var(--panel-bg); border: 1px solid var(--neon); padding: 15px; border-radius: 4px; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="header">
+        <h1>НевроЛаб Про</h1>
+        <p>Система за анализ на ЦНС</p>
+    </div>
+
+    <div class="control-section">
+        <div class="label-row"><span>Кислород ($O_2$)</span> <span class="val" id="v-ox">98%</span></div>
+        <input type="range" id="ox" min="0" max="100" value="98">
+        
+        <div class="label-row"><span>Глюкоза ($C_6H_{12}O_6$)</span> <span class="val" id="v-glu">90 mg/dL</span></div>
+        <input type="range" id="glu" min="0" max="200" value="90">
+
+        <div class="label-row"><span>Невротрансмитери</span> <span class="val" id="v-nt">85%</span></div>
+        <input type="range" id="nt" min="0" max="100" value="85">
+    </div>
+
+    <div class="header"><h1>Сценарии</h1></div>
+    <div class="btn-grid">
+        <button class="btn" onclick="apply(100, 110, 95)"><i class="fas fa-brain"></i> Норма</button>
+        <button class="btn" onclick="apply(30, 80, 40)"><i class="fas fa-Lungs"></i> Асфиксия</button>
+        <button class="btn" onclick="apply(90, 20, 30)"><i class="fas fa-vial"></i> Хипогликемия</button>
+        <button class="btn" onclick="apply(100, 150, 10)"><i class="fas fa-pills"></i> Седация</button>
+    </div>
+
+    <div id="status-box" style="margin-top: auto; padding: 15px; border: 1px solid #1a2a40; font-size: 0.8rem; line-height: 1.6;">
+        <div style="color: #4caf50;"><i class="fas fa-check-circle"></i> СЪЗНАНИЕ: СТАБИЛНО</div>
+        <div id="metabolism" style="color: #607d8b;">МЕТАБОЛИЗЪМ: НОРМАЛЕН</div>
+    </div>
+</div>
+
+<div class="main-view">
+    <div id="canvas-container">
+        <canvas id="brainCanvas"></canvas>
+    </div>
+
+    <div id="info-overlay">
+        <div id="zone-title" style="color:var(--neon); font-weight:bold; margin-bottom:5px;">Общ преглед</div>
+        <div id="zone-text" style="font-size:0.8rem; color:#cfd8dc;">Изберете зона за детайлен анализ на функциите.</div>
+    </div>
+
+    <div class="eeg-monitor">
+        <div class="eeg-label">EEG MONITOR (Real-time $ \mu V $)</div>
+        <canvas id="eegCanvas"></canvas>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('brainCanvas');
+    const ctx = canvas.getContext('2d');
+    const eegCanvas = document.getElementById('eegCanvas');
+    const eegCtx = eegCanvas.getContext('2d');
+
+    let pulses = [];
+    let eegData = [];
+
+    const zones = [
+        { name: "Челен дял (Логика)", x: 0.65, y: 0.4, r: 70, info: "Висши когнитивни функции, волеви движения и език." },
+        { name: "Тимпанен дял (Памет)", x: 0.5, y: 0.6, r: 50, info: "Слухова обработка и формиране на дълготрайна памет." },
+        { name: "Тилен дял (Зрение)", x: 0.3, y: 0.5, r: 55, info: "Основна зона за декодиране на зрителни сигнали." },
+        { name: "Малък мозък (Моторика)", x: 0.25, y: 0.75, r: 40, info: "Координация, баланс и фина моторика." }
+    ];
+
+    function init() {
+        resize();
+        window.addEventListener('resize', resize);
+        animate();
+    }
+
+    function resize() {
+        canvas.width = canvas.parentElement.offsetWidth;
+        canvas.height = canvas.parentElement.offsetHeight;
+        eegCanvas.width = eegCanvas.parentElement.offsetWidth;
+        eegCanvas.height = eegCanvas.parentElement.offsetHeight;
+    }
+
+    function apply(o, g, n) {
+        document.getElementById('ox').value = o;
+        document.getElementById('glu').value = g;
+        document.getElementById('nt').value = n;
+    }
+
+    function animate() {
+        ctx.fillStyle = 'rgba(2, 5, 10, 0.3)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const ox = document.getElementById('ox').value;
+        const nt = document.getElementById('nt').value;
+        const glu = document.getElementById('glu').value;
+
+        // Обновяване на UI текстове
+        document.getElementById('v-ox').innerText = ox + "%";
+        document.getElementById('v-glu').innerText = glu + " mg/dL";
+        document.getElementById('v-nt').innerText = nt + "%";
+
+        // Рисуване на зони
+        zones.forEach(z => {
+            const bx = canvas.width * z.x;
+            const by = canvas.height * z.y;
+            
+            ctx.beginPath();
+            ctx.arc(bx, by, z.r, 0, Math.PI*2);
+            ctx.strokeStyle = `rgba(0, 242, 254, ${ox/200})`;
+            ctx.stroke();
+            
+            // Невронна активност в зоната
+            if(Math.random() < (nt/100) * (ox/100)) {
+                pulses.push({x: bx + (Math.random()-0.5)*z.r, y: by + (Math.random()-0.5)*z.r, l: 1});
+            }
+        });
+
+        // Рисуване на импулси
+        pulses.forEach((p, i) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+            ctx.fillStyle = `rgba(0, 242, 254, ${p.l})`;
+            ctx.fill();
+            p.l -= 0.02;
+            if(p.l <= 0) pulses.splice(i, 1);
+        });
+
+        drawEEG(ox, nt, glu);
+        requestAnimationFrame(animate);
+    }
+
+    function drawEEG(ox, nt, glu) {
+        eegCtx.clearRect(0, 0, eegCanvas.width, eegCanvas.height);
+        eegCtx.beginPath();
+        eegCtx.strokeStyle = "#4caf50";
+        eegCtx.lineWidth = 1.5;
+
+        eegData.push((Math.random() - 0.5) * (nt/2) * (ox/100));
+        if(eegData.length > 200) eegData.shift();
+
+        const spacing = eegCanvas.width / 200;
+        eegData.forEach((val, i) => {
+            eegCtx.lineTo(i * spacing, (eegCanvas.height/2) + val);
+        });
+        eegCtx.stroke();
+
+        // Проверка за статус
+        const status = document.getElementById('status-box');
+        if(ox < 40 || glu < 30) {
+            status.innerHTML = "<div style='color:var(--danger)'><i class='fas fa-exclamation-triangle'></i> КРИТИЧНО СЪСТОЯНИЕ</div>";
+        } else {
+            status.innerHTML = "<div style='color:#4caf50'><i class='fas fa-check-circle'></i> СЪЗНАНИЕ: СТАБИЛНО</div>";
+        }
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        zones.forEach(z => {
+            const dx = mx - (canvas.width * z.x);
+            const dy = my - (canvas.height * z.y);
+            if(Math.sqrt(dx*dx + dy*dy) < z.r) {
+                document.getElementById('zone-title').innerText = z.name;
+                document.getElementById('zone-text').innerText = z.info;
+            }
+        });
+    });
+
+    init();
+</script>
+</body>
+</html>

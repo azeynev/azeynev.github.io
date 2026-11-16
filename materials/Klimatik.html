@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>AC Engineering Masterclass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05070a;
+            --panel: #0d1117;
+            --hot: #ff3300;
+            --cold: #00eaff;
+            --liquid: #0066ff;
+            --gas: #ff9900;
+            --accent: #2ecc71;
+        }
+
+        body { background: var(--bg); color: #e6edf3; font-family: 'JetBrains Mono', monospace; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+
+        /* SCADA SIDEBAR */
+        .scada {
+            width: 420px; background: var(--panel); border-right: 2px solid #30363d;
+            padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto;
+        }
+
+        .header { font-family: 'Orbitron'; font-size: 1.2rem; color: var(--accent); border-bottom: 1px solid #30363d; padding-bottom: 10px; text-align: center; }
+
+        .instrument-cluster { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .gauge { background: #000; padding: 10px; border-radius: 8px; border: 1px solid #30363d; text-align: center; }
+        .gauge label { display: block; font-size: 0.65rem; color: #8b949e; margin-bottom: 5px; }
+        .gauge .val { font-family: 'Orbitron'; font-size: 1.1rem; color: var(--accent); }
+
+        .control-panel { background: #161b22; padding: 15px; border-radius: 12px; border: 1px solid #30363d; }
+        
+        .btn {
+            width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer;
+            font-family: 'Orbitron'; font-weight: bold; margin-top: 10px; transition: 0.3s;
+        }
+        .btn-cool { background: #1f6feb; color: white; }
+        .btn-heat { background: #da3633; color: white; }
+        .btn.active { outline: 3px solid #fff; box-shadow: 0 0 15px currentColor; }
+
+        /* VIEWPORT */
+        .viewport { flex: 1; position: relative; padding: 20px; display: flex; flex-direction: column; justify-content: space-around; }
+
+        .unit { border: 2px solid #30363d; background: rgba(255,255,255,0.02); border-radius: 15px; position: relative; }
+        .idu { width: 600px; height: 160px; align-self: flex-end; }
+        .odu { width: 550px; height: 380px; align-self: flex-start; }
+
+        /* PIPING */
+        svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        .pipe-base { fill: none; stroke: #21262d; stroke-width: 12; stroke-linecap: round; }
+        .particle { filter: drop-shadow(0 0 5px currentColor); }
+
+        /* COMPONENTS */
+        .comp-icon { position: absolute; background: #000; border: 1px solid #8b949e; border-radius: 5px; font-size: 0.6rem; text-align: center; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .compressor { width: 80px; height: 120px; bottom: 30px; left: 30px; border-radius: 20px 20px 5px 5px; }
+        .accumulator { width: 45px; height: 80px; bottom: 30px; left: 120px; border-radius: 10px; }
+        .valve4w { width: 60px; height: 60px; bottom: 180px; left: 55px; border-radius: 50%; background: #444; }
+        .eev { width: 40px; height: 40px; top: 180px; left: 450px; border-radius: 5px; background: #222; }
+
+        .fan { font-size: 2.5rem; position: absolute; opacity: 0.5; }
+        .spinning { animation: rotate 0.5s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .label-tag { position: absolute; font-size: 0.6rem; color: #58a6ff; font-weight: bold; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="scada">
+    <div class="header">AC ENGINEERING PRO</div>
+    
+    <div class="instrument-cluster">
+        <div class="gauge">
+            <label>P-HIGH (bar)</label>
+            <div class="val" id="g-phigh">1.0</div>
+        </div>
+        <div class="gauge">
+            <label>P-LOW (bar)</label>
+            <div class="val" id="g-plow">1.0</div>
+        </div>
+        <div class="gauge">
+            <label>ТОК (Amps)</label>
+            <div class="val" id="g-amps" style="color: #eab308;">0.0</div>
+        </div>
+        <div class="gauge">
+            <label>ЕФЕКТИВНОСТ (COP)</label>
+            <div class="val" id="g-cop">---</div>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span>СТАЙНА ТЕМП.</span>
+            <span id="ui-temp" style="font-weight: bold; color: var(--cold);">24.0°C</span>
+        </div>
+        <label style="font-size: 0.7rem;">ЗАДАДЕНА ТЕМПЕРАТУРА: <span id="ui-target">24</span>°C</label>
+        <input type="range" id="slider" min="16" max="30" value="24" style="width: 100%;" oninput="updateTarget()">
+        
+        <button class="btn btn-cool" id="btn-c" onclick="setMode('COOLING')">ОХЛАЖДАНЕ (AC)</button>
+        <button class="btn btn-heat" id="btn-h" onclick="setMode('HEATING')">ОТОПЛЕНИЕ (HP)</button>
+    </div>
+
+    <div style="font-size: 0.7rem; color: #8b949e; line-height: 1.4; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px;">
+        <b>УРОК:</b> В инверторните системи компресорът променя своята честота (Hz), за да поддържа стабилно налягане. Вижте как <b>Консумацията (Amps)</b> пада, когато достигнем целта.
+    </div>
+</div>
+
+<div class="viewport">
+    <svg id="svg-pipes">
+        <path id="path-refr" class="pipe-base" d="M 100 700 L 100 550 L 800 550 L 800 150 L 400 150 L 100 150 L 100 700" />
+    </svg>
+
+    <div class="unit idu">
+        <div class="label-tag" style="top: 10px; left: 10px;">IDU (Вътрешен Топлообменник)</div>
+        <div id="fan-idu" class="fan" style="right: 50px; top: 40px;">⚙️</div>
+    </div>
+
+    <div class="unit odu">
+        <div class="label-tag" style="top: 10px; left: 10px;">ODU (Външен Агрегат)</div>
+        
+        <div class="comp-icon compressor" id="ui-comp">ИНВЕРТОР<br>COMP</div>
+        <div class="comp-icon accumulator">ACCUM.</div>
+        <div class="comp-icon valve4w" id="ui-4w">4-WAY<br>VALVE</div>
+        <div class="comp-icon eev">EEV</div>
+        <div class="label-tag" style="top: 165px; left: 450px;">Експанзия</div>
+
+        <div id="fan-odu" class="fan" style="right: 60px; top: 120px;">⚙️</div>
+    </div>
+</div>
+
+<script>
+    let state = {
+        mode: 'IDLE',
+        temp: 24.0,
+        target: 24,
+        amps: 0,
+        phigh: 1.0,
+        plow: 1.0,
+        particles: []
+    };
+
+    // Инициализация на фреонови частици
+    const svg = document.getElementById('svg-pipes');
+    for(let i=0; i<15; i++) {
+        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        c.setAttribute("r", "8");
+        c.setAttribute("class", "particle");
+        c.style.display = 'none';
+        svg.appendChild(c);
+        state.particles.push({el: c, pos: i * (100/15)});
+    }
+
+    function updateTarget() {
+        state.target = parseInt(document.getElementById('slider').value);
+        document.getElementById('ui-target').innerText = state.target;
+    }
+
+    function setMode(m) {
+        state.mode = (state.mode === m) ? 'IDLE' : m;
+        document.getElementById('btn-c').classList.toggle('active', state.mode === 'COOLING');
+        document.getElementById('btn-h').classList.toggle('active', state.mode === 'HEATING');
+    }
+
+    function runSystem() {
+        const diff = state.temp - state.target;
+        const absDiff = Math.abs(diff);
+
+        if(state.mode !== 'IDLE' && absDiff > 0.1) {
+            // Инверторна логика - мощността зависи от разликата
+            const load = Math.min(1.0, absDiff / 5); 
+            state.amps = (load * 8) + 0.5; // От 0.5А до 8.5А
+            
+            if(state.mode === 'COOLING') {
+                state.temp -= (load * 0.01);
+                state.phigh = 12 + (load * 10);
+                state.plow = 4 - (load * 2);
+                updateFlow(load, 1);
+            } else {
+                state.temp += (load * 0.01);
+                state.phigh = 25 + (load * 15);
+                state.plow = 6 - (load * 2);
+                updateFlow(load, -1);
+            }
+            
+            document.getElementById('fan-idu').classList.add('spinning');
+            document.getElementById('fan-odu').classList.add('spinning');
+            document.getElementById('g-cop').innerText = (4.2 - (load * 1.5)).toFixed(2);
+        } else {
+            state.amps *= 0.9;
+            state.phigh += (1.0 - state.phigh) * 0.05;
+            state.plow += (1.0 - state.plow) * 0.05;
+            state.particles.forEach(p => p.el.style.display = 'none');
+            document.getElementById('fan-idu').classList.remove('spinning');
+            document.getElementById('fan-odu').classList.remove('spinning');
+            document.getElementById('g-cop').innerText = "---";
+        }
+
+        updateUI();
+        requestAnimationFrame(runSystem);
+    }
+
+    function updateFlow(load, dir) {
+        const path = document.getElementById('path-refr');
+        const len = path.getTotalLength();
+        const speed = (load * 0.5) + 0.1;
+
+        state.particles.forEach(p => {
+            p.el.style.display = 'block';
+            p.pos = (p.pos + (speed * dir) + 100) % 100;
+            const pt = path.getPointAtLength((p.pos / 100) * len);
+            p.el.setAttribute("cx", pt.x);
+            p.el.setAttribute("cy", pt.y);
+
+            // Цветови код на фреона според позицията
+            p.el.setAttribute("fill", getRefrigerantColor(p.pos, state.mode));
+        });
+    }
+
+    function getRefrigerantColor(pos, mode) {
+        // Логика за цвят спрямо термодинамичната точка
+        if(mode === 'COOLING') {
+            if(pos < 25) return "var(--hot)"; // Discharge
+            if(pos < 50) return "var(--gas)"; // Condensing
+            if(pos < 75) return "var(--cold)"; // Evaporating
+            return "var(--liquid)";
+        } else {
+            if(pos > 75) return "var(--hot)";
+            if(pos > 50) return "var(--gas)";
+            if(pos > 25) return "var(--cold)";
+            return "var(--liquid)";
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('ui-temp').innerText = state.temp.toFixed(1) + "°C";
+        document.getElementById('g-phigh').innerText = state.phigh.toFixed(1);
+        document.getElementById('g-plow').innerText = state.plow.toFixed(1);
+        document.getElementById('g-amps').innerText = state.amps.toFixed(1);
+        
+        const comp = document.getElementById('ui-comp');
+        comp.style.boxShadow = state.amps > 1 ? `0 0 ${state.amps * 3}px var(--hot)` : 'none';
+        comp.style.borderColor = state.amps > 1 ? varColor() : '#30363d';
+    }
+
+    function varColor() { return state.mode === 'COOLING' ? 'var(--cold)' : 'var(--hot)'; }
+
+    runSystem();
+</script>
+</body>
+</html>

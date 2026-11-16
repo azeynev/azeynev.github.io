@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Pro - Играй Класическия Тетрис</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .main-game {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #ff0080, #00ffcc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .game-board-container {
+            position: relative;
+        }
+
+        #gameCanvas {
+            border: 3px solid #00ffcc;
+            border-radius: 5px;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 204, 0.5),
+                inset 0 0 20px rgba(0, 255, 204, 0.2);
+            background-color: rgba(0, 0, 20, 0.9);
+        }
+
+        .next-piece-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #nextCanvas {
+            border: 2px solid #ff0080;
+            border-radius: 5px;
+            background-color: rgba(0, 0, 20, 0.7);
+            box-shadow: 0 0 10px rgba(255, 0, 128, 0.5);
+        }
+
+        .info-panel {
+            background: rgba(0, 10, 30, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            width: 320px;
+            border: 2px solid rgba(0, 255, 204, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+        }
+
+        .panel-section {
+            margin-bottom: 25px;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            color: #00ffcc;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(0, 255, 204, 0.3);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(0, 20, 40, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-3px);
+            border-color: #00ffcc;
+            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff0080;
+            text-shadow: 0 0 10px rgba(255, 0, 128, 0.5);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .controls-list {
+            list-style: none;
+        }
+
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-key {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+        }
+
+        .level-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .level-bar {
+            flex-grow: 1;
+            height: 20px;
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 15px;
+        }
+
+        .level-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffcc, #ff0080);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .game-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-start {
+            background: linear-gradient(90deg, #00b09b, #96c93d);
+        }
+
+        .btn-pause {
+            background: linear-gradient(90deg, #ff5e62, #ff9966);
+        }
+
+        .btn-restart {
+            background: linear-gradient(90deg, #8e2de2, #4a00e0);
+        }
+
+        .instructions {
+            background: rgba(0, 10, 30, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            width: 100%;
+            border: 2px solid rgba(255, 0, 128, 0.3);
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.2);
+        }
+
+        .instructions h2 {
+            color: #ff0080;
+            margin-bottom: 15px;
+        }
+
+        .instructions p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .level-description {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .level-card {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(0, 20, 40, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            transition: all 0.3s;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ffcc;
+            box-shadow: 0 8px 20px rgba(0, 255, 204, 0.2);
+        }
+
+        .level-card h3 {
+            color: #00ffcc;
+            margin-bottom: 10px;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border-radius: 5px;
+            z-index: 10;
+        }
+
+        .game-over h2 {
+            font-size: 4rem;
+            color: #ff0080;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 0, 128, 0.7);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .combo-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffcc00;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.7);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9;
+        }
+
+        @media (max-width: 1100px) {
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .info-panel {
+                width: 100%;
+                max-width: 500px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            #gameCanvas {
+                width: 300px;
+                height: 600px;
+            }
+            
+            #nextCanvas {
+                width: 100px;
+                height: 100px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            width: 100%;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="main-game">
+            <div class="header">
+                <h1>TETRIS PRO</h1>
+                <div class="tagline">Класическа игра с модерни ефекти</div>
+            </div>
+            
+            <div class="game-board-container">
+                <canvas id="gameCanvas" width="300" height="600"></canvas>
+                <div id="gameOver" class="game-over">
+                    <h2>ИГРАТА СВЪРШИ!</h2>
+                    <div style="font-size: 1.5rem; margin-bottom: 20px;">Точки: <span id="finalScore">0</span></div>
+                    <div class="btn btn-restart" onclick="restartGame()">Нова Игра</div>
+                </div>
+                <div id="comboDisplay" class="combo-display"></div>
+            </div>
+            
+            <div class="next-piece-container">
+                <div style="margin-bottom: 10px; color: #ff0080; font-weight: bold;">СЛЕДВАЩА ФИГУРА:</div>
+                <canvas id="nextCanvas" width="100" height="100"></canvas>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <div class="panel-section">
+                <div class="panel-title">СТАТИСТИКИ</div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="score">0</div>
+                        <div class="stat-label">ТОЧКИ</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="level">1</div>
+                        <div class="stat-label">НИВО</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="lines">0</div>
+                        <div class="stat-label">РЕДОВЕ</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="tetris">0</div>
+                        <div class="stat-label">ТЕТРИСА</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="panel-title">КОНТРОЛИ</div>
+                <ul class="controls-list">
+                    <li class="control-item">
+                        <span>⬅️ ➡️ Движение наляво/надясно</span>
+                        <span class="control-key">← →</span>
+                    </li>
+                    <li class="control-item">
+                        <span>⬇️ Ускоряване надолу</span>
+                        <span class="control-key">↓</span>
+                    </li>
+                    <li class="control-item">
+                        <span>⬆️ Завъртане</span>
+                        <span class="control-key">↑</span>
+                    </li>
+                    <li class="control-item">
+                        <span>ПРОБЕЛ Падане веднага</span>
+                        <span class="control-key">SPACE</span>
+                    </li>
+                    <li class="control-item">
+                        <span>P Пауза</span>
+                        <span class="control-key">P</span>
+                    </li>
+                    <li class="control-item">
+                        <span>R Рестарт</span>
+                        <span class="control-key">R</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="panel-section">
+                <div class="panel-title">НИВО</div>
+                <div class="level-indicator">
+                    <span>1</span>
+                    <div class="level-bar">
+                        <div class="level-fill" id="levelFill"></div>
+                    </div>
+                    <span>10</span>
+                </div>
+                <div style="text-align: center; margin-top: 10px; color: #00ffcc;">
+                    Скорост: <span id="speedValue">Медлено</span>
+                </div>
+            </div>
+            
+            <div class="game-buttons">
+                <div class="btn btn-start" onclick="startGame()">СТАРТ</div>
+                <div class="btn btn-pause" onclick="togglePause()">ПАУЗА</div>
+                <div class="btn btn-restart" onclick="restartGame()">РЕСТАРТ</div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h2>🎮 ИНСТРУКЦИИ ЗА ИГРАТА</h2>
+            <p>Целта на играта е да подреждате падащите фигури (тетромино) така, че да попълвате хоризонтални редове.</p>
+            <p>Когато попълните цял ред, той ще изчезне и ще получите точки. Колкото повече редове изчистите наведнъж, толкова повече точки получавате!</p>
+            
+            <div class="level-description">
+                <div class="level-card">
+                    <h3>📊 НИВА И ТРУДНОСТ</h3>
+                    <p>Играта има 10 нива. Скоростта на падане на фигурите се увеличава с всяко ниво.</p>
+                    <p>Преминете на следващо ниво след изчистване на 10 реда.</p>
+                </div>
+                <div class="level-card">
+                    <h3>🎯 СПЕЦИАЛНИ ЕФЕКТИ</h3>
+                    <p>• Тетрис (4 реда наведнъж) - най-много точки</p>
+                    <p>• Комбо - изчистване на редове в последователни ходове</p>
+                    <p>• Частици при изчистване на редове</p>
+                </div>
+                <div class="level-card">
+                    <h3>🏆 ТОЧКУВАНЕ</h3>
+                    <p>• 1 ред = 100 x ниво</p>
+                    <p>• 2 реда = 300 x ниво</p>
+                    <p>• 3 реда = 500 x ниво</p>
+                    <p>• 4 реда (ТЕТРИС) = 800 x ниво</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Създадено с HTML5, CSS3 & JavaScript | Класическа игра Tetris с модерни ефекти
+        </div>
+    </div>
+
+    <script>
+        // Основни променливи на играта
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const nextCanvas = document.getElementById('nextCanvas');
+        const nextCtx = nextCanvas.getContext('2d');
+        
+        const ROWS = 20;
+        const COLS = 10;
+        const BLOCK_SIZE = 30;
+        
+        let board = [];
+        let currentPiece = null;
+        let nextPiece = null;
+        let score = 0;
+        let level = 1;
+        let lines = 0;
+        let tetrisCount = 0;
+        let gameOver = false;
+        let isPaused = false;
+        let gameLoop = null;
+        let dropCounter = 0;
+        let dropInterval = 1000; // Начална скорост в милисекунди
+        let lastTime = 0;
+        let combo = 0;
+        let comboTimeout = null;
+
+        // Дефиниране на всички видове тетромино фигури
+        const TETROMINOS = [
+            { // I
+                shape: [
+                    [0, 0, 0, 0],
+                    [1, 1, 1, 1],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0]
+                ],
+                color: '#00f5ff'
+            },
+            { // J
+                shape: [
+                    [1, 0, 0],
+                    [1, 1, 1],
+                    [0, 0, 0]
+                ],
+                color: '#0000ff'
+            },
+            { // L
+                shape: [
+                    [0, 0, 1],
+                    [1, 1, 1],
+                    [0, 0, 0]
+                ],
+                color: '#ff8000'
+            },
+            { // O
+                shape: [
+                    [1, 1],
+                    [1, 1]
+                ],
+                color: '#ffff00'
+            },
+            { // S
+                shape: [
+                    [0, 1, 1],
+                    [1, 1, 0],
+                    [0, 0, 0]
+                ],
+                color: '#00ff00'
+            },
+            { // T
+                shape: [
+                    [0, 1, 0],
+                    [1, 1, 1],
+                    [0, 0, 0]
+                ],
+                color: '#8000ff'
+            },
+            { // Z
+                shape: [
+                    [1, 1, 0],
+                    [0, 1, 1],
+                    [0, 0, 0]
+                ],
+                color: '#ff0000'
+            }
+        ];
+
+        // Инициализация на игралната дъска
+        function createBoard() {
+            board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+        }
+
+        // Създаване на нова фигура
+        function createPiece() {
+            const pieceType = Math.floor(Math.random() * TETROMINOS.length);
+            return {
+                shape: TETROMINOS[pieceType].shape,
+                color: TETROMINOS[pieceType].color,
+                row: 0,
+                col: Math.floor(COLS / 2) - Math.floor(TETROMINOS[pieceType].shape[0].length / 2)
+            };
+        }
+
+        // Рисуване на фигура
+        function drawPiece(piece, context, offsetX = 0, offsetY = 0) {
+            piece.shape.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value) {
+                        // Основен цвят
+                        context.fillStyle = piece.color;
+                        context.fillRect(
+                            (piece.col + x) * BLOCK_SIZE + offsetX,
+                            (piece.row + y) * BLOCK_SIZE + offsetY,
+                            BLOCK_SIZE,
+                            BLOCK_SIZE
+                        );
+                        
+                        // Ефект на светлина
+                        context.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                        context.fillRect(
+                            (piece.col + x) * BLOCK_SIZE + offsetX,
+                            (piece.row + y) * BLOCK_SIZE + offsetY,
+                            BLOCK_SIZE - 2,
+                            5
+                        );
+                        
+                        context.fillRect(
+                            (piece.col + x) * BLOCK_SIZE + offsetX,
+                            (piece.row + y) * BLOCK_SIZE + offsetY,
+                            5,
+                            BLOCK_SIZE - 2
+                        );
+                        
+                        // Ефект на сянка
+                        context.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                        context.fillRect(
+                            (piece.col + x) * BLOCK_SIZE + offsetX + BLOCK_SIZE - 5,
+                            (piece.row + y) * BLOCK_SIZE + offsetY + 5,
+                            5,
+                            BLOCK_SIZE - 5
+                        );
+                        
+                        context.fillRect(
+                            (piece.col + x) * BLOCK_SIZE + offsetX + 5,
+                            (piece.row + y) * BLOCK_SIZE + offsetY + BLOCK_SIZE - 5,
+                            BLOCK_SIZE - 5,
+                            5
+                        );
+                    }
+                });
+            });
+        }
+
+        // Рисуване на дъската
+        function drawBoard() {
+            // Фон
+            ctx.fillStyle = 'rgba(0, 0, 20, 0.9)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Решетка
+            ctx.strokeStyle = 'rgba(0, 255, 204, 0.1)';
+            ctx.lineWidth = 0.5;
+            
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    ctx.strokeRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    
+                    if (board[r][c]) {
+                        // Блокове на дъската
+                        ctx.fillStyle = board[r][c];
+                        ctx.fillRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                        
+                        // Ефекти на блоковете
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                        ctx.fillRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE - 2, 5);
+                        ctx.fillRect(c * BLOCK_SIZE, r * BLOCK_SIZE, 5, BLOCK_SIZE - 2);
+                        
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                        ctx.fillRect(c * BLOCK_SIZE + BLOCK_SIZE - 5, r * BLOCK_SIZE + 5, 5, BLOCK_SIZE - 5);
+                        ctx.fillRect(c * BLOCK_SIZE + 5, r * BLOCK_SIZE + BLOCK_SIZE - 5, BLOCK_SIZE - 5, 5);
+                    }
+                }
+            }
+        }
+
+        // Проверка за сблъсък
+        function hasCollision(piece) {
+            for (let r = 0; r < piece.shape.length; r++) {
+                for (let c = 0; c < piece.shape[r].length; c++) {
+                    if (piece.shape[r][c]) {
+                        const newRow = piece.row + r;
+                        const newCol = piece.col + c;
+                        
+                        if (
+                            newCol < 0 || 
+                            newCol >= COLS || 
+                            newRow >= ROWS || 
+                            (newRow >= 0 && board[newRow][newCol])
+                        ) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Фиксиране на фигурата в дъската
+        function mergePiece() {
+            for (let r = 0; r < currentPiece.shape.length; r++) {
+                for (let c = 0; c < currentPiece.shape[r].length; c++) {
+                    if (currentPiece.shape[r][c]) {
+                        const boardRow = currentPiece.row + r;
+                        const boardCol = currentPiece.col + c;
+                        
+                        if (boardRow >= 0) {
+                            board[boardRow][boardCol] = currentPiece.color;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Завъртане на фигура
+        function rotatePiece() {
+            const originalShape = currentPiece.shape;
+            // Транспониране на матрицата и обръщане на редовете за завъртане
+            const rotated = originalShape[0].map((_, index) =>
+                originalShape.map(row => row[index]).reverse()
+            );
+            
+            const originalShapeBackup = currentPiece.shape;
+            currentPiece.shape = rotated;
+            
+            if (hasCollision(currentPiece)) {
+                currentPiece.shape = originalShapeBackup;
+                return false;
+            }
+            
+            // Ефект при завъртане
+            createParticles(currentPiece.row * BLOCK_SIZE + BLOCK_SIZE * 2, 
+                          currentPiece.col * BLOCK_SIZE + BLOCK_SIZE * 2, 
+                          currentPiece.color, 5);
+            return true;
+        }
+
+        // Проверка за пълни редове
+        function checkRows() {
+            let rowsCleared = 0;
+            let rowsToClear = [];
+            
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (board[r].every(cell => cell !== 0)) {
+                    rowsToClear.push(r);
+                    rowsCleared++;
+                }
+            }
+            
+            if (rowsCleared > 0) {
+                // Анимация на изтриване на редовете
+                animateRowClear(rowsToClear);
+                
+                // Изтриване на редовете и добавяне на нови празни отгоре
+                rowsToClear.forEach(row => {
+                    board.splice(row, 1);
+                    board.unshift(Array(COLS).fill(0));
+                });
+                
+                // Пресмятане на точки
+                updateScore(rowsCleared);
+                
+                // Комбо система
+                combo++;
+                if (combo > 1) {
+                    showCombo(combo);
+                    // Допълнителни точки за комбо
+                    score += combo * 50 * level;
+                    updateUI();
+                }
+                
+                // Рестартиране на комбо таймера
+                clearTimeout(comboTimeout);
+                comboTimeout = setTimeout(() => {
+                    combo = 0;
+                }, 3000);
+                
+                // Обновяване на броя редове и проверка за ново ниво
+                lines += rowsCleared;
+                if (rowsCleared === 4) {
+                    tetrisCount++;
+                }
+                
+                updateLevel();
+                updateUI();
+                
+                // Създаване на частици за ефект
+                createClearParticles(rowsToClear);
+            }
+        }
+
+        // Анимация при изчистване на ред
+        function animateRowClear(rows) {
+            rows.forEach(row => {
+                for (let c = 0; c < COLS; c++) {
+                    setTimeout(() => {
+                        board[row][c] = '#ffffff';
+                        drawBoard();
+                        if (currentPiece) drawPiece(currentPiece, ctx);
+                    }, c * 30);
+                    
+                    setTimeout(() => {
+                        board[row][c] = 0;
+                        drawBoard();
+                        if (currentPiece) drawPiece(currentPiece, ctx);
+                    }, c * 30 + 150);
+                }
+            });
+        }
+
+        // Показване на комбо
+        function showCombo(comboCount) {
+            const comboDisplay = document.getElementById('comboDisplay');
+            comboDisplay.textContent = `COMBO x${comboCount}!`;
+            comboDisplay.style.opacity = '1';
+            comboDisplay.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            comboDisplay.style.color = comboCount >= 3 ? '#ff0000' : 
+                                      comboCount >= 2 ? '#ffcc00' : '#00ffcc';
+            
+            setTimeout(() => {
+                comboDisplay.style.opacity = '0';
+                comboDisplay.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 1000);
+        }
+
+        // Създаване на частици при изчистване на редове
+        function createClearParticles(rows) {
+            rows.forEach(row => {
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        createParticles(
+                            row * BLOCK_SIZE + BLOCK_SIZE / 2,
+                            Math.random() * canvas.width,
+                            board[row][Math.floor(Math.random() * COLS)] || '#ffffff',
+                            10
+                        );
+                    }, i * 50);
+                }
+            });
+        }
+
+        // Създаване на частици
+        function createParticles(x, y, color, count) {
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.backgroundColor = color;
+                particle.style.boxShadow = `0 0 10px ${color}`;
+                
+                document.querySelector('.game-board-container').appendChild(particle);
+                
+                // Анимация на частиците
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 2 + Math.random() * 3;
+                const size = 3 + Math.random() * 7;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                let vx = Math.cos(angle) * speed;
+                let vy = Math.sin(angle) * speed;
+                let opacity = 1;
+                
+                const animateParticle = () => {
+                    x += vx;
+                    y += vy;
+                    vy += 0.05; // Гравитация
+                    opacity -= 0.02;
+                    
+                    particle.style.left = `${x}px`;
+                    particle.style.top = `${y}px`;
+                    particle.style.opacity = opacity;
+                    
+                    if (opacity > 0) {
+                        requestAnimationFrame(animateParticle);
+                    } else {
+                        particle.remove();
+                    }
+                };
+                
+                requestAnimationFrame(animateParticle);
+            }
+        }
+
+        // Обновяване на точките
+        function updateScore(rowsCleared) {
+            const points = [0, 100, 300, 500, 800];
+            score += points[rowsCleared] * level;
+        }
+
+        // Обновяване на нивото
+        function updateLevel() {
+            const newLevel = Math.floor(lines / 10) + 1;
+            if (newLevel > level && newLevel <= 10) {
+                level = newLevel;
+                // Намаляване на интервала за падане (увеличаване на скоростта)
+                dropInterval = Math.max(100, 1000 - (level - 1) * 100);
+                
+                // Ефект при промяна на нивото
+                document.getElementById('level').classList.add('glow');
+                setTimeout(() => {
+                    document.getElementById('level').classList.remove('glow');
+                }, 1000);
+                
+                // Обновяване на индикатора за скорост
+                const speedText = ['Много бавно', 'Бавно', 'Средно', 'Бързо', 'Много бързо', 'Екстремно'];
+                document.getElementById('speedValue').textContent = 
+                    speedText[Math.min(level - 1, speedText.length - 1)];
+            }
+            
+            // Обновяване на индикатора за ниво
+            const levelFill = document.getElementById('levelFill');
+            levelFill.style.width = `${(lines % 10) * 10}%`;
+        }
+
+        // Обновяване на потребителския интерфейс
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lines').textContent = lines;
+            document.getElementById('tetris').textContent = tetrisCount;
+        }
+
+        // Движение на фигурата надолу
+        function moveDown() {
+            if (!currentPiece || gameOver || isPaused) return;
+            
+            currentPiece.row++;
+            
+            if (hasCollision(currentPiece)) {
+                currentPiece.row--;
+                mergePiece();
+                checkRows();
+                
+                // Създаване на нова фигура
+                currentPiece = nextPiece;
+                nextPiece = createPiece();
+                drawNextPiece();
+                
+                // Проверка за game over
+                if (hasCollision(currentPiece)) {
+                    gameOver = true;
+                    document.getElementById('finalScore').textContent = score;
+                    document.getElementById('gameOver').style.display = 'flex';
+                    cancelAnimationFrame(gameLoop);
+                }
+            }
+            
+            dropCounter = 0;
+        }
+
+        // Движение наляво/надясно
+        function movePiece(direction) {
+            if (!currentPiece || gameOver || isPaused) return;
+            
+            currentPiece.col += direction;
+            
+            if (hasCollision(currentPiece)) {
+                currentPiece.col -= direction;
+            } else {
+                // Ефект при движение
+                createParticles(
+                    currentPiece.row * BLOCK_SIZE + BLOCK_SIZE * 1.5,
+                    (currentPiece.col - direction) * BLOCK_SIZE + BLOCK_SIZE / 2,
+                    currentPiece.color,
+                    3
+                );
+            }
+        }
+
+        // Падане веднага (хард дроп)
+        function hardDrop() {
+            if (!currentPiece || gameOver || isPaused) return;
+            
+            while (!hasCollision(currentPiece)) {
+                currentPiece.row++;
+            }
+            
+            currentPiece.row--;
+            moveDown(); // Това ще фиксира фигурата
+        }
+
+        // Рисуване на следващата фигура
+        function drawNextPiece() {
+            nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+            
+            if (nextPiece) {
+                // Центриране на фигурата
+                const offsetX = (nextCanvas.width - nextPiece.shape[0].length * BLOCK_SIZE / 2) / 2;
+                const offsetY = (nextCanvas.height - nextPiece.shape.length * BLOCK_SIZE / 2) / 2;
+                
+                drawPiece(nextPiece, nextCtx, offsetX, offsetY);
+            }
+        }
+
+        // Главна игрална функция
+        function update(time = 0) {
+            if (gameOver || isPaused) return;
+            
+            const deltaTime = time - lastTime;
+            lastTime = time;
+            
+            dropCounter += deltaTime;
+            if (dropCounter > dropInterval) {
+                moveDown();
+            }
+            
+            // Рисуване
+            drawBoard();
+            if (currentPiece) {
+                drawPiece(currentPiece, ctx);
+                
+                // Рисуване на сянка на фигурата
+                const shadowPiece = {...currentPiece};
+                while (!hasCollision(shadowPiece)) {
+                    shadowPiece.row++;
+                }
+                shadowPiece.row--;
+                
+                ctx.globalAlpha = 0.3;
+                drawPiece(shadowPiece, ctx);
+                ctx.globalAlpha = 1.0;
+            }
+            
+            gameLoop = requestAnimationFrame(update);
+        }
+
+        // Стартиране на играта
+        function startGame() {
+            if (gameLoop) {
+                cancelAnimationFrame(gameLoop);
+            }
+            
+            createBoard();
+            currentPiece = createPiece();
+            nextPiece = createPiece();
+            score = 0;
+            level = 1;
+            lines = 0;
+            tetrisCount = 0;
+            gameOver = false;
+            isPaused = false;
+            dropInterval = 1000;
+            combo = 0;
+            
+            updateUI();
+            drawNextPiece();
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('speedValue').textContent = 'Медлено';
+            document.getElementById('levelFill').style.width = '0%';
+            
+            lastTime = 0;
+            gameLoop = requestAnimationFrame(update);
+        }
+
+        // Рестартиране на играта
+        function restartGame() {
+            startGame();
+        }
+
+        // Пауза/продължаване на играта
+        function togglePause() {
+            if (gameOver) return;
+            
+            isPaused = !isPaused;
+            const pauseBtn = document.querySelector('.btn-pause');
+            
+            if (isPaused) {
+                pauseBtn.textContent = 'ПРОДЪЛЖИ';
+                pauseBtn.style.background = 'linear-gradient(90deg, #96c93d, #00b09b)';
+                
+                // Добавяне на текст за пауза
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.font = 'bold 40px Arial';
+                ctx.fillStyle = '#ff0080';
+                ctx.textAlign = 'center';
+                ctx.fillText('ПАУЗА', canvas.width / 2, canvas.height / 2);
+            } else {
+                pauseBtn.textContent = 'ПАУЗА';
+                pauseBtn.style.background = 'linear-gradient(90deg, #ff5e62, #ff9966)';
+                lastTime = performance.now();
+                gameLoop = requestAnimationFrame(update);
+            }
+        }
+
+        // Обработка на клавиши
+        document.addEventListener('keydown', event => {
+            if (gameOver) return;
+            
+            switch(event.key) {
+                case 'ArrowLeft':
+                    movePiece(-1);
+                    break;
+                case 'ArrowRight':
+                    movePiece(1);
+                    break;
+                case 'ArrowDown':
+                    moveDown();
+                    break;
+                case 'ArrowUp':
+                    rotatePiece();
+                    break;
+                case ' ':
+                    hardDrop();
+                    break;
+                case 'p':
+                case 'P':
+                    togglePause();
+                    break;
+                case 'r':
+                case 'R':
+                    restartGame();
+                    break;
+            }
+        });
+
+        // Бутони за мобилни устройства
+        document.addEventListener('DOMContentLoaded', () => {
+            // Създаване на мобилни контроли
+            const mobileControls = `
+                <div style="display: none; margin-top: 20px; text-align: center;" id="mobileControls">
+                    <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+                        <button style="padding: 15px; font-size: 24px; margin: 5px;" onclick="movePiece(-1)">←</button>
+                        <button style="padding: 15px; font-size: 24px; margin: 5px;" onclick="rotatePiece()">↻</button>
+                        <button style="padding: 15px; font-size: 24px; margin: 5px;" onclick="movePiece(1)">→</button>
+                    </div>
+                    <div style="display: flex; justify-content: center;">
+                        <button style="padding: 15px; font-size: 18px; margin: 5px;" onclick="moveDown()">⬇️ Надолу</button>
+                        <button style="padding: 15px; font-size: 18px; margin: 5px;" onclick="hardDrop()">💥 Падане</button>
+                    </div>
+                </div>
+            `;
+            
+            document.querySelector('.main-game').insertAdjacentHTML('beforeend', mobileControls);
+            
+            // Показване на мобилни контроли само на мобилни устройства
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                document.getElementById('mobileControls').style.display = 'block';
+            }
+            
+            // Инициализация на играта
+            startGame();
+        });
+
+        // Глобални функции за достъп от бутоните
+        window.startGame = startGame;
+        window.togglePause = togglePause;
+        window.restartGame = restartGame;
+        window.movePiece = movePiece;
+        window.rotatePiece = rotatePiece;
+        window.hardDrop = hardDrop;
+        window.moveDown = moveDown;
+    </script>
+</body>
+</html>

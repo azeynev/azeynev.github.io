@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Lab: Oscilloscope & Feedback</title>
+    <style>
+        :root { --neon: #00f2ff; --warn: #fbbf24; --danger: #ff0055; --bg: #020617; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        .rack { background: #0f172a; padding: 25px; border-radius: 20px; border: 2px solid #1e293b; width: 900px; box-shadow: 0 25px 50px rgba(0,0,0,0.7); display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+        canvas { background: #000; border-radius: 10px; border: 1px solid #334155; width: 100%; }
+        .vu-container { display: flex; gap: 5px; background: #000; padding: 15px; border-radius: 8px; justify-content: center; height: 30px; }
+        .led { flex: 1; border-radius: 2px; background: #1e293b; transition: 0.1s; }
+        .controls { display: flex; flex-direction: column; gap: 15px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; }
+        .slider-group { display: flex; flex-direction: column; gap: 5px; }
+        input[type=range] { accent-color: var(--neon); cursor: pointer; }
+        .val { color: var(--neon); font-family: monospace; font-weight: bold; float: right; }
+        .alert { text-align: center; font-weight: bold; height: 20px; text-transform: uppercase; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+    <h1 style="font-weight: 200; letter-spacing: 5px;">AUDIO ANALYTICS <span style="color:var(--neon)">PRO</span></h1>
+
+    <div class="rack">
+        <div>
+            <div id="status" class="alert" style="color: #22c55e; margin-bottom: 10px;">System Ready</div>
+            <canvas id="scopeCanvas" height="300"></canvas>
+            
+            <div style="margin-top: 20px;">
+                <label style="font-size: 0.7rem; color: #64748b;">VU METER (OUTPUT LEVEL)</label>
+                <div class="vu-container" id="ledBar"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="slider-group">
+                <label>Input Gain <span class="val" id="gainVal">30%</span></label>
+                <input type="range" id="gain" min="0" max="100" value="30">
+            </div>
+
+            <div class="slider-group">
+                <label>Feedback (Обратна връзка) <span class="val" id="feedVal">0%</span></label>
+                <input type="range" id="feedback" min="0" max="100" value="0">
+            </div>
+
+            <div style="font-size: 0.75rem; color: #94a3b8; border-top: 1px solid #334155; padding-top: 15px;">
+                📊 <b>Учебна цел:</b><br>
+                Наблюдавайте как при висока <b>Обратна връзка</b> и <b>Gain</b>, вълната на осцилоскопа се деформира. Това е симулация на самовъзбуждане (позитивна обратна връзка).
+            </div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('scopeCanvas');
+    const ctx = canvas.getContext('2d');
+    const ledContainer = document.getElementById('ledBar');
+    const gainInput = document.getElementById('gain');
+    const feedInput = document.getElementById('feedback');
+    
+    canvas.width = 600;
+    const numLeds = 20;
+    const leds = [];
+    let time = 0;
+
+    // Инициализация на светодиоди
+    for (let i = 0; i < numLeds; i++) {
+        const led = document.createElement('div');
+        led.className = 'led';
+        ledContainer.appendChild(led);
+        leds.push(led);
+    }
+
+    function draw() {
+        const gain = parseInt(gainInput.value);
+        const feedback = parseInt(feedInput.value);
+        document.getElementById('gainVal').innerText = gain + "%";
+        document.getElementById('feedVal').innerText = feedback + "%";
+
+        // Логика за самовъзбуждане
+        const isHowling = (gain * feedback) > 3500;
+        const statusText = document.getElementById('status');
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Рисуване на мрежа (Grid)
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1;
+        for(let i=0; i<10; i++) {
+            ctx.beginPath(); ctx.moveTo(i*60, 0); ctx.lineTo(i*60, 300); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, i*30); ctx.lineTo(600, i*30); ctx.stroke();
+        }
+
+        // Генериране на вълната
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = isHowling ? '#ff0055' : '#00f2ff';
+        if(isHowling) {
+            ctx.shadowBlur = 15; ctx.shadowColor = '#ff0055';
+            statusText.innerText = "CRITICAL: FEEDBACK LOOP / HOWLING";
+            statusText.style.color = "#ff0055";
+        } else {
+            ctx.shadowBlur = 0;
+            statusText.innerText = "System Stable";
+            statusText.style.color = "#22c55e";
+        }
+
+        let totalOutput = 0;
+        for (let x = 0; x < canvas.width; x++) {
+            let amplitude = gain * 0.8;
+            let freq = 0.05;
+            
+            // Математическа симулация на шума от обратната връзка
+            if(isHowling) {
+                amplitude += Math.sin(time * 0.5) * feedback * 0.5;
+                freq = 0.2 + (feedback / 200);
+            }
+
+            let y = 150 + Math.sin(x * freq + time) * amplitude;
+            
+            // Добавяме малко случаен шум
+            y += (Math.random() - 0.5) * (feedback / 10);
+
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+
+            if(x === canvas.width - 1) totalOutput = Math.abs(y - 150);
+        }
+        ctx.stroke();
+
+        // Обновяване на VU Meter
+        const activeLeds = Math.min(numLeds, Math.floor((totalOutput / 100) * numLeds));
+        leds.forEach((led, i) => {
+            if (i < activeLeds) {
+                let color = '#22c55e';
+                if (i > 12) color = '#fbbf24';
+                if (i > 17) color = '#ff0055';
+                led.style.background = color;
+                led.style.boxShadow = `0 0 10px ${color}`;
+            } else {
+                led.style.background = '#1e293b';
+                led.style.boxShadow = 'none';
+            }
+        });
+
+        time += 0.2;
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+</script>
+</body>
+</html>

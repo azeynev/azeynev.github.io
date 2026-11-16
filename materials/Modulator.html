@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Functional Modulation Lab</title>
+    <style>
+        :root { --bg: #05070a; --panel: #11141b; --neon: #00f2ff; --msg: #ffcc00; --car: #ff3e3e; }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        #ui { width: 340px; background: var(--panel); border-right: 2px solid #1f242d; padding: 20px; display: flex; flex-direction: column; gap: 15px; box-shadow: 10px 0 30px #000; }
+        h1 { font-size: 18px; color: var(--neon); text-transform: uppercase; letter-spacing: 2px; margin: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        .control-group { background: rgba(255,255,255,0.03); border: 1px solid #2a2f3a; padding: 12px; border-radius: 10px; }
+        label { font-size: 11px; color: #888; display: block; margin-bottom: 5px; }
+        .val { float: right; color: var(--neon); font-family: monospace; font-weight: bold; }
+        input[type=range] { width: 100%; accent-color: var(--neon); cursor: pointer; }
+        
+        .mode-btn { flex: 1; padding: 10px; background: #1a1f2b; border: 1px solid #333; color: #fff; cursor: pointer; border-radius: 5px; font-weight: bold; transition: 0.3s; }
+        .mode-btn.active { background: var(--neon); color: #000; border-color: var(--neon); box-shadow: 0 0 15px rgba(0,242,255,0.4); }
+
+        /* Main View */
+        #viewport { flex-grow: 1; display: grid; grid-template-rows: repeat(3, 1fr) 1.2fr; gap: 10px; padding: 10px; }
+        .scope-card { background: #0d1117; border: 1px solid #1f242d; border-radius: 10px; position: relative; overflow: hidden; }
+        .tag { position: absolute; top: 10px; left: 15px; font-size: 10px; font-weight: bold; color: #555; z-index: 5; text-transform: uppercase; }
+        canvas { width: 100%; height: 100%; display: block; }
+        
+        .stats { font-size: 11px; color: #444; margin-top: auto; }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <h1>MODULATION PRO</h1>
+    
+    <div style="display: flex; gap: 5px;">
+        <button id="btnAM" class="mode-btn active" onclick="setMode('AM')">AM</button>
+        <button id="btnFM" class="mode-btn" onclick="setMode('FM')">FM</button>
+    </div>
+
+    <div class="control-group" style="border-left: 4px solid var(--msg);">
+        <label>MESSAGE (ИНФОРМАЦИЯ): <span class="val" id="fm_v">2</span> Hz</label>
+        <input type="range" id="fm" min="0.5" max="10" step="0.1" value="2">
+        <label>AMPLITUDE (Am): <span class="val" id="am_v">0.5</span></label>
+        <input type="range" id="am" min="0.1" max="1.0" step="0.05" value="0.5">
+    </div>
+
+    <div class="control-group" style="border-left: 4px solid var(--car);">
+        <label>CARRIER (НОСЕЩА): <span class="val" id="fc_v">50</span> Hz</label>
+        <input type="range" id="fc" min="20" max="150" step="1" value="50">
+    </div>
+
+    <div class="control-group" style="border-left: 4px solid var(--neon);">
+        <label>MOD. INDEX (m / β): <span class="val" id="idx_v">1.0</span></label>
+        <input type="range" id="idx" min="0.1" max="5" step="0.1" value="1">
+    </div>
+
+    <div class="stats">
+        * AM: V(t) = Ac[1 + m*cos(wm*t)]*cos(wc*t)<br>
+        * FM: V(t) = Ac*cos(wc*t + β*sin(wm*t))
+    </div>
+</div>
+
+<div id="viewport">
+    <div class="scope-card"><span class="tag" style="color:var(--msg)">Информационен Сигнал (Vm)</span><canvas id="cMsg"></canvas></div>
+    <div class="scope-card"><span class="tag" style="color:var(--car)">Носещ Сигнал (Vc)</span><canvas id="cCar"></canvas></div>
+    <div class="scope-card"><span class="tag" style="color:var(--neon)">Модулиран Изход (Vout)</span><canvas id="cMod"></canvas></div>
+    
+    <div class="scope-card" style="background: #000;">
+        <span class="tag">Енергиен Поток на Трансмисията (Live Flux)</span>
+        <canvas id="cWow"></canvas>
+    </div>
+</div>
+
+<script>
+    const state = { mode: 'AM', time: 0 };
+    const canvases = {
+        msg: document.getElementById('cMsg'),
+        car: document.getElementById('cCar'),
+        mod: document.getElementById('cMod'),
+        wow: document.getElementById('cWow')
+    };
+
+    function setMode(m) {
+        state.mode = m;
+        document.getElementById('btnAM').classList.toggle('active', m === 'AM');
+        document.getElementById('btnFM').classList.toggle('active', m === 'FM');
+    }
+
+    function draw() {
+        state.time += 0.005;
+        const fm = parseFloat(document.getElementById('fm').value);
+        const am = parseFloat(document.getElementById('am').value);
+        const fc = parseFloat(document.getElementById('fc').value);
+        const idx = parseFloat(document.getElementById('idx').value);
+
+        // Update UI labels
+        document.getElementById('fm_v').innerText = fm + " Hz";
+        document.getElementById('am_v').innerText = am;
+        document.getElementById('fc_v').innerText = fc + " Hz";
+        document.getElementById('idx_v').innerText = idx;
+
+        renderScopes(fm, am, fc, idx);
+        renderWow(fm, am, fc, idx);
+
+        requestAnimationFrame(draw);
+    }
+
+    function renderScopes(fm, am, fc, idx) {
+        Object.values(canvases).forEach(c => {
+            if(c.width !== c.offsetWidth) { c.width = c.offsetWidth; c.height = c.offsetHeight; }
+        });
+
+        const ctxM = canvases.msg.getContext('2d');
+        const ctxC = canvases.car.getContext('2d');
+        const ctxO = canvases.mod.getContext('2d');
+
+        [ctxM, ctxC, ctxO].forEach(ctx => ctx.clearRect(0,0, 2000, 1000));
+
+        const w = canvases.msg.width;
+        const h = canvases.msg.height;
+        const midY = h / 2;
+
+        ctxM.beginPath(); ctxM.strokeStyle = '#ffcc00'; ctxM.lineWidth = 2;
+        ctxC.beginPath(); ctxC.strokeStyle = '#ff3e3e'; ctxC.lineWidth = 1;
+        ctxO.beginPath(); ctxO.strokeStyle = '#00f2ff'; ctxO.lineWidth = 2;
+
+        for(let x = 0; x < w; x++) {
+            const t = (x / w) * 0.5; // Гледаме прозорец от 0.5 секунди
+            const curTime = state.time + t;
+
+            // 1. Message
+            const vMsg = am * Math.sin(2 * Math.PI * fm * curTime);
+            // 2. Carrier
+            const vCar = 0.8 * Math.sin(2 * Math.PI * fc * curTime);
+            // 3. Modulated
+            let vMod = 0;
+            if(state.mode === 'AM') {
+                vMod = 0.6 * (1 + idx * vMsg) * Math.sin(2 * Math.PI * fc * curTime);
+            } else {
+                vMod = 0.7 * Math.sin(2 * Math.PI * fc * curTime + idx * Math.sin(2 * Math.PI * fm * curTime));
+            }
+
+            const yM = midY - vMsg * (h/3);
+            const yC = midY - vCar * (h/3);
+            const yO = midY - vMod * (h/3);
+
+            if(x===0) { ctxM.moveTo(x, yM); ctxC.moveTo(x, yC); ctxO.moveTo(x, yO); }
+            else { ctxM.lineTo(x, yM); ctxC.lineTo(x, yC); ctxO.lineTo(x, yO); }
+        }
+        ctxM.stroke(); ctxC.stroke(); ctxO.stroke();
+    }
+
+    function renderWow(fm, am, fc, idx) {
+        const ctx = canvases.wow.getContext('2d');
+        const w = canvases.wow.width;
+        const h = canvases.wow.height;
+        ctx.clearRect(0,0, w, h);
+
+        const particles = 40;
+        for(let i=0; i<particles; i++) {
+            let offset = (i / particles) * w;
+            let x = (offset + state.time * 200) % w;
+            
+            // Wow ефектът реагира на модулацията
+            let sTime = state.time + (x/w);
+            let wave;
+            if(state.mode === 'AM') {
+                wave = Math.abs(Math.sin(2 * Math.PI * fm * sTime) * idx * 50);
+            } else {
+                wave = (fc / 150) * 40; // FM реагира на гъстотата
+            }
+
+            ctx.fillStyle = state.mode === 'AM' ? `rgba(0, 242, 255, ${wave/60})` : '#00f2ff';
+            ctx.shadowBlur = wave;
+            ctx.shadowColor = '#00f2ff';
+            ctx.beginPath();
+            ctx.arc(x, h/2 + Math.sin(x*0.01)*20, state.mode === 'AM' ? 2 + wave/5 : 3, 0, 7);
+            ctx.fill();
+        }
+    }
+
+    draw();
+</script>
+</body>
+</html>

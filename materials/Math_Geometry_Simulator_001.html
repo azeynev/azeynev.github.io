@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивен симулатор по планиметрия</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(0, 20, 40, 0.8);
+            border-radius: 15px;
+            border: 2px solid #00aaff;
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: #00ffaa;
+            text-shadow: 0 0 15px rgba(0, 255, 170, 0.6);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #aaffff;
+            margin-bottom: 15px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .control-panel {
+            background: rgba(10, 20, 30, 0.85);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #00aaff;
+            box-shadow: 0 0 30px rgba(0, 100, 255, 0.3);
+        }
+
+        .shapes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .shape-btn {
+            padding: 20px 10px;
+            background: rgba(20, 30, 50, 0.7);
+            border: 2px solid #33415c;
+            border-radius: 10px;
+            color: #aaffff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .shape-btn:hover {
+            border-color: #00aaff;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 170, 255, 0.3);
+        }
+
+        .shape-btn.active {
+            background: rgba(0, 170, 255, 0.3);
+            border-color: #00ffaa;
+            color: #00ffaa;
+            box-shadow: 0 0 20px rgba(0, 255, 170, 0.5);
+        }
+
+        .shape-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .properties-panel {
+            background: rgba(20, 30, 50, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #33415c;
+            margin-bottom: 20px;
+        }
+
+        .property-group {
+            margin-bottom: 15px;
+        }
+
+        .property-group h4 {
+            color: #00aaff;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .slider-container label {
+            min-width: 120px;
+            color: #aaffff;
+            font-weight: 600;
+        }
+
+        input[type="range"], input[type="number"] {
+            flex: 1;
+            height: 35px;
+            padding: 0 10px;
+            background: rgba(0, 30, 60, 0.9);
+            border: 2px solid #00aaff;
+            border-radius: 6px;
+            color: #00ffaa;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, #0066ff, #00aaff);
+            height: 8px;
+            padding: 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #00ffaa;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 10px rgba(0, 255, 170, 0.8);
+        }
+
+        .value-display {
+            min-width: 60px;
+            text-align: center;
+            background: rgba(0, 30, 60, 0.9);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 2px solid #00aaff;
+            color: #00ffaa;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option.active {
+            border-color: #ffffff;
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+
+        .side-inputs {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .side-inputs.active {
+            display: grid;
+        }
+
+        .side-input {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .side-input label {
+            color: #aaffff;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px;
+            background: linear-gradient(135deg, #00aaff 0%, #0066ff 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 100, 255, 0.4);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #00ffaa 0%, #00aaff 100%);
+            box-shadow: 0 6px 20px rgba(0, 255, 170, 0.5);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.reset {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+        }
+
+        button.reset:hover {
+            background: linear-gradient(135deg, #ff6666 0%, #ff0000 100%);
+        }
+
+        .canvas-container {
+            background: rgba(10, 20, 30, 0.85);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #00aaff;
+            box-shadow: 0 0 30px rgba(0, 100, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .canvas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #33415c;
+        }
+
+        .canvas-title {
+            color: #00ffaa;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .canvas-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .canvas-wrapper {
+            flex: 1;
+            background: rgba(0, 30, 60, 0.8);
+            border-radius: 10px;
+            border: 2px solid #33415c;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #geometryCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: rgba(5, 15, 25, 0.9);
+        }
+
+        .info-panel {
+            background: rgba(10, 20, 30, 0.85);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #00ffaa;
+            box-shadow: 0 0 30px rgba(0, 255, 170, 0.3);
+            margin-bottom: 25px;
+        }
+
+        .info-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .info-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-card {
+            background: rgba(20, 30, 50, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #33415c;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            border-color: #00aaff;
+            transform: translateY(-5px);
+        }
+
+        .info-title {
+            color: #00ffaa;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .info-value {
+            font-family: 'Courier New', monospace;
+            font-size: 1.4rem;
+            color: #00aaff;
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .info-formula {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            color: #aaffff;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .anim-btn {
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #ffaa00 0%, #ff5500 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .anim-btn:hover {
+            background: linear-gradient(135deg, #ffcc00 0%, #ff7700 100%);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 20, 40, 0.7);
+            border-radius: 10px;
+            border: 1px solid #00aaff;
+            color: #aaffff;
+            font-size: 0.9rem;
+        }
+
+        .circuit-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, transparent 79px, rgba(0, 100, 255, 0.1) 81px, transparent 82px),
+                linear-gradient(rgba(0, 100, 255, 0.1) 1px, transparent 1px);
+            background-size: 100px 100px, 8px 8px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .grid-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #33415c;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #00aaff;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .coordinate-display {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: #00ffaa;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
+        .side-labels {
+            display: none;
+            position: absolute;
+            pointer-events: none;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #ffaa00;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .side-labels.active {
+            display: block;
+        }
+
+        .explanation-panel {
+            background: rgba(10, 20, 30, 0.85);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #ffaa00;
+            box-shadow: 0 0 30px rgba(255, 170, 0, 0.3);
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .explanation-panel.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .explanation-title {
+            color: #ffaa00;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .explanation-content {
+            background: rgba(20, 30, 50, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #33415c;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .explanation-step {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #33415c;
+        }
+
+        .explanation-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .step-title {
+            color: #00ffaa;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .step-description {
+            color: #aaffff;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .step-formula {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 30, 60, 0.8);
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #00aaff;
+            margin: 10px 0;
+            color: #00ffaa;
+        }
+
+        .step-example {
+            background: rgba(255, 170, 0, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #ffaa00;
+            margin: 10px 0;
+            color: #ffcc00;
+        }
+
+        .empty-canvas {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #aaffff;
+            text-align: center;
+        }
+
+        .empty-canvas-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-canvas-text {
+            font-size: 1.2rem;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ИНТЕРАКТИВЕН СИМУЛАТОР ПО ПЛАНИМЕТРИЯ</h1>
+            <div class="subtitle">Изследване на равнинни фигури с възможност за задаване на страни и автоматични изчисления</div>
+            <div class="circuit-pattern"></div>
+        </header>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <h3 style="color: #00ffaa; margin-bottom: 20px;">📐 ИЗБОР НА ФИГУРА</h3>
+                
+                <div class="shapes-grid">
+                    <div class="shape-btn active" data-shape="triangle">
+                        <div class="shape-icon">△</div>
+                        <div>Триъгълник</div>
+                    </div>
+                    <div class="shape-btn" data-shape="square">
+                        <div class="shape-icon">□</div>
+                        <div>Квадрат</div>
+                    </div>
+                    <div class="shape-btn" data-shape="rectangle">
+                        <div class="shape-icon">▭</div>
+                        <div>Правоъгълник</div>
+                    </div>
+                    <div class="shape-btn" data-shape="circle">
+                        <div class="shape-icon">○</div>
+                        <div>Кръг</div>
+                    </div>
+                    <div class="shape-btn" data-shape="pentagon">
+                        <div class="shape-icon">⬠</div>
+                        <div>Петоъгълник</div>
+                    </div>
+                    <div class="shape-btn" data-shape="hexagon">
+                        <div class="shape-icon">⬡</div>
+                        <div>Шестоъгълник</div>
+                    </div>
+                </div>
+
+                <div class="properties-panel">
+                    <h3 style="color: #00aaff; margin-bottom: 15px;">⚙️ СВОЙСТВА НА ФИГУРАТА</h3>
+                    
+                    <div class="property-group">
+                        <h4>Основни размери</h4>
+                        <div class="slider-container">
+                            <label for="size">Размер:</label>
+                            <input type="range" id="size" min="10" max="200" value="100" step="1">
+                            <div class="value-display" id="size-value">100</div>
+                        </div>
+                        <div class="slider-container">
+                            <label for="width">Ширина:</label>
+                            <input type="range" id="width" min="10" max="200" value="150" step="1">
+                            <div class="value-display" id="width-value">150</div>
+                        </div>
+                        <div class="slider-container">
+                            <label for="height">Височина:</label>
+                            <input type="range" id="height" min="10" max="200" value="100" step="1">
+                            <div class="value-display" id="height-value">100</div>
+                        </div>
+                    </div>
+
+                    <!-- Input fields for sides -->
+                    <div class="property-group">
+                        <h4>Дължини на страни</h4>
+                        <div class="side-inputs" id="triangle-sides">
+                            <div class="side-input">
+                                <label for="sideA">Страна A:</label>
+                                <input type="number" id="sideA" min="1" max="300" value="100" step="1">
+                            </div>
+                            <div class="side-input">
+                                <label for="sideB">Страна B:</label>
+                                <input type="number" id="sideB" min="1" max="300" value="100" step="1">
+                            </div>
+                            <div class="side-input">
+                                <label for="sideC">Страна C:</label>
+                                <input type="number" id="sideC" min="1" max="300" value="100" step="1">
+                            </div>
+                            <div class="side-input">
+                                <label for="heightTri">Височина:</label>
+                                <input type="number" id="heightTri" min="1" max="300" value="86.6" step="0.1">
+                            </div>
+                        </div>
+                        
+                        <div class="side-inputs" id="rectangle-sides">
+                            <div class="side-input">
+                                <label for="rectWidth">Ширина:</label>
+                                <input type="number" id="rectWidth" min="1" max="300" value="150" step="1">
+                            </div>
+                            <div class="side-input">
+                                <label for="rectHeight">Височина:</label>
+                                <input type="number" id="rectHeight" min="1" max="300" value="100" step="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="property-group">
+                        <h4>Цвят и запълване</h4>
+                        <div class="color-picker">
+                            <div class="color-option active" style="background: #00ffaa;" data-color="#00ffaa"></div>
+                            <div class="color-option" style="background: #00aaff;" data-color="#00aaff"></div>
+                            <div class="color-option" style="background: #ffaa00;" data-color="#ffaa00"></div>
+                            <div class="color-option" style="background: #ff4444;" data-color="#ff4444"></div>
+                            <div class="color-option" style="background: #aa00ff;" data-color="#aa00ff"></div>
+                        </div>
+                        <div class="slider-container">
+                            <label for="rotation">Завъртане:</label>
+                            <input type="range" id="rotation" min="0" max="360" value="0" step="1">
+                            <div class="value-display" id="rotation-value">0°</div>
+                        </div>
+                    </div>
+
+                    <div class="grid-toggle">
+                        <label>Показвай мрежа:</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="gridToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="grid-toggle">
+                        <label>Показвай страни:</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showSidesToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="drawBtn">🎨 ИЗЧЕРТАЙ ФИГУРА</button>
+                    <button class="reset" id="clearBtn">❌ ИЗЧИСТИ КАНВАСА</button>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <div class="canvas-header">
+                    <div class="canvas-title" id="currentShape">Изберете фигура и параметри</div>
+                    <div class="canvas-controls">
+                        <button class="anim-btn" id="rotateBtn">🔄 Завърти</button>
+                        <button class="anim-btn" id="pulseBtn">✨ Пулсирай</button>
+                    </div>
+                </div>
+                
+                <div class="canvas-wrapper">
+                    <canvas id="geometryCanvas" width="800" height="600"></canvas>
+                    <div class="coordinate-display" id="coords">X: 0, Y: 0</div>
+                    <div class="side-labels" id="sideLabels"></div>
+                    
+                    <div class="empty-canvas" id="emptyCanvas">
+                        <div class="empty-canvas-icon">📐</div>
+                        <div class="empty-canvas-text">
+                            <h3>Добре дошли в симулатора по планиметрия!</h3>
+                            <p>Изберете фигура отляво, задайте параметрите и натиснете бутона "ИЗЧЕРТАЙ ФИГУРА", за да видите резултата.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="explanation-panel" id="explanationPanel">
+            <div class="explanation-title">📚 Обяснение на фигурата и изчисленията</div>
+            <div class="explanation-content" id="explanationContent">
+                <!-- Explanation content will be generated here -->
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3 style="color: #00ffaa; margin-bottom: 20px;">📊 ИЗЧИСЛЕНИЯ И ФОРМУЛИ</h3>
+            <div class="info-content">
+                <div class="info-card">
+                    <div class="info-title">ПЛОЩ</div>
+                    <div class="info-value" id="areaValue">0.00</div>
+                    <div class="info-formula" id="areaFormula">Изберете фигура</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-title">ПЕРИМЕТЪР</div>
+                    <div class="info-value" id="perimeterValue">0.00</div>
+                    <div class="info-formula" id="perimeterFormula">Изберете фигура</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-title">ЪГЛИ</div>
+                    <div class="info-value" id="anglesValue">-</div>
+                    <div class="info-formula" id="anglesFormula">Изберете фигура</div>
+                </div>
+            </div>
+            
+            <div class="animation-controls">
+                <button class="anim-btn" id="showAreaBtn">📐 Покажи площ</button>
+                <button class="anim-btn" id="showPerimeterBtn">📏 Покажи периметър</button>
+                <button class="anim-btn" id="showAnglesBtn">📐 Покажи ъгли</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Интерактивен симулатор по планиметрия - Създаден за образователни цели</p>
+            <p>© 2024 Геометричен симулатор</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Canvas setup
+            const canvas = document.getElementById('geometryCanvas');
+            const ctx = canvas.getContext('2d');
+            const coordsDisplay = document.getElementById('coords');
+            const sideLabels = document.getElementById('sideLabels');
+            const emptyCanvas = document.getElementById('emptyCanvas');
+            const explanationPanel = document.getElementById('explanationPanel');
+            const explanationContent = document.getElementById('explanationContent');
+            
+            // State variables
+            let currentShape = 'triangle';
+            let currentDrawnShape = null;
+            let animationId = null;
+            let isRotating = false;
+            let rotationAngle = 0;
+            let isPulsing = false;
+            let pulseScale = 1;
+            let pulseDirection = 1;
+            let showSides = true;
+            
+            // Configuration
+            const config = {
+                size: 100,
+                width: 150,
+                height: 100,
+                rotation: 0,
+                color: '#00ffaa',
+                showGrid: true,
+                // Triangle sides
+                sideA: 100,
+                sideB: 100,
+                sideC: 100,
+                heightTri: 86.6,
+                // Rectangle sides
+                rectWidth: 150,
+                rectHeight: 100
+            };
+            
+            // DOM elements
+            const shapeBtns = document.querySelectorAll('.shape-btn');
+            const sizeSlider = document.getElementById('size');
+            const sizeValue = document.getElementById('size-value');
+            const widthSlider = document.getElementById('width');
+            const widthValue = document.getElementById('width-value');
+            const heightSlider = document.getElementById('height');
+            const heightValue = document.getElementById('height-value');
+            const rotationSlider = document.getElementById('rotation');
+            const rotationValue = document.getElementById('rotation-value');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const gridToggle = document.getElementById('gridToggle');
+            const showSidesToggle = document.getElementById('showSidesToggle');
+            const drawBtn = document.getElementById('drawBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const rotateBtn = document.getElementById('rotateBtn');
+            const pulseBtn = document.getElementById('pulseBtn');
+            const showAreaBtn = document.getElementById('showAreaBtn');
+            const showPerimeterBtn = document.getElementById('showPerimeterBtn');
+            const showAnglesBtn = document.getElementById('showAnglesBtn');
+            const currentShapeDisplay = document.getElementById('currentShape');
+            const areaValue = document.getElementById('areaValue');
+            const perimeterValue = document.getElementById('perimeterValue');
+            const anglesValue = document.getElementById('anglesValue');
+            const areaFormula = document.getElementById('areaFormula');
+            const perimeterFormula = document.getElementById('perimeterFormula');
+            const anglesFormula = document.getElementById('anglesFormula');
+            
+            // Side inputs
+            const sideAInput = document.getElementById('sideA');
+            const sideBInput = document.getElementById('sideB');
+            const sideCInput = document.getElementById('sideC');
+            const heightTriInput = document.getElementById('heightTri');
+            const rectWidthInput = document.getElementById('rectWidth');
+            const rectHeightInput = document.getElementById('rectHeight');
+            
+            // Initialize
+            updateSliders();
+            updateSideInputs();
+            drawGrid();
+            updateCalculations();
+            
+            // Event listeners
+            shapeBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    shapeBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentShape = this.getAttribute('data-shape');
+                    currentShapeDisplay.textContent = `Избрана фигура: ${getShapeName(currentShape)}`;
+                    updateSliders();
+                    updateSideInputs();
+                    updateCalculations();
+                    clearCanvas();
+                });
+            });
+            
+            // Slider events
+            sizeSlider.addEventListener('input', function() {
+                config.size = parseInt(this.value);
+                sizeValue.textContent = config.size;
+                updateSideInputsFromSliders();
+                updateCalculations();
+            });
+            
+            widthSlider.addEventListener('input', function() {
+                config.width = parseInt(this.value);
+                widthValue.textContent = config.width;
+                updateSideInputsFromSliders();
+                updateCalculations();
+            });
+            
+            heightSlider.addEventListener('input', function() {
+                config.height = parseInt(this.value);
+                heightValue.textContent = config.height;
+                updateSideInputsFromSliders();
+                updateCalculations();
+            });
+            
+            rotationSlider.addEventListener('input', function() {
+                config.rotation = parseInt(this.value);
+                rotationValue.textContent = config.rotation + '°';
+                if (currentDrawnShape) {
+                    drawCurrentShape();
+                }
+            });
+            
+            // Side input events
+            sideAInput.addEventListener('input', function() {
+                config.sideA = parseFloat(this.value);
+                updateSlidersFromSideInputs();
+                updateCalculations();
+            });
+            
+            sideBInput.addEventListener('input', function() {
+                config.sideB = parseFloat(this.value);
+                updateSlidersFromSideInputs();
+                updateCalculations();
+            });
+            
+            sideCInput.addEventListener('input', function() {
+                config.sideC = parseFloat(this.value);
+                updateSlidersFromSideInputs();
+                updateCalculations();
+            });
+            
+            heightTriInput.addEventListener('input', function() {
+                config.heightTri = parseFloat(this.value);
+                updateCalculations();
+            });
+            
+            rectWidthInput.addEventListener('input', function() {
+                config.rectWidth = parseFloat(this.value);
+                updateSlidersFromSideInputs();
+                updateCalculations();
+            });
+            
+            rectHeightInput.addEventListener('input', function() {
+                config.rectHeight = parseFloat(this.value);
+                updateSlidersFromSideInputs();
+                updateCalculations();
+            });
+            
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    colorOptions.forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    config.color = this.getAttribute('data-color');
+                    if (currentDrawnShape) {
+                        drawCurrentShape();
+                    }
+                });
+            });
+            
+            gridToggle.addEventListener('change', function() {
+                config.showGrid = this.checked;
+                if (currentDrawnShape) {
+                    drawCurrentShape();
+                }
+            });
+            
+            showSidesToggle.addEventListener('change', function() {
+                showSides = this.checked;
+                if (currentDrawnShape) {
+                    drawCurrentShape();
+                }
+            });
+            
+            drawBtn.addEventListener('click', function() {
+                drawShapeOnCanvas();
+                generateExplanation();
+            });
+            
+            clearBtn.addEventListener('click', function() {
+                clearCanvas();
+            });
+            
+            rotateBtn.addEventListener('click', function() {
+                isRotating = !isRotating;
+                if (isRotating && currentDrawnShape) {
+                    startRotation();
+                }
+            });
+            
+            pulseBtn.addEventListener('click', function() {
+                isPulsing = !isPulsing;
+                if (isPulsing && currentDrawnShape) {
+                    startPulsing();
+                }
+            });
+            
+            showAreaBtn.addEventListener('click', function() {
+                if (currentDrawnShape) {
+                    highlightArea();
+                }
+            });
+            
+            showPerimeterBtn.addEventListener('click', function() {
+                if (currentDrawnShape) {
+                    highlightPerimeter();
+                }
+            });
+            
+            showAnglesBtn.addEventListener('click', function() {
+                if (currentDrawnShape) {
+                    highlightAngles();
+                }
+            });
+            
+            // Mouse coordinates
+            canvas.addEventListener('mousemove', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                coordsDisplay.textContent = `X: ${Math.round(x)}, Y: ${Math.round(y)}`;
+            });
+            
+            function updateSliders() {
+                // Show/hide sliders based on selected shape
+                const sizeGroup = document.querySelector('label[for="size"]').parentElement;
+                const widthGroup = document.querySelector('label[for="width"]').parentElement;
+                const heightGroup = document.querySelector('label[for="height"]').parentElement;
+                
+                switch(currentShape) {
+                    case 'triangle':
+                    case 'pentagon':
+                    case 'hexagon':
+                        sizeGroup.style.display = 'flex';
+                        widthGroup.style.display = 'none';
+                        heightGroup.style.display = 'none';
+                        break;
+                    case 'square':
+                        sizeGroup.style.display = 'flex';
+                        widthGroup.style.display = 'none';
+                        heightGroup.style.display = 'none';
+                        break;
+                    case 'rectangle':
+                        sizeGroup.style.display = 'none';
+                        widthGroup.style.display = 'flex';
+                        heightGroup.style.display = 'flex';
+                        break;
+                    case 'circle':
+                        sizeGroup.style.display = 'flex';
+                        widthGroup.style.display = 'none';
+                        heightGroup.style.display = 'none';
+                        break;
+                }
+            }
+            
+            function updateSideInputs() {
+                // Hide all side inputs first
+                document.querySelectorAll('.side-inputs').forEach(el => {
+                    el.classList.remove('active');
+                });
+                
+                // Show relevant side inputs
+                switch(currentShape) {
+                    case 'triangle':
+                        document.getElementById('triangle-sides').classList.add('active');
+                        break;
+                    case 'rectangle':
+                    case 'square':
+                        document.getElementById('rectangle-sides').classList.add('active');
+                        break;
+                }
+            }
+            
+            function updateSideInputsFromSliders() {
+                switch(currentShape) {
+                    case 'triangle':
+                        config.sideA = config.size;
+                        config.sideB = config.size;
+                        config.sideC = config.size;
+                        config.heightTri = (config.size * Math.sqrt(3)) / 2;
+                        sideAInput.value = config.sideA;
+                        sideBInput.value = config.sideB;
+                        sideCInput.value = config.sideC;
+                        heightTriInput.value = config.heightTri.toFixed(1);
+                        break;
+                    case 'square':
+                        config.rectWidth = config.size;
+                        config.rectHeight = config.size;
+                        rectWidthInput.value = config.rectWidth;
+                        rectHeightInput.value = config.rectHeight;
+                        break;
+                    case 'rectangle':
+                        config.rectWidth = config.width;
+                        config.rectHeight = config.height;
+                        rectWidthInput.value = config.rectWidth;
+                        rectHeightInput.value = config.rectHeight;
+                        break;
+                    case 'circle':
+                        // No sides for circle
+                        break;
+                }
+            }
+            
+            function updateSlidersFromSideInputs() {
+                switch(currentShape) {
+                    case 'triangle':
+                        config.size = (config.sideA + config.sideB + config.sideC) / 3;
+                        sizeSlider.value = config.size;
+                        sizeValue.textContent = config.size;
+                        break;
+                    case 'square':
+                        config.size = config.rectWidth;
+                        sizeSlider.value = config.size;
+                        sizeValue.textContent = config.size;
+                        break;
+                    case 'rectangle':
+                        config.width = config.rectWidth;
+                        config.height = config.rectHeight;
+                        widthSlider.value = config.width;
+                        heightSlider.value = config.height;
+                        widthValue.textContent = config.width;
+                        heightValue.textContent = config.height;
+                        break;
+                }
+            }
+            
+            function getShapeName(shape) {
+                const names = {
+                    'triangle': 'Триъгълник',
+                    'square': 'Квадрат',
+                    'rectangle': 'Правоъгълник',
+                    'circle': 'Кръг',
+                    'pentagon': 'Петоъгълник',
+                    'hexagon': 'Шестоъгълник'
+                };
+                return names[shape] || 'Фигура';
+            }
+            
+            function drawGrid() {
+                if (!config.showGrid) return;
+                
+                ctx.strokeStyle = 'rgba(0, 170, 255, 0.2)';
+                ctx.lineWidth = 1;
+                
+                // Vertical lines
+                for (let x = 0; x <= canvas.width; x += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                
+                // Horizontal lines
+                for (let y = 0; y <= canvas.height; y += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+                
+                // Center lines
+                ctx.strokeStyle = 'rgba(0, 255, 170, 0.4)';
+                ctx.lineWidth = 2;
+                
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2, 0);
+                ctx.lineTo(canvas.width / 2, canvas.height);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height / 2);
+                ctx.lineTo(canvas.width, canvas.height / 2);
+                ctx.stroke();
+            }
+            
+            function drawShapeOnCanvas() {
+                currentDrawnShape = {
+                    type: currentShape,
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    size: config.size,
+                    width: config.width,
+                    height: config.height,
+                    rotation: config.rotation,
+                    color: config.color,
+                    sideA: config.sideA,
+                    sideB: config.sideB,
+                    sideC: config.sideC,
+                    heightTri: config.heightTri,
+                    rectWidth: config.rectWidth,
+                    rectHeight: config.rectHeight
+                };
+                
+                emptyCanvas.style.display = 'none';
+                drawCurrentShape();
+                
+                // Show explanation panel
+                explanationPanel.classList.add('active');
+            }
+            
+            function drawCurrentShape() {
+                if (!currentDrawnShape) return;
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawGrid();
+                
+                ctx.save();
+                ctx.translate(currentDrawnShape.x, currentDrawnShape.y);
+                
+                // Apply rotation
+                const rotation = isRotating ? rotationAngle : currentDrawnShape.rotation;
+                ctx.rotate(rotation * Math.PI / 180);
+                
+                // Apply pulsing
+                const scale = isPulsing ? pulseScale : 1;
+                ctx.scale(scale, scale);
+                
+                ctx.fillStyle = currentDrawnShape.color + '80';
+                ctx.strokeStyle = currentDrawnShape.color;
+                ctx.lineWidth = 3;
+                
+                switch(currentDrawnShape.type) {
+                    case 'triangle':
+                        drawTriangle(0, 0);
+                        break;
+                    case 'square':
+                        drawSquare(0, 0);
+                        break;
+                    case 'rectangle':
+                        drawRectangle(0, 0);
+                        break;
+                    case 'circle':
+                        drawCircle(0, 0, currentDrawnShape.size);
+                        break;
+                    case 'pentagon':
+                        drawPolygon(0, 0, currentDrawnShape.size, 5);
+                        break;
+                    case 'hexagon':
+                        drawPolygon(0, 0, currentDrawnShape.size, 6);
+                        break;
+                }
+                
+                ctx.restore();
+                
+                // Draw side labels
+                if (showSides) {
+                    drawSideLabels();
+                }
+            }
+            
+            function drawTriangle(x, y) {
+                // Calculate triangle points based on side lengths
+                const a = currentDrawnShape.sideA;
+                const b = currentDrawnShape.sideB;
+                const c = currentDrawnShape.sideC;
+                const h = currentDrawnShape.heightTri;
+                
+                // For simplicity, we'll draw an isosceles triangle with base = sideC
+                const base = c;
+                const height = h;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y - height/2);
+                ctx.lineTo(x + base/2, y + height/2);
+                ctx.lineTo(x - base/2, y + height/2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            function drawSquare(x, y) {
+                const size = currentDrawnShape.rectWidth;
+                ctx.beginPath();
+                ctx.rect(x - size / 2, y - size / 2, size, size);
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            function drawRectangle(x, y) {
+                const width = currentDrawnShape.rectWidth;
+                const height = currentDrawnShape.rectHeight;
+                ctx.beginPath();
+                ctx.rect(x - width / 2, y - height / 2, width, height);
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            function drawCircle(x, y, radius) {
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            function drawPolygon(x, y, radius, sides) {
+                ctx.beginPath();
+                for (let i = 0; i < sides; i++) {
+                    const angle = (i * 2 * Math.PI / sides) - Math.PI / 2;
+                    const px = x + radius * Math.cos(angle);
+                    const py = y + radius * Math.sin(angle);
+                    
+                    if (i === 0) {
+                        ctx.moveTo(px, py);
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            function drawSideLabels() {
+                if (!currentDrawnShape) return;
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                
+                ctx.save();
+                ctx.fillStyle = '#ffaa00';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                switch(currentDrawnShape.type) {
+                    case 'triangle':
+                        const triHeight = currentDrawnShape.heightTri;
+                        const triBase = currentDrawnShape.sideC;
+                        
+                        // Label for sides
+                        ctx.fillText(`a = ${currentDrawnShape.sideA.toFixed(1)}`, centerX + triBase/4, centerY - triHeight/4);
+                        ctx.fillText(`b = ${currentDrawnShape.sideB.toFixed(1)}`, centerX - triBase/4, centerY - triHeight/4);
+                        ctx.fillText(`c = ${currentDrawnShape.sideC.toFixed(1)}`, centerX, centerY + triHeight/2 + 15);
+                        ctx.fillText(`h = ${currentDrawnShape.heightTri.toFixed(1)}`, centerX - triBase/2 - 20, centerY);
+                        break;
+                        
+                    case 'rectangle':
+                        const rectWidth = currentDrawnShape.rectWidth;
+                        const rectHeight = currentDrawnShape.rectHeight;
+                        
+                        ctx.fillText(`a = ${currentDrawnShape.rectWidth.toFixed(1)}`, centerX, centerY - rectHeight/2 - 15);
+                        ctx.fillText(`b = ${currentDrawnShape.rectHeight.toFixed(1)}`, centerX - rectWidth/2 - 15, centerY);
+                        break;
+                        
+                    case 'square':
+                        const squareSize = currentDrawnShape.rectWidth;
+                        
+                        ctx.fillText(`a = ${currentDrawnShape.rectWidth.toFixed(1)}`, centerX, centerY - squareSize/2 - 15);
+                        ctx.fillText(`a = ${currentDrawnShape.rectWidth.toFixed(1)}`, centerX - squareSize/2 - 15, centerY);
+                        break;
+                }
+                
+                ctx.restore();
+            }
+            
+            function clearCanvas() {
+                currentDrawnShape = null;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawGrid();
+                emptyCanvas.style.display = 'flex';
+                explanationPanel.classList.remove('active');
+                isRotating = false;
+                isPulsing = false;
+                
+                // Reset calculations
+                areaValue.textContent = '0.00';
+                perimeterValue.textContent = '0.00';
+                anglesValue.textContent = '-';
+                areaFormula.textContent = 'Изберете фигура';
+                perimeterFormula.textContent = 'Изберете фигура';
+                anglesFormula.textContent = 'Изберете фигура';
+            }
+            
+            function startRotation() {
+                function rotate() {
+                    if (!isRotating || !currentDrawnShape) return;
+                    
+                    rotationAngle += 2;
+                    if (rotationAngle >= 360) rotationAngle = 0;
+                    
+                    drawCurrentShape();
+                    animationId = requestAnimationFrame(rotate);
+                }
+                rotate();
+            }
+            
+            function startPulsing() {
+                function pulse() {
+                    if (!isPulsing || !currentDrawnShape) return;
+                    
+                    pulseScale += 0.02 * pulseDirection;
+                    if (pulseScale >= 1.2) pulseDirection = -1;
+                    if (pulseScale <= 0.8) pulseDirection = 1;
+                    
+                    drawCurrentShape();
+                    animationId = requestAnimationFrame(pulse);
+                }
+                pulse();
+            }
+            
+            function updateCalculations() {
+                let area = 0;
+                let perimeter = 0;
+                let angles = '';
+                
+                switch(currentShape) {
+                    case 'triangle':
+                        // Using Heron's formula for area
+                        const s = (config.sideA + config.sideB + config.sideC) / 2;
+                        area = Math.sqrt(s * (s - config.sideA) * (s - config.sideB) * (s - config.sideC));
+                        perimeter = config.sideA + config.sideB + config.sideC;
+                        
+                        // Calculate angles using law of cosines
+                        const angleA = Math.acos((config.sideB**2 + config.sideC**2 - config.sideA**2) / (2 * config.sideB * config.sideC)) * 180 / Math.PI;
+                        const angleB = Math.acos((config.sideA**2 + config.sideC**2 - config.sideB**2) / (2 * config.sideA * config.sideC)) * 180 / Math.PI;
+                        const angleC = 180 - angleA - angleB;
+                        
+                        angles = `${angleA.toFixed(1)}°, ${angleB.toFixed(1)}°, ${angleC.toFixed(1)}°`;
+                        areaFormula.textContent = 'S = √[s(s-a)(s-b)(s-c)]';
+                        perimeterFormula.textContent = 'P = a + b + c';
+                        anglesFormula.textContent = 'α + β + γ = 180°';
+                        break;
+                        
+                    case 'square':
+                        area = config.rectWidth * config.rectWidth;
+                        perimeter = 4 * config.rectWidth;
+                        angles = '90°, 90°, 90°, 90°';
+                        areaFormula.textContent = 'S = a²';
+                        perimeterFormula.textContent = 'P = 4 × a';
+                        anglesFormula.textContent = 'α = β = γ = δ = 90°';
+                        break;
+                        
+                    case 'rectangle':
+                        area = config.rectWidth * config.rectHeight;
+                        perimeter = 2 * (config.rectWidth + config.rectHeight);
+                        angles = '90°, 90°, 90°, 90°';
+                        areaFormula.textContent = 'S = a × b';
+                        perimeterFormula.textContent = 'P = 2 × (a + b)';
+                        anglesFormula.textContent = 'α = β = γ = δ = 90°';
+                        break;
+                        
+                    case 'circle':
+                        area = Math.PI * config.size * config.size;
+                        perimeter = 2 * Math.PI * config.size;
+                        angles = '360°';
+                        areaFormula.textContent = 'S = π × r²';
+                        perimeterFormula.textContent = 'P = 2 × π × r';
+                        anglesFormula.textContent = 'α = 360°';
+                        break;
+                        
+                    case 'pentagon':
+                        area = 0.25 * Math.sqrt(5 * (5 + 2 * Math.sqrt(5))) * config.size * config.size;
+                        perimeter = config.size * 5;
+                        angles = '108°, 108°, 108°, 108°, 108°';
+                        areaFormula.textContent = 'S = ¼ × √(5(5+2√5)) × a²';
+                        perimeterFormula.textContent = 'P = 5 × a';
+                        anglesFormula.textContent = 'α = 108°';
+                        break;
+                        
+                    case 'hexagon':
+                        area = (3 * Math.sqrt(3) * config.size * config.size) / 2;
+                        perimeter = config.size * 6;
+                        angles = '120°, 120°, 120°, 120°, 120°, 120°';
+                        areaFormula.textContent = 'S = (3√3 × a²)/2';
+                        perimeterFormula.textContent = 'P = 6 × a';
+                        anglesFormula.textContent = 'α = 120°';
+                        break;
+                }
+                
+                areaValue.textContent = area.toFixed(2);
+                perimeterValue.textContent = perimeter.toFixed(2);
+                anglesValue.textContent = angles;
+            }
+            
+            function generateExplanation() {
+                if (!currentDrawnShape) return;
+                
+                let explanationHTML = '';
+                
+                switch(currentDrawnShape.type) {
+                    case 'triangle':
+                        explanationHTML = `
+                            <div class="explanation-step">
+                                <div class="step-title">📐 Какво е триъгълник?</div>
+                                <div class="step-description">
+                                    Триъгълникът е геометрична фигура, образувана от три страни и три ъгъла. 
+                                    В нашия случай страните са: a = ${currentDrawnShape.sideA}, b = ${currentDrawnShape.sideB}, c = ${currentDrawnShape.sideC}.
+                                </div>
+                            </div>
+                            <div class="explanation-step">
+                                <div class="step-title">📏 Изчисляване на периметъра</div>
+                                <div class="step-description">
+                                    Периметърът на триъгълник се намира като сбор от дължините на трите му страни:
+                                </div>
+                                <div class="step-formula">P = a + b + c</div>
+                                <div class="step-example">
+                                    В нашия случай: P = ${currentDrawnShape.sideA} + ${currentDrawnShape.sideB} + ${currentDrawnShape.sideC} = ${perimeterValue.textContent}
+                                </div>
+                            </div>
+                            <div class="explanation-step">
+                                <div class="step-title">📐 Изчисляване на лицето</div>
+                                <div class="step-description">
+                                    За изчисляване на лицето на триъгълник използвахме Хероновата формула:
+                                </div>
+                                <div class="step-formula">
+                                    s = (a + b + c) / 2<br>
+                                    S = √[s(s-a)(s-b)(s-c)]
+                                </div>
+                                <div class="step-example">
+                                    Първо намираме полупериметъра: s = (${currentDrawnShape.sideA} + ${currentDrawnShape.sideB} + ${currentDrawnShape.sideC}) / 2 = ${((currentDrawnShape.sideA + currentDrawnShape.sideB + currentDrawnShape.sideC) / 2).toFixed(2)}<br>
+                                    След това изчисляваме лицето: S = √[${((currentDrawnShape.sideA + currentDrawnShape.sideB + currentDrawnShape.sideC) / 2).toFixed(2)} × (${((currentDrawnShape.sideA + currentDrawnShape.sideB + currentDrawnShape.sideC) / 2).toFixed(2)} - ${currentDrawnShape.sideA}) × ...] = ${areaValue.textContent}
+                                </div>
+                            </div>
+                            <div class="explanation-step">
+                                <div class="step-title">📐 Изчисляване на ъглите</div>
+                                <div class="step-description">
+                                    Ъглите в триъгълника се изчисляват с косинусовата теорема. Сборът на ъглите във всеки триъгълник е 180°.
+                                </div>
+                                <div class="step-example">
+                                    В нашия триъгълник ъглите са: ${anglesValue.textContent}
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'square':
+                        explanationHTML = `
+                            <div class="explanation-step">
+                                <div class="step-title">□ Какво е квадрат?</div>
+                                <div class="step-description">
+                                    Квадратът е четириъгълник с четири равни страни и четири прави ъгъла (по 90°). 
+                                    В нашия случай страната е: a = ${currentDrawnShape.rectWidth}.
+                                </div>
+                            </div>
+                            <div class="explanation-step">
+                                <div class="step-title">📏 Изчисляване на периметъра</div>
+                                <div class="step-description">
+                                    Периметърът на квадрат се намира като сбор от дължините на четирите му страни:
+                                </div>
+                                <div class="step-formula">P = 4 × a</div>
+                                <div class="step-example">
+                                    В нашия случай: P = 4 × ${currentDrawnShape.rectWidth} = ${perimeterValue.textContent}
+                                </div>
+                            </div>
+                            <div class="explanation-step">
+                                <div class="step-title">📐 Изчисляване на лицето</div>
+                                <div class="step-description">
+                                    Лицето на квадрат се намира като повърхнината, която заема:
+                                </div>
+                                <div class="step-formula">S = a × a = a²</div>
+                                <div class="step-example">
+                                    В нашия случай: S = ${currentDrawnShape.rectWidth} × ${currentDrawnShape.rectWidth} = ${areaValue.textContent}
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'rectangle':
+                        explanationHTML = `
+                            <div class="explanation-step">
+                                <div class="step-title">▭ Какво е правоъгълник?</div>
+                                <div class="step-description">
+                                    Правоъгълникът е четириъгълник с четири прави ъгъла (по 90°). 
+                                    Срещуположните му страни са равни. В нашия случай страните са: a = ${currentDrawnShape.rectWidth}, b = ${currentDrawnShape.rectHeight}.
+                                </div>
+                            </div>
+                            <div class="explanation-step">
+                                <div class="step-title">📏 Изчисляване на периметъра</div>
+                                <div class="step-description">
+                                    Периметърът на правоъгълник се намира като сбор от дължините на четирите му страни:
+                                </div>
+                                <div class="step-formula">P = 2 × (a + b)</div>
+                                <div class="step-example">
+                                    В нашия случай: P = 2 × (${currentDrawnShape.rectWidth} + ${currentDrawnShape.rectHeight}) = ${perimeterValue.textContent}
+                                </div>
+                            </div>
+                            <div class="explanation-step">
+                                <div class="step-title">📐 Изчисляване на лицето</div>
+                                <div class="step-description">
+                                    Лицето на правоъгълник се намира като произведение на двете му различни страни:
+                                </div>
+                                <div class="step-formula">S = a × b</div>
+                                <div class="step-example">
+                                    В нашия случай: S = ${currentDrawnShape.rectWidth} × ${currentDrawnShape.rectHeight} = ${areaValue.textContent}
+                                </div>
+                            </div>
+                        `;
+                        break;
+                }
+                
+                explanationContent.innerHTML = explanationHTML;
+            }
+            
+            function highlightArea() {
+                // Add pulsing text
+                areaValue.style.animation = 'pulse 1s ease 3';
+                setTimeout(() => {
+                    areaValue.style.animation = '';
+                }, 3000);
+            }
+            
+            function highlightPerimeter() {
+                // Add pulsing text
+                perimeterValue.style.animation = 'pulse 1s ease 3';
+                setTimeout(() => {
+                    perimeterValue.style.animation = '';
+                }, 3000);
+            }
+            
+            function highlightAngles() {
+                // Add pulsing text
+                anglesValue.style.animation = 'pulse 1s ease 3';
+                setTimeout(() => {
+                    anglesValue.style.animation = '';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

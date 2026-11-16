@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Симулатор на вибрираща струна - Оптимизиран</title>
+    <style>
+        :root {
+            --primary: #0066cc;
+            --primary-light: #3399ff;
+            --secondary: #663399;
+            --secondary-light: #9966cc;
+            --accent: #ff6600;
+            --accent-light: #ff9933;
+            --dark-bg: #0a1525;
+            --medium-bg: #16213e;
+            --light-bg: #1a1a2e;
+            --text: #e6f7ff;
+            --text-light: #b3e0ff;
+            --panel-bg: rgba(25, 40, 65, 0.9);
+            --border-color: rgba(102, 217, 255, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: var(--dark-bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        /* Хедър - компактен */
+        header {
+            text-align: center;
+            padding: 15px;
+            background: var(--panel-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 5px;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: var(--primary-light);
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        
+        /* Основно съдържание - респонсивно */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        @media (min-width: 1024px) {
+            .main-content {
+                flex-direction: row;
+                height: calc(100vh - 180px);
+            }
+        }
+        
+        /* Лева колона - симулация */
+        .simulation-column {
+            flex: 3;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        /* Симулационна област - голяма и ясна */
+        .simulation-panel {
+            flex: 1;
+            background: var(--panel-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .simulation-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            border: 2px solid var(--border-color);
+            min-height: 300px;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Контроли върху canvas */
+        .canvas-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .canvas-btn {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: 1px solid var(--primary-light);
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .canvas-btn:hover {
+            background: rgba(0, 102, 204, 0.7);
+        }
+        
+        /* Статистика - компактна */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .stats-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .stat-box {
+            background: rgba(15, 30, 50, 0.7);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-light);
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        /* Дясна колона - контроли */
+        .controls-column {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+        
+        /* Контролни панели - компактни */
+        .control-panel {
+            background: var(--panel-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+        }
+        
+        .panel-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(102, 217, 255, 0.3);
+        }
+        
+        /* Групи от контроли */
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        
+        .control-label {
+            min-width: 120px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .control-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--primary-light);
+        }
+        
+        /* Плъзгачи - по-ясни */
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #003366, var(--primary));
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        
+        /* Бутони за модове - компактни */
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .mode-btn {
+            padding: 10px 5px;
+            background: rgba(0, 51, 102, 0.7);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .mode-btn:hover {
+            background: rgba(0, 102, 204, 0.9);
+        }
+        
+        .mode-btn.active {
+            background: var(--primary);
+            box-shadow: 0 0 10px rgba(51, 153, 255, 0.5);
+        }
+        
+        /* Бутони за действия */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .action-btn {
+            padding: 12px 8px;
+            background: rgba(102, 51, 153, 0.7);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        
+        .action-btn.pluck {
+            background: rgba(204, 102, 0, 0.7);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-icon {
+            font-size: 1.2rem;
+        }
+        
+        /* Хармоници - компактни */
+        .harmonics-container {
+            margin-top: 15px;
+        }
+        
+        .harmonics-visual {
+            height: 120px;
+            background: rgba(10, 21, 37, 0.7);
+            border-radius: 8px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid rgba(102, 217, 255, 0.2);
+        }
+        
+        /* Ефекти - компактни */
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .effect-btn {
+            padding: 10px 5px;
+            background: rgba(51, 51, 102, 0.7);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .effect-btn.active {
+            background: var(--secondary);
+            box-shadow: 0 0 8px rgba(153, 102, 204, 0.5);
+        }
+        
+        .effect-icon {
+            font-size: 1rem;
+        }
+        
+        /* Настройки за трептене - нова секция */
+        .vibration-controls {
+            margin-top: 15px;
+        }
+        
+        /* Футър */
+        footer {
+            text-align: center;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            border-top: 1px solid rgba(102, 217, 255, 0.2);
+        }
+        
+        /* Помощна информация */
+        .help-text {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        /* Анимации */
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Адаптивност */
+        @media (max-width: 1023px) {
+            .main-content {
+                height: auto;
+            }
+            
+            .controls-column {
+                max-height: none;
+                overflow-y: visible;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .control-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .control-label {
+                min-width: auto;
+            }
+            
+            input[type="range"] {
+                width: 100%;
+            }
+            
+            .mode-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .effects-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Скролбар стилове */
+        .controls-column::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .controls-column::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .controls-column::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        .controls-column::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+        
+        /* Индикатор за активна вибрация */
+        .vibration-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #ff3333;
+            border-radius: 50%;
+            margin-left: 5px;
+            animation: pulse 0.5s infinite;
+        }
+        
+        .vibration-indicator.active {
+            background: #33ff33;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-guitar"></i> Симулатор на вибрираща струна</h1>
+            <div class="subtitle">Визуализация на уравнението на струната и стоящите вълни</div>
+            <div class="subtitle" style="font-size: 0.9rem;">Дръпнете струната и регулирайте параметрите, за да наблюдавате различни модове на трептене</div>
+        </header>
+        
+        <div class="main-content">
+            <!-- Лева колона - симулация -->
+            <div class="simulation-column">
+                <div class="simulation-panel">
+                    <div class="simulation-title">
+                        <i class="fas fa-wave-square"></i> Визуализация на струната
+                        <span id="vibrationIndicator" class="vibration-indicator"></span>
+                    </div>
+                    
+                    <div class="canvas-container">
+                        <canvas id="stringCanvas"></canvas>
+                        
+                        <div class="canvas-controls">
+                            <button class="canvas-btn" id="zoomInBtn">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            <button class="canvas-btn" id="zoomOutBtn">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <button class="canvas-btn" id="resetViewBtn">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-container">
+                        <div class="stat-box">
+                            <div class="stat-value" id="frequencyValue">440</div>
+                            <div class="stat-label">Честота (Hz)</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="wavelengthValue">1.56</div>
+                            <div class="stat-label">Дължина на вълната (m)</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="tensionValue">100</div>
+                            <div class="stat-label">Сила на опън (N)</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="amplitudeValue">0.5</div>
+                            <div class="stat-label">Амплитуда</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Дясна колона - контроли -->
+            <div class="controls-column">
+                <!-- Настройки на струната -->
+                <div class="control-panel">
+                    <div class="panel-title">
+                        <i class="fas fa-sliders-h"></i> Настройки на струната
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-row">
+                            <div class="control-label">Сила на опън:</div>
+                            <input type="range" id="tensionSlider" min="20" max="300" step="5" value="100">
+                            <div class="control-value" id="tensionValue">100</div>
+                        </div>
+                        <div class="help-text">По-голяма сила = по-висока честота</div>
+                        
+                        <div class="control-row">
+                            <div class="control-label">Плътност:</div>
+                            <input type="range" id="densitySlider" min="0.001" max="0.05" step="0.001" value="0.01">
+                            <div class="control-value" id="densityValue">0.01</div>
+                        </div>
+                        <div class="help-text">По-голяма плътност = по-ниска честота</div>
+                        
+                        <div class="control-row">
+                            <div class="control-label">Затихване:</div>
+                            <input type="range" id="dampingSlider" min="0" max="0.1" step="0.002" value="0.02">
+                            <div class="control-value" id="dampingValue">0.02</div>
+                        </div>
+                        <div class="help-text">Контролира колко бързо затихва вибрацията</div>
+                    </div>
+                </div>
+                
+                <!-- Модове на трептене -->
+                <div class="control-panel">
+                    <div class="panel-title">
+                        <i class="fas fa-music"></i> Модове на трептене
+                    </div>
+                    
+                    <div class="control-row">
+                        <div class="control-label">Мод (брой полувълни):</div>
+                        <input type="range" id="modeSlider" min="1" max="10" step="1" value="1">
+                        <div class="control-value" id="modeValue">1</div>
+                    </div>
+                    
+                    <div class="mode-grid" id="modeButtons">
+                        <!-- Бутоните ще се генерират от JavaScript -->
+                    </div>
+                    
+                    <div class="help-text">Изберете мод за да видите различни стоящи вълни</div>
+                </div>
+                
+                <!-- Действия със струната -->
+                <div class="control-panel">
+                    <div class="panel-title">
+                        <i class="fas fa-hand-pointer"></i> Действия със струната
+                    </div>
+                    
+                    <div class="action-grid">
+                        <button class="action-btn pluck" id="pluckCenterBtn">
+                            <div class="action-icon"><i class="fas fa-hand-rock"></i></div>
+                            Дръпни в средата
+                        </button>
+                        <button class="action-btn pluck" id="pluckQuarterBtn">
+                            <div class="action-icon"><i class="fas fa-hand-point-up"></i></div>
+                            Дръпни на 1/4
+                        </button>
+                        <button class="action-btn" id="exciteBtn">
+                            <div class="action-icon"><i class="fas fa-bolt"></i></div>
+                            Възбуди струната
+                        </button>
+                        <button class="action-btn" id="dampenBtn">
+                            <div class="action-icon"><i class="fas fa-volume-mute"></i></div>
+                            Затиши
+                        </button>
+                        <button class="action-btn" id="pauseBtn">
+                            <div class="action-icon"><i class="fas fa-pause"></i></div>
+                            Пауза / Продължи
+                        </button>
+                        <button class="action-btn" id="resetBtn">
+                            <div class="action-icon"><i class="fas fa-redo"></i></div>
+                            Нулирай всичко
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Настройки за вибрация -->
+                <div class="control-panel">
+                    <div class="panel-title">
+                        <i class="fas fa-vibration"></i> Настройки за вибрация
+                    </div>
+                    
+                    <div class="control-row">
+                        <div class="control-label">Амплитуда:</div>
+                        <input type="range" id="amplitudeSlider" min="0.1" max="1.5" step="0.05" value="0.5">
+                        <div class="control-value" id="amplitudeSliderValue">0.5</div>
+                    </div>
+                    <div class="help-text">Контролира височината на вълните</div>
+                    
+                    <div class="control-row">
+                        <div class="control-label">Скорост на анимация:</div>
+                        <input type="range" id="speedSlider" min="0.1" max="3" step="0.1" value="1">
+                        <div class="control-value" id="speedValue">1.0</div>
+                    </div>
+                    <div class="help-text">Променя скоростта на вибрацията</div>
+                </div>
+                
+                <!-- Визуални ефекти -->
+                <div class="control-panel">
+                    <div class="panel-title">
+                        <i class="fas fa-magic"></i> Визуални ефекти
+                    </div>
+                    
+                    <div class="effects-grid" id="effectsButtons">
+                        <!-- Бутоните ще се генерират от JavaScript -->
+                    </div>
+                    
+                    <div class="harmonics-container">
+                        <div class="control-row">
+                            <div class="control-label">Покажи хармоници:</div>
+                            <input type="range" id="harmonicsSlider" min="0" max="12" step="1" value="5">
+                            <div class="control-value" id="harmonicsValue">5</div>
+                        </div>
+                        
+                        <div class="harmonics-visual">
+                            <canvas id="harmonicsCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Симулатор на вибрираща струна - Учебен инструмент за физика и математика</p>
+            <p style="font-size: 0.7rem; margin-top: 5px;">Уравнение на струната: ∂²y/∂t² = c² · ∂²y/∂x², където c = √(T/μ)</p>
+        </footer>
+    </div>
+
+    <script>
+        // Инициализация на canvas елементите
+        const stringCanvas = document.getElementById('stringCanvas');
+        const stringCtx = stringCanvas.getContext('2d');
+        const harmonicsCanvas = document.getElementById('harmonicsCanvas');
+        const harmonicsCtx = harmonicsCanvas.getContext('2d');
+        const vibrationIndicator = document.getElementById('vibrationIndicator');
+        
+        // Настройване на размерите
+        function resizeCanvases() {
+            const container = document.querySelector('.canvas-container');
+            stringCanvas.width = container.clientWidth;
+            stringCanvas.height = container.clientHeight;
+            
+            harmonicsCanvas.width = harmonicsCanvas.parentElement.clientWidth;
+            harmonicsCanvas.height = harmonicsCanvas.parentElement.clientHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvases);
+        resizeCanvases();
+        
+        // Параметри на симулацията - опростени
+        let params = {
+            tension: 100,
+            density: 0.01,
+            damping: 0.02,
+            length: 1.0,
+            mode: 1,
+            amplitude: 0.5,
+            speed: 1.0,
+            pluckPos: 0.5,
+            time: 0,
+            isPaused: false,
+            showHarmonics: 5,
+            
+            // Ефекти
+            effects: {
+                nodes: true,
+                particles: false,
+                glow: true,
+                color: false
+            },
+            
+            // Мащабиране
+            zoom: 1.0,
+            offsetY: 0,
+            
+            // Състояние на струната
+            points: new Array(201).fill(0),
+            velocities: new Array(201).fill(0),
+            
+            // Хармоници
+            harmonics: []
+        };
+        
+        // Инициализация
+        function init() {
+            // Изчисляване на начални стойности
+            updateWaveSpeed();
+            initHarmonics();
+            
+            // Генериране на бутони за модове
+            generateModeButtons();
+            
+            // Генериране на бутони за ефекти
+            generateEffectButtons();
+            
+            // Настройване на контролите
+            setupControls();
+            
+            // Стартиране на анимацията
+            animate();
+            
+            // Първоначално възбуждане
+            exciteMode(1);
+            
+            // Индикатор за вибрация
+            updateVibrationIndicator();
+        }
+        
+        // Изчисляване на скоростта на вълната
+        function updateWaveSpeed() {
+            params.waveSpeed = Math.sqrt(params.tension / params.density);
+            params.fundamentalFreq = (1 / (2 * params.length)) * params.waveSpeed;
+        }
+        
+        // Инициализация на хармониците
+        function initHarmonics() {
+            params.harmonics = [];
+            for (let i = 1; i <= 12; i++) {
+                params.harmonics.push({
+                    amp: i === params.mode ? 1.0 : 0.1,
+                    freq: i * params.fundamentalFreq,
+                    phase: Math.random() * Math.PI * 2,
+                    color: `hsl(${i * 30}, 80%, 60%)`
+                });
+            }
+        }
+        
+        // Генериране на бутони за модове
+        function generateModeButtons() {
+            const container = document.getElementById('modeButtons');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= 10; i++) {
+                const btn = document.createElement('button');
+                btn.className = `mode-btn ${i === 1 ? 'active' : ''}`;
+                btn.textContent = i;
+                btn.setAttribute('data-mode', i);
+                btn.addEventListener('click', () => exciteMode(i));
+                container.appendChild(btn);
+            }
+        }
+        
+        // Генериране на бутони за ефекти
+        function generateEffectButtons() {
+            const container = document.getElementById('effectsButtons');
+            const effects = [
+                {id: 'nodes', icon: 'fas fa-circle', label: 'Възли'},
+                {id: 'particles', icon: 'fas fa-atom', label: 'Частици'},
+                {id: 'glow', icon: 'fas fa-sun', label: 'Светене'},
+                {id: 'color', icon: 'fas fa-palette', label: 'Цветове'},
+                {id: 'grid', icon: 'fas fa-th', label: 'Мрежа'},
+                {id: 'info', icon: 'fas fa-info', label: 'Инфо'}
+            ];
+            
+            container.innerHTML = '';
+            
+            effects.forEach(effect => {
+                const btn = document.createElement('button');
+                btn.className = `effect-btn ${params.effects[effect.id] ? 'active' : ''}`;
+                btn.innerHTML = `<div class="effect-icon"><i class="${effect.icon}"></i></div><div>${effect.label}</div>`;
+                btn.setAttribute('data-effect', effect.id);
+                btn.addEventListener('click', () => toggleEffect(effect.id));
+                container.appendChild(btn);
+            });
+        }
+        
+        // Настройване на контролите
+        function setupControls() {
+            // Свързване на плъзгачите
+            const sliders = [
+                {id: 'tensionSlider', valueId: 'tensionValue', param: 'tension', update: updateWaveSpeed},
+                {id: 'densitySlider', valueId: 'densityValue', param: 'density', update: updateWaveSpeed},
+                {id: 'dampingSlider', valueId: 'dampingValue', param: 'damping'},
+                {id: 'modeSlider', valueId: 'modeValue', param: 'mode', update: (val) => exciteMode(val)},
+                {id: 'amplitudeSlider', valueId: 'amplitudeSliderValue', param: 'amplitude'},
+                {id: 'speedSlider', valueId: 'speedValue', param: 'speed'},
+                {id: 'harmonicsSlider', valueId: 'harmonicsValue', param: 'showHarmonics'}
+            ];
+            
+            sliders.forEach(slider => {
+                const element = document.getElementById(slider.id);
+                const valueElement = document.getElementById(slider.valueId);
+                
+                // Начална стойност
+                element.value = params[slider.param];
+                valueElement.textContent = params[slider.param];
+                
+                // Слушател за промени
+                element.addEventListener('input', function() {
+                    const value = slider.id.includes('density') ? parseFloat(this.value) : 
+                                 slider.id.includes('amplitude') ? parseFloat(this.value) :
+                                 slider.id.includes('damping') ? parseFloat(this.value) :
+                                 slider.id.includes('speed') ? parseFloat(this.value) :
+                                 parseInt(this.value);
+                    
+                    params[slider.param] = value;
+                    valueElement.textContent = value.toFixed(slider.id.includes('density') ? 3 : 
+                                                           slider.id.includes('damping') ? 3 : 0);
+                    
+                    if (slider.update) {
+                        slider.update(value);
+                    }
+                    
+                    if (slider.param === 'mode') {
+                        updateActiveModeButton(value);
+                    }
+                    
+                    updateInfoDisplay();
+                });
+            });
+            
+            // Бутони за действия
+            document.getElementById('pluckCenterBtn').addEventListener('click', () => pluckString(0.5));
+            document.getElementById('pluckQuarterBtn').addEventListener('click', () => pluckString(0.25));
+            document.getElementById('exciteBtn').addEventListener('click', exciteRandom);
+            document.getElementById('dampenBtn').addEventListener('click', dampen);
+            document.getElementById('pauseBtn').addEventListener('click', togglePause);
+            document.getElementById('resetBtn').addEventListener('click', resetAll);
+            
+            // Бутони за мащабиране
+            document.getElementById('zoomInBtn').addEventListener('click', () => adjustZoom(1.2));
+            document.getElementById('zoomOutBtn').addEventListener('click', () => adjustZoom(0.8));
+            document.getElementById('resetViewBtn').addEventListener('click', resetView);
+            
+            // Начално актуализиране на информацията
+            updateInfoDisplay();
+        }
+        
+        // Превключване на ефект
+        function toggleEffect(effect) {
+            if (params.effects.hasOwnProperty(effect)) {
+                params.effects[effect] = !params.effects[effect];
+                
+                const btn = document.querySelector(`.effect-btn[data-effect="${effect}"]`);
+                if (btn) {
+                    btn.classList.toggle('active');
+                }
+            }
+        }
+        
+        // Актуализиране на информацията
+        function updateInfoDisplay() {
+            document.getElementById('frequencyValue').textContent = 
+                Math.round(params.fundamentalFreq * params.mode);
+            document.getElementById('wavelengthValue').textContent = 
+                (2 * params.length / params.mode).toFixed(2);
+            document.getElementById('tensionValue').textContent = params.tension;
+            document.getElementById('amplitudeValue').textContent = params.amplitude.toFixed(2);
+        }
+        
+        // Актуализиране на активния бутон за мод
+        function updateActiveModeButton(mode) {
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.getAttribute('data-mode')) === mode);
+            });
+        }
+        
+        // Актуализиране на индикатора за вибрация
+        function updateVibrationIndicator() {
+            const maxAmplitude = Math.max(...params.points.map(Math.abs));
+            vibrationIndicator.classList.toggle('active', maxAmplitude > 0.01);
+        }
+        
+        // Дръпване на струната
+        function pluckString(position) {
+            params.pluckPos = position;
+            
+            for (let i = 0; i < params.points.length; i++) {
+                const x = i / (params.points.length - 1);
+                
+                if (x <= position) {
+                    params.points[i] = params.amplitude * (x / position);
+                } else {
+                    params.points[i] = params.amplitude * ((1 - x) / (1 - position));
+                }
+                
+                params.velocities[i] = 0;
+            }
+            
+            params.mode = 1;
+            updateActiveModeButton(1);
+            document.getElementById('modeSlider').value = 1;
+            document.getElementById('modeValue').textContent = 1;
+            
+            initHarmonics();
+        }
+        
+        // Възбуждане на случайни хармоници
+        function exciteRandom() {
+            for (let i = 0; i < params.points.length; i++) {
+                const x = i / (params.points.length - 1);
+                let displacement = 0;
+                
+                // Добавяне на няколко хармоника
+                for (let n = 1; n <= 5; n++) {
+                    displacement += (0.5 / n) * Math.sin(n * Math.PI * x);
+                }
+                
+                params.points[i] = params.amplitude * displacement;
+                params.velocities[i] = 0;
+            }
+            
+            initHarmonics();
+        }
+        
+        // Възбуждане на конкретен мод
+        function exciteMode(mode) {
+            params.mode = mode;
+            
+            for (let i = 0; i < params.points.length; i++) {
+                const x = i / (params.points.length - 1);
+                params.points[i] = params.amplitude * Math.sin(mode * Math.PI * x);
+                params.velocities[i] = 0;
+            }
+            
+            initHarmonics();
+            updateInfoDisplay();
+        }
+        
+        // Затихване
+        function dampen() {
+            for (let i = 0; i < params.velocities.length; i++) {
+                params.velocities[i] *= 0.1;
+            }
+        }
+        
+        // Превключване на пауза
+        function togglePause() {
+            params.isPaused = !params.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            const icon = btn.querySelector('.action-icon i');
+            
+            if (params.isPaused) {
+                icon.className = 'fas fa-play';
+            } else {
+                icon.className = 'fas fa-pause';
+            }
+        }
+        
+        // Нулиране на всичко
+        function resetAll() {
+            params.tension = 100;
+            params.density = 0.01;
+            params.damping = 0.02;
+            params.mode = 1;
+            params.amplitude = 0.5;
+            params.speed = 1.0;
+            params.showHarmonics = 5;
+            params.zoom = 1.0;
+            params.offsetY = 0;
+            
+            // Нулиране на плъзгачите
+            document.getElementById('tensionSlider').value = params.tension;
+            document.getElementById('densitySlider').value = params.density;
+            document.getElementById('dampingSlider').value = params.damping;
+            document.getElementById('modeSlider').value = params.mode;
+            document.getElementById('amplitudeSlider').value = params.amplitude;
+            document.getElementById('speedSlider').value = params.speed;
+            document.getElementById('harmonicsSlider').value = params.showHarmonics;
+            
+            // Нулиране на стойностите
+            document.getElementById('tensionValue').textContent = params.tension;
+            document.getElementById('densityValue').textContent = params.density.toFixed(3);
+            document.getElementById('dampingValue').textContent = params.damping.toFixed(3);
+            document.getElementById('modeValue').textContent = params.mode;
+            document.getElementById('amplitudeSliderValue').textContent = params.amplitude.toFixed(2);
+            document.getElementById('speedValue').textContent = params.speed.toFixed(1);
+            document.getElementById('harmonicsValue').textContent = params.showHarmonics;
+            
+            updateWaveSpeed();
+            exciteMode(1);
+            
+            // Анимация на бутона
+            const btn = document.getElementById('resetBtn');
+            btn.classList.add('pulse');
+            setTimeout(() => btn.classList.remove('pulse'), 1000);
+        }
+        
+        // Мащабиране
+        function adjustZoom(factor) {
+            params.zoom *= factor;
+            params.zoom = Math.max(0.5, Math.min(3, params.zoom));
+        }
+        
+        // Нулиране на изгледа
+        function resetView() {
+            params.zoom = 1.0;
+            params.offsetY = 0;
+        }
+        
+        // Изчисляване на следващото състояние
+        function updateString() {
+            if (params.isPaused) return;
+            
+            const dt = 0.01 * params.speed;
+            const dx = 1.0 / (params.points.length - 1);
+            const accelerations = new Array(params.points.length).fill(0);
+            
+            // Изчисляване на ускоренията
+            for (let i = 1; i < params.points.length - 1; i++) {
+                const d2y_dx2 = (params.points[i-1] - 2*params.points[i] + params.points[i+1]) / (dx*dx);
+                accelerations[i] = params.waveSpeed * params.waveSpeed * d2y_dx2 
+                                 - params.damping * params.velocities[i];
+            }
+            
+            // Актуализиране на скорости и позиции
+            for (let i = 1; i < params.points.length - 1; i++) {
+                params.velocities[i] += accelerations[i] * dt;
+                params.points[i] += params.velocities[i] * dt;
+            }
+            
+            // Фиксирани краища
+            params.points[0] = 0;
+            params.points[params.points.length - 1] = 0;
+            params.velocities[0] = 0;
+            params.velocities[params.points.length - 1] = 0;
+            
+            params.time += dt;
+            
+            // Актуализиране на хармониците
+            updateHarmonicsData();
+            
+            // Актуализиране на индикатора
+            updateVibrationIndicator();
+        }
+        
+        // Актуализиране на хармониците
+        function updateHarmonicsData() {
+            for (let i = 0; i < params.harmonics.length; i++) {
+                const h = params.harmonics[i];
+                h.phase += h.freq * 0.01;
+                
+                if (i + 1 !== params.mode) {
+                    h.amp = Math.max(0.05, h.amp * 0.995);
+                } else {
+                    h.amp = Math.min(1.0, h.amp * 1.005);
+                }
+            }
+        }
+        
+        // Рисуване на струната
+        function drawString() {
+            // Изчистване
+            stringCtx.clearRect(0, 0, stringCanvas.width, stringCanvas.height);
+            
+            // Фон
+            stringCtx.fillStyle = '#000';
+            stringCtx.fillRect(0, 0, stringCanvas.width, stringCanvas.height);
+            
+            // Мрежа
+            if (params.effects.grid) {
+                drawGrid();
+            }
+            
+            // Опорни точки
+            drawSupports();
+            
+            // Струната
+            drawStringCurve();
+            
+            // Възли и пучки
+            if (params.effects.nodes) {
+                drawNodes();
+            }
+            
+            // Информация
+            if (params.effects.info) {
+                drawInfo();
+            }
+        }
+        
+        // Рисуване на мрежа
+        function drawGrid() {
+            stringCtx.strokeStyle = 'rgba(100, 150, 200, 0.1)';
+            stringCtx.lineWidth = 1;
+            
+            const stepX = stringCanvas.width / 10;
+            const stepY = stringCanvas.height / 8;
+            
+            // Вертикални линии
+            for (let x = 0; x <= stringCanvas.width; x += stepX) {
+                stringCtx.beginPath();
+                stringCtx.moveTo(x, 0);
+                stringCtx.lineTo(x, stringCanvas.height);
+                stringCtx.stroke();
+            }
+            
+            // Хоризонтални линии
+            for (let y = 0; y <= stringCanvas.height; y += stepY) {
+                stringCtx.beginPath();
+                stringCtx.moveTo(0, y);
+                stringCtx.lineTo(stringCanvas.width, y);
+                stringCtx.stroke();
+            }
+            
+            // Централна линия
+            stringCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            stringCtx.setLineDash([5, 5]);
+            stringCtx.beginPath();
+            stringCtx.moveTo(0, stringCanvas.height / 2);
+            stringCtx.lineTo(stringCanvas.width, stringCanvas.height / 2);
+            stringCtx.stroke();
+            stringCtx.setLineDash([]);
+        }
+        
+        // Рисуване на опорни точки
+        function drawSupports() {
+            // Лява опора
+            stringCtx.fillStyle = '#444';
+            stringCtx.fillRect(0, stringCanvas.height / 2 - 20, 10, 40);
+            
+            // Дясна опора
+            stringCtx.fillRect(stringCanvas.width - 10, stringCanvas.height / 2 - 20, 10, 40);
+            
+            // Точки на закрепване
+            stringCtx.fillStyle = '#ff9933';
+            stringCtx.beginPath();
+            stringCtx.arc(0, stringCanvas.height / 2, 6, 0, Math.PI * 2);
+            stringCtx.fill();
+            
+            stringCtx.beginPath();
+            stringCtx.arc(stringCanvas.width, stringCanvas.height / 2, 6, 0, Math.PI * 2);
+            stringCtx.fill();
+        }
+        
+        // Рисуване на кривата на струната
+        function drawStringCurve() {
+            stringCtx.beginPath();
+            stringCtx.lineWidth = 3;
+            
+            // Цвят
+            if (params.effects.color) {
+                const gradient = stringCtx.createLinearGradient(0, 0, stringCanvas.width, 0);
+                gradient.addColorStop(0, '#ff0000');
+                gradient.addColorStop(0.5, '#00ff00');
+                gradient.addColorStop(1, '#0000ff');
+                stringCtx.strokeStyle = gradient;
+            } else {
+                const maxAmp = Math.max(...params.points.map(Math.abs));
+                const intensity = Math.min(1, maxAmp / params.amplitude);
+                const hue = 200 + intensity * 100;
+                stringCtx.strokeStyle = `hsl(${hue}, 80%, 60%)`;
+            }
+            
+            // Рисуване на кривата
+            for (let i = 0; i < params.points.length; i++) {
+                const x = i / (params.points.length - 1) * stringCanvas.width;
+                const y = stringCanvas.height / 2 - params.points[i] * stringCanvas.height * 0.4 * params.zoom + params.offsetY;
+                
+                if (i === 0) {
+                    stringCtx.moveTo(x, y);
+                } else {
+                    stringCtx.lineTo(x, y);
+                }
+            }
+            
+            // Ефект на светене
+            if (params.effects.glow) {
+                stringCtx.shadowColor = stringCtx.strokeStyle;
+                stringCtx.shadowBlur = 10;
+            }
+            
+            stringCtx.stroke();
+            
+            // Нулиране на сенката
+            if (params.effects.glow) {
+                stringCtx.shadowBlur = 0;
+            }
+        }
+        
+        // Рисуване на възли
+        function drawNodes() {
+            // Възли
+            for (let n = 0; n <= params.mode; n++) {
+                const x = (n / params.mode) * stringCanvas.width;
+                const y = stringCanvas.height / 2 + params.offsetY;
+                
+                stringCtx.fillStyle = n === 0 || n === params.mode ? '#ff3333' : '#ff6666';
+                stringCtx.beginPath();
+                stringCtx.arc(x, y, 6, 0, Math.PI * 2);
+                stringCtx.fill();
+            }
+            
+            // Пучки
+            for (let n = 0; n < params.mode; n++) {
+                const x = ((n + 0.5) / params.mode) * stringCanvas.width;
+                const y = stringCanvas.height / 2 + params.offsetY;
+                
+                stringCtx.fillStyle = '#33ff33';
+                stringCtx.beginPath();
+                stringCtx.arc(x, y, 8, 0, Math.PI * 2);
+                stringCtx.fill();
+            }
+        }
+        
+        // Рисуване на информация
+        function drawInfo() {
+            stringCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            stringCtx.font = '14px Arial';
+            stringCtx.textAlign = 'left';
+            
+            stringCtx.fillText(`Мод: ${params.mode}`, 10, 20);
+            stringCtx.fillText(`Честота: ${Math.round(params.fundamentalFreq * params.mode)} Hz`, 10, 40);
+            stringCtx.fillText(`Амплитуда: ${params.amplitude.toFixed(2)}`, 10, 60);
+        }
+        
+        // Рисуване на хармониците
+        function drawHarmonics() {
+            harmonicsCtx.clearRect(0, 0, harmonicsCanvas.width, harmonicsCanvas.height);
+            
+            // Фон
+            harmonicsCtx.fillStyle = 'rgba(10, 21, 37, 0.7)';
+            harmonicsCtx.fillRect(0, 0, harmonicsCanvas.width, harmonicsCanvas.height);
+            
+            const barWidth = harmonicsCanvas.width / (params.showHarmonics + 1);
+            const maxHeight = harmonicsCanvas.height * 0.7;
+            
+            // Ленти
+            for (let i = 0; i < params.showHarmonics; i++) {
+                const h = params.harmonics[i];
+                if (!h) continue;
+                
+                const x = (i + 1) * barWidth;
+                const height = h.amp * maxHeight;
+                const y = harmonicsCanvas.height - height - 10;
+                
+                // Лента
+                harmonicsCtx.fillStyle = h.color;
+                harmonicsCtx.fillRect(x - barWidth/2, y, barWidth * 0.8, height);
+                
+                // Номер
+                harmonicsCtx.fillStyle = '#ffffff';
+                harmonicsCtx.font = '10px Arial';
+                harmonicsCtx.textAlign = 'center';
+                harmonicsCtx.fillText(`${i+1}`, x, harmonicsCanvas.height - 2);
+            }
+            
+            // Заглавие
+            harmonicsCtx.fillStyle = '#66d9ff';
+            harmonicsCtx.font = 'bold 12px Arial';
+            harmonicsCtx.textAlign = 'left';
+            harmonicsCtx.fillText('Хармоници', 5, 12);
+        }
+        
+        // Анимационен цикъл
+        function animate() {
+            updateString();
+            drawString();
+            drawHarmonics();
+            requestAnimationFrame(animate);
+        }
+        
+        // Стартиране
+        window.addEventListener('load', init);
+        
+        // Преместване с мишката за регулиране на изгледа
+        let isDragging = false;
+        let lastY = 0;
+        
+        stringCanvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastY = e.clientY;
+        });
+        
+        stringCanvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaY = e.clientY - lastY;
+                params.offsetY += deltaY;
+                lastY = e.clientY;
+            }
+        });
+        
+        stringCanvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        stringCanvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+        
+        // Мащабиране с колелцето на мишката
+        stringCanvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            adjustZoom(zoomFactor);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hematology Simulator | Професионален симулатор на кръвни телца</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0c0c1d;
+            --secondary: #1a1a3a;
+            --accent-red: #e63946;
+            --accent-blue: #457b9d;
+            --accent-green: #2a9d8f;
+            --accent-gold: #ffd166;
+            --text-primary: #f8f9fa;
+            --text-secondary: #adb5bd;
+            --panel-bg: rgba(15, 25, 45, 0.85);
+            --border-color: rgba(100, 150, 255, 0.1);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 20px rgba(69, 123, 157, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: var(--primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background particles */
+        .background-particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-blue), transparent);
+            animation: float 15s infinite linear;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            padding: 30px 0;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--accent-red);
+            text-shadow: 0 0 15px rgba(230, 57, 70, 0.5);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .simulation-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-bottom: 40px;
+            min-height: 700px;
+        }
+
+        /* Simulation Area */
+        .simulation-area {
+            background: rgba(5, 10, 25, 0.8);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow), var(--glow);
+            height: 700px;
+        }
+
+        .simulation-header {
+            padding: 20px 25px;
+            background: rgba(15, 25, 45, 0.9);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .simulation-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .simulation-title i {
+            color: var(--accent-blue);
+        }
+
+        .simulation-canvas {
+            width: 100%;
+            height: calc(100% - 70px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Blood Cell Styles */
+        .blood-cell {
+            position: absolute;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .red-cell {
+            background: radial-gradient(circle at 30% 30%, #ff6b6b, #e63946, #9d0208);
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.5),
+                        inset 10px -10px 20px rgba(150, 0, 0, 0.3);
+        }
+
+        .white-cell {
+            background: radial-gradient(circle at 30% 30%, #ffffff, #f1faee, #a8dadc);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .cell-nucleus {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #a8dadc, #457b9d);
+            top: 25%;
+            left: 25%;
+            box-shadow: inset 0 0 10px rgba(30, 60, 100, 0.5);
+        }
+
+        .cell-center {
+            position: absolute;
+            width: 20%;
+            height: 20%;
+            border-radius: 50%;
+            background: rgba(150, 0, 0, 0.3);
+            top: 40%;
+            left: 40%;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            background: var(--panel-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .controls-header {
+            padding: 25px;
+            background: rgba(20, 30, 50, 0.9);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .controls-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 5px;
+        }
+
+        .controls-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .controls-content {
+            padding: 25px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .control-group {
+            margin-bottom: 30px;
+            background: rgba(10, 20, 40, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(100, 150, 255, 0.05);
+        }
+
+        .control-group-title {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-gold);
+        }
+
+        .control-group-title i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Slider Controls */
+        .slider-container {
+            margin-bottom: 20px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .slider-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slider-value {
+            font-weight: 600;
+            color: var(--accent-green);
+            font-size: 1rem;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            outline: none;
+            overflow: hidden;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(69, 123, 157, 0.8);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            background: var(--accent-green);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10px rgba(69, 123, 157, 0.8);
+        }
+
+        /* Buttons */
+        .control-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .control-btn {
+            padding: 14px 5px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(30, 40, 60, 0.7);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .control-btn i {
+            font-size: 1.3rem;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--accent-green), #1d7c6f);
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, var(--accent-red), #c5303d);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, var(--accent-blue), #2c5a7a);
+        }
+
+        .control-btn.active {
+            box-shadow: 0 0 20px rgba(69, 123, 157, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--panel-bg);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(100, 150, 255, 0.2);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.red {
+            background: rgba(230, 57, 70, 0.15);
+            color: var(--accent-red);
+        }
+
+        .stat-icon.white {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+        }
+
+        .stat-icon.total {
+            background: rgba(42, 157, 143, 0.15);
+            color: var(--accent-green);
+        }
+
+        .stat-icon.ratio {
+            background: rgba(255, 209, 102, 0.15);
+            color: var(--accent-gold);
+        }
+
+        .stat-title {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-unit {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* Instructions */
+        .instructions {
+            background: var(--panel-bg);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+
+        .instructions-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .instructions-header i {
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+        }
+
+        .instructions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .instruction-card {
+            background: rgba(10, 20, 40, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .instruction-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instruction-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(0) translateX(20px); }
+            75% { transform: translateY(20px) translateX(10px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(230, 57, 70, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(230, 57, 70, 0.8); }
+        }
+
+        .pulsing {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .simulation-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-panel {
+                height: auto;
+            }
+            
+            .stats-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .control-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-blue);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background particles -->
+    <div class="background-particles" id="backgroundParticles"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-microscope"></i>
+                </div>
+                <h1>Hematology Simulator</h1>
+            </div>
+            <p class="subtitle">Професионален симулатор за наблюдение и анализ на поведението на червени и бели кръвни телца в реално време</p>
+        </header>
+
+        <!-- Main Simulation Area -->
+        <div class="simulation-container">
+            <div class="simulation-area">
+                <div class="simulation-header">
+                    <div class="simulation-title">
+                        <i class="fas fa-vial"></i>
+                        Микроскопско наблюдение
+                    </div>
+                    <div class="simulation-status">
+                        <span id="statusIndicator" class="status-indicator">
+                            <i class="fas fa-circle" style="color: #2a9d8f;"></i> <span id="statusText">Активна симулация</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="simulation-canvas" id="simulationCanvas">
+                    <!-- Кръвните телца ще се добавят тук динамично -->
+                </div>
+            </div>
+
+            <!-- Controls Panel -->
+            <div class="controls-panel">
+                <div class="controls-header">
+                    <div class="controls-title">
+                        <i class="fas fa-sliders-h"></i>
+                        Контролен панел
+                    </div>
+                    <div class="controls-subtitle">
+                        Настройте параметрите на симулацията в реално време
+                    </div>
+                </div>
+                
+                <div class="controls-content">
+                    <!-- Red Blood Cells Controls -->
+                    <div class="control-group">
+                        <div class="control-group-title">
+                            <i class="fas fa-tint" style="color: #e63946;"></i>
+                            Червени кръвни телца
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div class="slider-label">
+                                    <i class="fas fa-hashtag"></i>
+                                    Брой клетки
+                                </div>
+                                <div class="slider-value" id="redCountValue">45</div>
+                            </div>
+                            <input type="range" min="10" max="80" value="45" class="slider" id="redCountSlider">
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div class="slider-label">
+                                    <i class="fas fa-expand-arrows-alt"></i>
+                                    Размер
+                                </div>
+                                <div class="slider-value" id="redSizeValue">22</div>
+                            </div>
+                            <input type="range" min="15" max="35" value="22" class="slider" id="redSizeSlider">
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div class="slider-label">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    Скорост на движение
+                                </div>
+                                <div class="slider-value" id="redSpeedValue">3.5</div>
+                            </div>
+                            <input type="range" min="1" max="5" value="3.5" step="0.1" class="slider" id="redSpeedSlider">
+                        </div>
+                    </div>
+                    
+                    <!-- White Blood Cells Controls -->
+                    <div class="control-group">
+                        <div class="control-group-title">
+                            <i class="fas fa-shield-alt" style="color: #ffffff;"></i>
+                            Бели кръвни телца
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div class="slider-label">
+                                    <i class="fas fa-hashtag"></i>
+                                    Брой клетки
+                                </div>
+                                <div class="slider-value" id="whiteCountValue">12</div>
+                            </div>
+                            <input type="range" min="1" max="25" value="12" class="slider" id="whiteCountSlider">
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div class="slider-label">
+                                    <i class="fas fa-expand-arrows-alt"></i>
+                                    Размер
+                                </div>
+                                <div class="slider-value" id="whiteSizeValue">28</div>
+                            </div>
+                            <input type="range" min="20" max="40" value="28" class="slider" id="whiteSizeSlider">
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div class="slider-label">
+                                    <i class="fas fa-bullseye"></i>
+                                    Активност
+                                </div>
+                                <div class="slider-value" id="whiteActivityValue">3</div>
+                            </div>
+                            <input type="range" min="1" max="5" value="3" step="0.5" class="slider" id="whiteActivitySlider">
+                        </div>
+                    </div>
+                    
+                    <!-- Simulation Settings -->
+                    <div class="control-group">
+                        <div class="control-group-title">
+                            <i class="fas fa-cogs" style="color: #457b9d;"></i>
+                            Настройки на симулацията
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div class="slider-label">
+                                    <i class="fas fa-weight"></i>
+                                    Плътност на плазмата
+                                </div>
+                                <div class="slider-value" id="densityValue">6</div>
+                            </div>
+                            <input type="range" min="1" max="10" value="6" class="slider" id="densitySlider">
+                        </div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-header">
+                                <div class="slider-label">
+                                    <i class="fas fa-forward"></i>
+                                    Скорост на симулацията
+                                </div>
+                                <div class="slider-value" id="simSpeedValue">4</div>
+                            </div>
+                            <input type="range" min="1" max="5" value="4" step="0.5" class="slider" id="simSpeedSlider">
+                        </div>
+                    </div>
+                    
+                    <!-- Control Buttons -->
+                    <div class="control-buttons">
+                        <button class="control-btn btn-start active" id="startBtn">
+                            <i class="fas fa-play-circle"></i>
+                            Старт
+                        </button>
+                        <button class="control-btn btn-stop" id="stopBtn">
+                            <i class="fas fa-pause-circle"></i>
+                            Пауза
+                        </button>
+                        <button class="control-btn btn-reset" id="resetBtn">
+                            <i class="fas fa-redo-alt"></i>
+                            Рестарт
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Panel -->
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon total">
+                        <i class="fas fa-cells"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Общ брой клетки</div>
+                        <div class="stat-value" id="totalCells">57</div>
+                    </div>
+                </div>
+                <div class="stat-unit">активни в симулацията</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon red">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Червени телца</div>
+                        <div class="stat-value" id="redCells">45</div>
+                    </div>
+                </div>
+                <div class="stat-unit">еритроцити (~45 млн/µL)</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon white">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Бели телца</div>
+                        <div class="stat-value" id="whiteCells">12</div>
+                    </div>
+                </div>
+                <div class="stat-unit">лефкоцити (~7,500/µL)</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon ratio">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Съотношение</div>
+                        <div class="stat-value" id="ratioValue">3.8:1</div>
+                    </div>
+                </div>
+                <div class="stat-unit">червени:бели клетки</div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <div class="instructions-header">
+                <i class="fas fa-info-circle"></i>
+                <h3>Ръководство за употреба</h3>
+            </div>
+            
+            <div class="instructions-grid">
+                <div class="instruction-card">
+                    <h4><i class="fas fa-sliders-h"></i> Контрол на параметрите</h4>
+                    <p>Използвайте плъзгачите, за да регулирате различни параметри на кръвните клетки и самата симулация. Промените се прилагат в реално време.</p>
+                </div>
+                
+                <div class="instruction-card">
+                    <h4><i class="fas fa-play-circle"></i> Управление на симулацията</h4>
+                    <p>Стартирайте, паузирайте или рестартирайте симулацията с бутоните в контролния панел. Наблюдавайте как клетките реагират на промените.</p>
+                </div>
+                
+                <div class="instruction-card">
+                    <h4><i class="fas fa-chart-line"></i> Анализ на данни</h4>
+                    <p>Следете статистиките в реално време за броя на клетките, тяхното съотношение и други важни показатели за анализа.</p>
+                </div>
+                
+                <div class="instruction-card">
+                    <h4><i class="fas fa-lightbulb"></i> Научни бележки</h4>
+                    <p>Червените кръвни телца (еритроцити) са отговорни за преноса на кислород, докато белите (лефкоцити) са част от имунната система.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Hematology Simulator v2.0 | Професионален инструмент за симулация на кръвни телца</p>
+            <p style="margin-top: 10px; font-size: 0.85rem;">
+                <i class="fas fa-exclamation-circle"></i> Този симулатор е предназначен за образователни и изследователски цели.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Симулатор на кръвни телца
+        class BloodCellSimulator {
+            constructor() {
+                // Контейнер за симулацията
+                this.canvas = document.getElementById('simulationCanvas');
+                
+                // Масиви за клетките
+                this.redCells = [];
+                this.whiteCells = [];
+                
+                // Статус на симулацията
+                this.isRunning = false;
+                this.animationId = null;
+                
+                // Параметри
+                this.params = {
+                    redCount: 45,
+                    redSize: 22,
+                    redSpeed: 3.5,
+                    whiteCount: 12,
+                    whiteSize: 28,
+                    whiteActivity: 3,
+                    density: 6,
+                    simSpeed: 4
+                };
+                
+                // Размери на контейнера
+                this.canvasWidth = this.canvas.clientWidth;
+                this.canvasHeight = this.canvas.clientHeight;
+                
+                // Инициализиране
+                this.initControls();
+                this.createBackgroundParticles();
+                this.createCells();
+                this.updateStats();
+                
+                // Стартиране на симулацията
+                this.start();
+            }
+            
+            // Създаване на фонов частици
+            createBackgroundParticles() {
+                const container = document.getElementById('backgroundParticles');
+                for (let i = 0; i < 50; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    const size = Math.random() * 4 + 1;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.animationDelay = `${Math.random() * 15}s`;
+                    particle.style.opacity = Math.random() * 0.5 + 0.1;
+                    
+                    container.appendChild(particle);
+                }
+            }
+            
+            // Инициализиране на контролите
+            initControls() {
+                // Свързване на плъзгачите
+                this.sliders = {
+                    redCount: document.getElementById('redCountSlider'),
+                    redSize: document.getElementById('redSizeSlider'),
+                    redSpeed: document.getElementById('redSpeedSlider'),
+                    whiteCount: document.getElementById('whiteCountSlider'),
+                    whiteSize: document.getElementById('whiteSizeSlider'),
+                    whiteActivity: document.getElementById('whiteActivitySlider'),
+                    density: document.getElementById('densitySlider'),
+                    simSpeed: document.getElementById('simSpeedSlider')
+                };
+                
+                // Свързване на стойностите
+                this.valueDisplays = {
+                    redCount: document.getElementById('redCountValue'),
+                    redSize: document.getElementById('redSizeValue'),
+                    redSpeed: document.getElementById('redSpeedValue'),
+                    whiteCount: document.getElementById('whiteCountValue'),
+                    whiteSize: document.getElementById('whiteSizeValue'),
+                    whiteActivity: document.getElementById('whiteActivityValue'),
+                    density: document.getElementById('densityValue'),
+                    simSpeed: document.getElementById('simSpeedValue')
+                };
+                
+                // Добавяне на слушатели за плъзгачите
+                for (const [key, slider] of Object.entries(this.sliders)) {
+                    slider.addEventListener('input', (e) => {
+                        const value = e.target.value;
+                        this.params[key] = parseFloat(value);
+                        this.valueDisplays[key].textContent = value;
+                        
+                        // Ако симулацията работи, прилагаме промените
+                        if (this.isRunning) {
+                            if (key === 'redCount' || key === 'whiteCount') {
+                                this.updateCellCounts();
+                            }
+                        }
+                        
+                        this.updateStats();
+                    });
+                }
+                
+                // Свързване на бутоните
+                this.startBtn = document.getElementById('startBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.statusText = document.getElementById('statusText');
+                
+                // Добавяне на слушатели за бутоните
+                this.startBtn.addEventListener('click', () => this.start());
+                this.stopBtn.addEventListener('click', () => this.stop());
+                this.resetBtn.addEventListener('click', () => this.reset());
+                
+                // Инициализиране на стойностите
+                for (const [key, slider] of Object.entries(this.sliders)) {
+                    this.valueDisplays[key].textContent = slider.value;
+                    this.params[key] = parseFloat(slider.value);
+                }
+            }
+            
+            // Създаване на клетките
+            createCells() {
+                this.clearCanvas();
+                
+                // Създаване на червени кръвни телца
+                for (let i = 0; i < this.params.redCount; i++) {
+                    this.createRedCell();
+                }
+                
+                // Създаване на бели кръвни телца
+                for (let i = 0; i < this.params.whiteCount; i++) {
+                    this.createWhiteCell();
+                }
+            }
+            
+            // Създаване на червено кръвно телце
+            createRedCell() {
+                const cell = document.createElement('div');
+                cell.className = 'blood-cell red-cell';
+                
+                const size = this.params.redSize;
+                cell.style.width = `${size}px`;
+                cell.style.height = `${size}px`;
+                
+                // Начална позиция
+                cell.x = Math.random() * (this.canvasWidth - size);
+                cell.y = Math.random() * (this.canvasHeight - size);
+                cell.style.left = `${cell.x}px`;
+                cell.style.top = `${cell.y}px`;
+                
+                // Скорост и посока
+                cell.vx = (Math.random() - 0.5) * 2;
+                cell.vy = (Math.random() - 0.5) * 2;
+                
+                // Добавяне на вдлъбнатината (характерна за еритроцитите)
+                const center = document.createElement('div');
+                center.className = 'cell-center';
+                cell.appendChild(center);
+                
+                // Добавяне в масива и контейнера
+                this.redCells.push(cell);
+                this.canvas.appendChild(cell);
+                
+                return cell;
+            }
+            
+            // Създаване на бяло кръвно телце
+            createWhiteCell() {
+                const cell = document.createElement('div');
+                cell.className = 'blood-cell white-cell';
+                
+                const size = this.params.whiteSize;
+                cell.style.width = `${size}px`;
+                cell.style.height = `${size}px`;
+                
+                // Начална позиция
+                cell.x = Math.random() * (this.canvasWidth - size);
+                cell.y = Math.random() * (this.canvasHeight - size);
+                cell.style.left = `${cell.x}px`;
+                cell.style.top = `${cell.y}px`;
+                
+                // Скорост и посока
+                cell.vx = (Math.random() - 0.5) * 1.5;
+                cell.vy = (Math.random() - 0.5) * 1.5;
+                
+                // Добавяне на ядро (характерно за левкоцитите)
+                const nucleus = document.createElement('div');
+                nucleus.className = 'cell-nucleus';
+                cell.appendChild(nucleus);
+                
+                // Цел за движение (белите клетки са по-целенасочени)
+                cell.targetX = null;
+                cell.targetY = null;
+                cell.searchTimer = 0;
+                
+                // Добавяне в масива и контейнера
+                this.whiteCells.push(cell);
+                this.canvas.appendChild(cell);
+                
+                return cell;
+            }
+            
+            // Изчистване на контейнера
+            clearCanvas() {
+                this.canvas.innerHTML = '';
+                this.redCells = [];
+                this.whiteCells = [];
+            }
+            
+            // Обновяване на броя клетки
+            updateCellCounts() {
+                const targetRedCount = parseInt(this.params.redCount);
+                const targetWhiteCount = parseInt(this.params.whiteCount);
+                
+                // Регулиране на червените клетки
+                if (this.redCells.length < targetRedCount) {
+                    // Добавяне на нови клетки
+                    const toAdd = targetRedCount - this.redCells.length;
+                    for (let i = 0; i < toAdd; i++) {
+                        this.createRedCell();
+                    }
+                } else if (this.redCells.length > targetRedCount) {
+                    // Премахване на излишни клетки
+                    const toRemove = this.redCells.length - targetRedCount;
+                    for (let i = 0; i < toRemove; i++) {
+                        const cell = this.redCells.pop();
+                        cell.remove();
+                    }
+                }
+                
+                // Регулиране на белите клетки
+                if (this.whiteCells.length < targetWhiteCount) {
+                    // Добавяне на нови клетки
+                    const toAdd = targetWhiteCount - this.whiteCells.length;
+                    for (let i = 0; i < toAdd; i++) {
+                        this.createWhiteCell();
+                    }
+                } else if (this.whiteCells.length > targetWhiteCount) {
+                    // Премахване на излишни клетки
+                    const toRemove = this.whiteCells.length - targetWhiteCount;
+                    for (let i = 0; i < toRemove; i++) {
+                        const cell = this.whiteCells.pop();
+                        cell.remove();
+                    }
+                }
+            }
+            
+            // Стартиране на симулацията
+            start() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                this.statusText.textContent = 'Активна симулация';
+                this.statusText.previousElementSibling.style.color = '#2a9d8f';
+                
+                // Обновяване на бутоните
+                this.startBtn.classList.add('active');
+                this.stopBtn.classList.remove('active');
+                
+                // Стартиране на анимацията
+                this.animate();
+            }
+            
+            // Спиране на симулацията
+            stop() {
+                if (!this.isRunning) return;
+                
+                this.isRunning = false;
+                this.statusText.textContent = 'Паузирана симулация';
+                this.statusText.previousElementSibling.style.color = '#e63946';
+                
+                // Обновяване на бутоните
+                this.stopBtn.classList.add('active');
+                this.startBtn.classList.remove('active');
+                
+                // Спиране на анимацията
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+            }
+            
+            // Рестартиране на симулацията
+            reset() {
+                this.stop();
+                this.createCells();
+                this.updateStats();
+                
+                this.statusText.textContent = 'Рестартирана симулация';
+                this.statusText.previousElementSibling.style.color = '#ffd166';
+                
+                // Автоматично стартиране след 1 секунда
+                setTimeout(() => {
+                    this.start();
+                }, 1000);
+            }
+            
+            // Основна анимационна функция
+            animate() {
+                if (!this.isRunning) return;
+                
+                // Обновяване на червените клетки
+                this.updateRedCells();
+                
+                // Обновяване на белите клетки
+                this.updateWhiteCells();
+                
+                // Проверка за сблъсъци
+                this.checkCollisions();
+                
+                // Обновяване на статистиките
+                this.updateStats();
+                
+                // Продължаване на анимацията
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+            
+            // Обновяване на червените кръвни телца
+            updateRedCells() {
+                const speedFactor = this.params.simSpeed * 0.1;
+                const densityFactor = (10 - this.params.density) * 0.1 + 0.5;
+                
+                this.redCells.forEach(cell => {
+                    // Прилагане на скоростта и плътността
+                    const speed = this.params.redSpeed * speedFactor * densityFactor;
+                    
+                    // Обновяване на позицията
+                    cell.x += cell.vx * speed;
+                    cell.y += cell.vy * speed;
+                    
+                    // Проверка за сблъсък със стените
+                    const size = parseInt(cell.style.width);
+                    
+                    if (cell.x <= 0 || cell.x >= this.canvasWidth - size) {
+                        cell.vx *= -0.9;
+                        cell.x = cell.x <= 0 ? 0 : this.canvasWidth - size;
+                    }
+                    
+                    if (cell.y <= 0 || cell.y >= this.canvasHeight - size) {
+                        cell.vy *= -0.9;
+                        cell.y = cell.y <= 0 ? 0 : this.canvasHeight - size;
+                    }
+                    
+                    // Прилагане на промяна в размера
+                    const currentSize = parseInt(cell.style.width);
+                    const targetSize = this.params.redSize;
+                    if (Math.abs(currentSize - targetSize) > 1) {
+                        const newSize = currentSize + (targetSize > currentSize ? 1 : -1);
+                        cell.style.width = `${newSize}px`;
+                        cell.style.height = `${newSize}px`;
+                    }
+                    
+                    // Обновяване на CSS позицията
+                    cell.style.left = `${cell.x}px`;
+                    cell.style.top = `${cell.y}px`;
+                    
+                    // Добавяне на лека пулсация
+                    const pulse = Math.sin(Date.now() * 0.002 + cell.x * 0.01) * 0.05 + 1;
+                    cell.style.transform = `scale(${pulse})`;
+                });
+            }
+            
+            // Обновяване на белите кръвни телца
+            updateWhiteCells() {
+                const speedFactor = this.params.simSpeed * 0.08;
+                
+                this.whiteCells.forEach(cell => {
+                    // Белите клетки се движат по-целенасочено
+                    cell.searchTimer--;
+                    
+                    if (cell.searchTimer <= 0 || cell.targetX === null) {
+                        // Задаване на нова цел
+                        const size = parseInt(cell.style.width);
+                        cell.targetX = Math.random() * (this.canvasWidth - size);
+                        cell.targetY = Math.random() * (this.canvasHeight - size);
+                        cell.searchTimer = 30 + Math.random() * 40;
+                        
+                        // Изчисляване на посоката към целта
+                        const dx = cell.targetX - cell.x;
+                        const dy = cell.targetY - cell.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance > 0) {
+                            cell.vx = (dx / distance) * this.params.whiteActivity * 0.3;
+                            cell.vy = (dy / distance) * this.params.whiteActivity * 0.3;
+                        }
+                    }
+                    
+                    // Прилагане на скоростта
+                    const speed = speedFactor;
+                    
+                    // Обновяване на позицията
+                    cell.x += cell.vx * speed;
+                    cell.y += cell.vy * speed;
+                    
+                    // Проверка за сблъсък със стените
+                    const size = parseInt(cell.style.width);
+                    
+                    if (cell.x <= 0 || cell.x >= this.canvasWidth - size) {
+                        cell.vx *= -0.8;
+                        cell.x = cell.x <= 0 ? 0 : this.canvasWidth - size;
+                        cell.targetX = null; // Търси нова цел
+                    }
+                    
+                    if (cell.y <= 0 || cell.y >= this.canvasHeight - size) {
+                        cell.vy *= -0.8;
+                        cell.y = cell.y <= 0 ? 0 : this.canvasHeight - size;
+                        cell.targetX = null; // Търси нова цел
+                    }
+                    
+                    // Прилагане на промяна в размера
+                    const currentSize = parseInt(cell.style.width);
+                    const targetSize = this.params.whiteSize;
+                    if (Math.abs(currentSize - targetSize) > 1) {
+                        const newSize = currentSize + (targetSize > currentSize ? 1 : -1);
+                        cell.style.width = `${newSize}px`;
+                        cell.style.height = `${newSize}px`;
+                    }
+                    
+                    // Обновяване на CSS позицията
+                    cell.style.left = `${cell.x}px`;
+                    cell.style.top = `${cell.y}px`;
+                    
+                    // Добавяне на лека пулсация
+                    const pulse = Math.sin(Date.now() * 0.001 + cell.x * 0.01) * 0.1 + 1;
+                    cell.style.transform = `scale(${pulse})`;
+                });
+            }
+            
+            // Проверка за сблъсъци между клетките
+            checkCollisions() {
+                // Проверка за сблъсъци между бели и червени клетки
+                for (const whiteCell of this.whiteCells) {
+                    const whiteSize = parseInt(whiteCell.style.width);
+                    const whiteX = whiteCell.x + whiteSize / 2;
+                    const whiteY = whiteCell.y + whiteSize / 2;
+                    
+                    for (const redCell of this.redCells) {
+                        const redSize = parseInt(redCell.style.width);
+                        const redX = redCell.x + redSize / 2;
+                        const redY = redCell.y + redSize / 2;
+                        
+                        // Изчисляване на разстоянието
+                        const dx = whiteX - redX;
+                        const dy = whiteY - redY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const minDistance = (whiteSize + redSize) / 2;
+                        
+                        // Ако клетките са твърде близо
+                        if (distance < minDistance) {
+                            // Бялата клетка "атакува" червената
+                            const force = 0.5;
+                            redCell.vx += (dx / distance) * force;
+                            redCell.vy += (dy / distance) * force;
+                            
+                            // Визуален ефект при сблъсък
+                            redCell.style.boxShadow = '0 0 25px rgba(255, 255, 100, 0.9), inset 10px -10px 20px rgba(150, 0, 0, 0.3)';
+                            
+                            // Връщане на нормалния ефект след 200ms
+                            setTimeout(() => {
+                                redCell.style.boxShadow = '0 0 20px rgba(230, 57, 70, 0.5), inset 10px -10px 20px rgba(150, 0, 0, 0.3)';
+                            }, 200);
+                        }
+                    }
+                }
+            }
+            
+            // Обновяване на статистиките
+            updateStats() {
+                const total = this.redCells.length + this.whiteCells.length;
+                const ratio = this.redCells.length / this.whiteCells.length;
+                
+                document.getElementById('totalCells').textContent = total;
+                document.getElementById('redCells').textContent = this.redCells.length;
+                document.getElementById('whiteCells').textContent = this.whiteCells.length;
+                document.getElementById('ratioValue').textContent = ratio.toFixed(1) + ':1';
+            }
+        }
+
+        // Инициализиране на симулатора при зареждане на страницата
+        document.addEventListener('DOMContentLoaded', () => {
+            new BloodCellSimulator();
+        });
+    </script>
+</body>
+</html>
