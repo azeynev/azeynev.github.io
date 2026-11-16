@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дигитална учебна библиотека | д-р Адем Ибушев Зейнев (PhD)</title>
-    <meta name="description" content="Интерактивна дигитална библиотека с 45 авторски HTML5 симулации, изпитни системи и учебни лаборатории по Математика, Информатика, Физика и Биология — д-р Адем Ибушев Зейнев.">
+    <meta name="description" content="Интерактивна дигитална библиотека с 50 авторски HTML5 симулации, изпитни системи и учебни лаборатории по Математика, Информатика, Физика и Биология — д-р Адем Ибушев Зейнев.">
     <meta name="author" content="д-р Адем Ибушев Зейнев / Adem ZEINEV, PhD">
     <meta name="theme-color" content="#4338ca">
 
@@ -125,7 +125,7 @@
                     <!-- Quick Hub Stats -->
                     <div class="grid grid-cols-3 gap-2.5 shrink-0 text-center">
                         <div class="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm">
-                            <div id="stat-total-count" class="text-2xl font-extrabold text-white">45</div>
+                            <div id="stat-total-count" class="text-2xl font-extrabold text-white">50</div>
                             <div class="text-[11px] text-indigo-100">
                                 <span class="lang-inline-bg">Разработки</span>
                                 <span class="lang-inline-en">Modules</span>
@@ -153,28 +153,35 @@
         <!-- FILTER BAR: CATEGORIES, GRADE DROPDOWN & SEARCH -->
         <section class="bg-white dark:bg-slate-800 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4 no-print">
             <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-                <!-- Category Tabs -->
+                <!-- Category Tabs (Dynamic Counts!) -->
                 <div class="flex flex-wrap gap-2" id="category-tabs">
                     <button data-cat="all" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-600 text-white shadow-sm transition">
-                        <span class="lang-inline-bg">Всички (45)</span><span class="lang-inline-en">All (45)</span>
+                        <span class="lang-inline-bg">Всички (<span class="cat-count" data-cat="all">50</span>)</span>
+                        <span class="lang-inline-en">All (<span class="cat-count" data-cat="all">50</span>)</span>
                     </button>
                     <button data-cat="math" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
-                        📐 <span class="lang-inline-bg">Математика (7)</span><span class="lang-inline-en">Mathematics (7)</span>
+                        📐 <span class="lang-inline-bg">Математика (<span class="cat-count" data-cat="math">7</span>)</span>
+                        <span class="lang-inline-en">Mathematics (<span class="cat-count" data-cat="math">7</span>)</span>
                     </button>
                     <button data-cat="informatics" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
-                        💻 <span class="lang-inline-bg">Информатика и Симулатори (13)</span><span class="lang-inline-en">Informatics & Simulators (13)</span>
+                        💻 <span class="lang-inline-bg">Информатика и Симулатори (<span class="cat-count" data-cat="informatics">16</span>)</span>
+                        <span class="lang-inline-en">Informatics & Simulators (<span class="cat-count" data-cat="informatics">16</span>)</span>
                     </button>
                     <button data-cat="exams" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
-                        📝 <span class="lang-inline-bg">Изпити и Тестове (6)</span><span class="lang-inline-en">Exams & Tests (6)</span>
+                        📝 <span class="lang-inline-bg">Изпити и Тестове (<span class="cat-count" data-cat="exams">6</span>)</span>
+                        <span class="lang-inline-en">Exams & Tests (<span class="cat-count" data-cat="exams">6</span>)</span>
                     </button>
                     <button data-cat="physics" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
-                        ⚡ <span class="lang-inline-bg">Физика и Техника (7)</span><span class="lang-inline-en">Physics & Tech (7)</span>
+                        ⚡ <span class="lang-inline-bg">Физика и Техника (<span class="cat-count" data-cat="physics">8</span>)</span>
+                        <span class="lang-inline-en">Physics & Tech (<span class="cat-count" data-cat="physics">8</span>)</span>
                     </button>
                     <button data-cat="biology" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
-                        🧬 <span class="lang-inline-bg">Биология и Химия (10)</span><span class="lang-inline-en">Biology & Chemistry (10)</span>
+                        🧬 <span class="lang-inline-bg">Биология и Химия (<span class="cat-count" data-cat="biology">10</span>)</span>
+                        <span class="lang-inline-en">Biology & Chemistry (<span class="cat-count" data-cat="biology">10</span>)</span>
                     </button>
                     <button data-cat="tools" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
-                        🏫 <span class="lang-inline-bg">Училищни инструменти (2)</span><span class="lang-inline-en">School Tools (2)</span>
+                        🏫 <span class="lang-inline-bg">Училищни инструменти (<span class="cat-count" data-cat="tools">3</span>)</span>
+                        <span class="lang-inline-en">School Tools (<span class="cat-count" data-cat="tools">3</span>)</span>
                     </button>
                 </div>
 
@@ -199,7 +206,7 @@
                 <span>
                     <span class="lang-inline-bg">Показани разработки:</span>
                     <span class="lang-inline-en">Showing modules:</span>
-                    <strong id="visible-count" class="text-brand-600 dark:text-brand-400">45</strong>
+                    <strong id="visible-count" class="text-brand-600 dark:text-brand-400">50</strong>
                 </span>
                 <button onclick="resetAllFilters()" class="text-brand-600 dark:text-brand-400 hover:underline font-semibold">
                     <i class="fa-solid fa-rotate-left mr-1"></i>
@@ -253,8 +260,7 @@
 
     <script>
         // =========================================================================
-        // ПЪЛЕН КАТАЛОГ С ВСИЧКИ 31 АВТОРСКИ HTML5 УЧЕБНИ РЕСУРСА
-        // Имената на файловете (file) съвпадат точно с твоите оригинални файлове.
+        // ПЪЛЕН КАТАЛОГ С ВСИЧКИ 50 АВТОРСКИ HTML5 УЧЕБНИ РЕСУРСА
         // =========================================================================
         const MATERIALS_DATA = [
             // --- МАТЕМАТИКА И ГЕОМЕТРИЯ (7) ---
@@ -350,7 +356,46 @@
                 demoType: "dde"
             },
 
-            // --- ИНФОРМАТИКА И ЦИФРОВА СХЕМОТЕХНИКА (8) ---
+            // --- ИНФОРМАТИКА, МРЕЖИ И КИБЕРСИГУРНОСТ (16) ---
+            {
+                file: "OSI_model_double_simulator_002.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "8. – 12. клас",
+                subjectBg: "Компютърни мрежи",
+                subjectEn: "Computer Networks",
+                titleBg: "OSI Модел Симулатор — двустранна визуализация",
+                titleEn: "OSI Model Simulator — Client & Server Stack",
+                descBg: "Интерактивна анимация на движението на данни през 7-те слоя на OSI модела (Client ↔ Server), капсулиране, декапсулиране и журнал на събитията.",
+                descEn: "Interactive animation of data flow across all 7 OSI layers (Client ↔ Server), encapsulation, decapsulation, and event log.",
+                demoType: "network"
+            },
+            {
+                file: "TCP-IP-SImulator_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "8. – 12. клас",
+                subjectBg: "Компютърни мрежи",
+                subjectEn: "Computer Networks",
+                titleBg: "TCP/IP Модел — капсулиране на пакети и протоколи",
+                titleEn: "TCP/IP Model — Packet Encapsulation & Protocols",
+                descBg: "Визуализация на структурата на пакета (TCP/IP/Ethernet заглавки, CRC), рутиране и пренос на HTTP, FTP, Email и DNS заявки.",
+                descEn: "Visualization of packet structure (TCP/IP/Ethernet headers, CRC), routing, and transmission of HTTP, FTP, Email, and DNS requests.",
+                demoType: "network"
+            },
+            {
+                file: "Phishing_Simulator.html",
+                cat: "informatics",
+                grade: "5-7",
+                gradeLabel: "6. – 12. клас",
+                subjectBg: "Киберсигурност",
+                subjectEn: "Cybersecurity",
+                titleBg: "Симулатор на Фишинг атака (Жертва vs Хакер)",
+                titleEn: "Phishing Attack Simulator (Victim vs Hacker View)",
+                descBg: "Учебен инструмент с разделен екран, показващ в реално време как работи имейл фишингът, фалшивите форми за вход и защитата от тях.",
+                descEn: "Split-screen educational tool demonstrating in real time how email phishing, spoofed login pages, and user defenses work.",
+                demoType: "cyber"
+            },
             {
                 file: "Logig_Lab_001.html",
                 cat: "informatics",
@@ -455,8 +500,86 @@
                 descEn: "Classic arcade game demonstrating 2D array manipulation, collision detection, and state management.",
                 demoType: "default"
             },
+            {
+                file: "Sclad_Simulator_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "9. – 12. клас",
+                subjectBg: "Информатика и ИТ",
+                subjectEn: "Informatics & IT",
+                titleBg: "Складова система — ERP бизнес симулатор",
+                titleEn: "Warehouse Management — ERP Business Simulator",
+                descBg: "Бизнес симулация за управление на складови наличности, автоматично създаване на доставки при критичен минимум и финансови справки.",
+                descEn: "Business simulation for inventory management, automated restocking orders at critical stock levels, and financial reports.",
+                demoType: "erp"
+            },
+            {
+                file: "Biblioteka_School_Simulator_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "8. – 11. клас",
+                subjectBg: "Информатика и ИТ",
+                subjectEn: "Informatics & IT",
+                titleBg: "Училищна библиотека — информационна система",
+                titleEn: "School Library — Information System Simulator",
+                descBg: "Система за дигитално библиотечно обслужване с каталог от книги, търсене, заемане, връщане и проследяване на просрочия.",
+                descEn: "Digital library management system with book catalog, search, borrowing, returns, and overdue tracking.",
+                demoType: "default"
+            },
+            {
+                file: "DDoS_model_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "9. – 12. клас",
+                subjectBg: "Киберсигурност",
+                subjectEn: "Cybersecurity",
+                titleBg: "DDoS Атака и Защита — мрежови симулатор",
+                titleEn: "DDoS Attack & Mitigation — Network Simulator",
+                descBg: "Симулатор на мрежов трафик в реално време с графики на натоварването и защитни механизми (Rate limiting, WAF, CDN, CAPTCHA).",
+                descEn: "Real-time network traffic simulator with load graphs and mitigation defenses (Rate limiting, WAF, CDN, CAPTCHA).",
+                demoType: "cyber"
+            },
+            {
+                file: "SOC-SImulator_002.html",
+                cat: "informatics",
+                grade: "11-12",
+                gradeLabel: "10. – 12. клас",
+                subjectBg: "Киберсигурност",
+                subjectEn: "Cybersecurity",
+                titleBg: "SOC Център за киберсигурност (Blue Team Lab)",
+                titleEn: "Security Operations Center (SOC) Simulator",
+                descBg: "Професионален център за сигурност с интерактивна мрежова топология, MITRE ATT&CK техники, Firewall правила и Honeypot.",
+                descEn: "Professional Security Operations Center featuring interactive network topology, MITRE ATT&CK techniques, Firewall rules, and Honeypot.",
+                demoType: "cyber"
+            },
+            {
+                file: "Exam_student_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "8. – 12. клас",
+                subjectBg: "Информатика и ИТ",
+                subjectEn: "Informatics & IT",
+                titleBg: "EduExam — училищна система за електронно изпитване",
+                titleEn: "EduExam — School E-Assessment Platform",
+                descBg: "Интерактивна платформа за ученици с таймер, създаване на изпити по различни предмети, статистики и история на оценките.",
+                descEn: "Interactive student assessment platform with countdown timer, custom exam builder across subjects, statistics, and grade history.",
+                demoType: "exam"
+            },
 
-            // --- ФИЗИКА И ТЕХНИКА (6) ---
+            // --- ФИЗИКА, ХАРДУЕР И ТЕХНИКА (8) ---
+            {
+                file: "PSU_Simulator_realtime_001.html",
+                cat: "physics",
+                grade: "8-10",
+                gradeLabel: "9. – 12. клас",
+                subjectBg: "Хардуер и Електротехника",
+                subjectEn: "Hardware & Electrical Eng.",
+                titleBg: "PSU Cyber-Tech Lab — симулатор на компютърно захранване",
+                titleEn: "PSU Cyber-Tech Lab — Power Supply Oscilloscope",
+                descBg: "Диагностичен терминал в реално време с осцилоскопи за 230V AC и +12V / +5V / +3.3V шини, пулсации (V-Ripple) и защита при претоварване.",
+                descEn: "Real-time diagnostic terminal with oscilloscopes for 230V AC and +12V/+5V/+3.3V rails, voltage ripple, and overload protection.",
+                demoType: "psu"
+            },
             {
                 file: "Ekvopotencialna.html",
                 cat: "physics",
@@ -535,8 +658,21 @@
                 descEn: "Interactive diagram of compressor, condenser, expansion valve, and evaporator in cooling and heating modes.",
                 demoType: "physics"
             },
+            {
+                file: "Thermo_Yadren_SIntez.html",
+                cat: "physics",
+                grade: "11-12",
+                gradeLabel: "10. – 12. клас",
+                subjectBg: "Физика и STEM",
+                subjectEn: "Physics & STEM",
+                titleBg: "Симулатор на термоядрен синтез (Токамак реактор)",
+                titleEn: "Thermonuclear Fusion Simulator (Tokamak Reactor)",
+                descBg: "Интерактивен модел на термоядрен реактор с управление на температурата на плазмата, магнитното поле и енергийния добив.",
+                descEn: "Interactive thermonuclear reactor model with plasma temperature control, magnetic confinement field, and energy output.",
+                demoType: "physics"
+            },
 
-            // --- БИОЛОГИЯ И ХИМИЯ (9) ---
+            // --- БИОЛОГИЯ И ХИМИЯ (10) ---
             {
                 file: "Bio_optix_lab_003.html",
                 cat: "biology",
@@ -654,8 +790,34 @@
                 descEn: "Ecological and mathematical model of population growth with carrying capacity K and response delay τ.",
                 demoType: "population"
             },
+            {
+                file: "Tablica_Mendeleev.html",
+                cat: "biology",
+                grade: "8-10",
+                gradeLabel: "7. – 12. клас",
+                subjectBg: "Химия и STEM",
+                subjectEn: "Chemistry & STEM",
+                titleBg: "Интерактивна периодична таблица на Менделеев (118 елемента)",
+                titleEn: "Interactive Periodic Table of Elements (118 Elements)",
+                descBg: "Пълна интерактивна периодична система с търсачка, филтриране по химични групи, електронни конфигурации и приложения.",
+                descEn: "Complete interactive periodic table with search, chemical group filters, electron configurations, and real-world applications.",
+                demoType: "chemistry"
+            },
 
-            // --- УЧИЛИЩНИ ИНСТРУМЕНТИ (2) ---
+            // --- УЧИЛИЩНИ ИНСТРУМЕНТИ (3) ---
+            {
+                file: "code_artifact_2.html",
+                cat: "tools",
+                grade: "all",
+                gradeLabel: "Учители • 1. – 12. кл.",
+                subjectBg: "Учителски инструмент",
+                subjectEn: "Teacher Tool",
+                titleBg: "СмартТест Анализатор — проверка на тестове и А/Б/В/Г анализ",
+                titleEn: "SmartTest Analyzer — Grading & Option Statistics",
+                descBg: "Учителски инструмент за бърза проверка с 1 клик, изчисляване на оценки по 6-балната система, експорт в Excel (CSV) и процентен анализ на дистракторите.",
+                descEn: "Teacher tool for 1-click grading, 6-point scale calculation, Excel (CSV) export, and statistical A/B/C/D distractor breakdown.",
+                demoType: "grader"
+            },
             {
                 file: "students_programator_time_new_FINAL_002.html",
                 cat: "tools",
@@ -681,101 +843,6 @@
                 descBg: "Интерактивна среда за зареждане, организиране и мигновено стартиране на локални HTML учебни модули в браузъра.",
                 descEn: "Interactive environment for loading, organizing, and launching local HTML educational modules in the browser.",
                 demoType: "default"
-            },
-
-            // --- НОВИ ИНФОРМАЦИОННИ И КИБЕР СИМУЛАТОРИ (5) ---
-            {
-                file: "Sclad_Simulator_001.html",
-                cat: "informatics",
-                grade: "8-10",
-                gradeLabel: "9. – 12. клас",
-                subjectBg: "Информатика и ИТ",
-                subjectEn: "Informatics & IT",
-                titleBg: "Складова система — ERP бизнес симулатор",
-                titleEn: "Warehouse Management — ERP Business Simulator",
-                descBg: "Бизнес симулация за управление на складови наличности, автоматично създаване на доставки при критичен минимум и финансови справки.",
-                descEn: "Business simulation for inventory management, automated restocking orders at critical stock levels, and financial reports.",
-                demoType: "erp"
-            },
-            {
-                file: "Biblioteka_School_Simulator_001.html",
-                cat: "informatics",
-                grade: "8-10",
-                gradeLabel: "8. – 11. клас",
-                subjectBg: "Информатика и ИТ",
-                subjectEn: "Informatics & IT",
-                titleBg: "Училищна библиотека — информационна система",
-                titleEn: "School Library — Information System Simulator",
-                descBg: "Система за дигитално библиотечно обслужване с каталог от книги, търсене, заемане, връщане и проследяване на просрочия.",
-                descEn: "Digital library management system with book catalog, search, borrowing, returns, and overdue tracking.",
-                demoType: "default"
-            },
-            {
-                file: "DDoS_model_001.html",
-                cat: "informatics",
-                grade: "8-10",
-                gradeLabel: "9. – 12. клас",
-                subjectBg: "Киберсигурност",
-                subjectEn: "Cybersecurity",
-                titleBg: "DDoS Атака и Защита — мрежови симулатор",
-                titleEn: "DDoS Attack & Mitigation — Network Simulator",
-                descBg: "Симулатор на мрежов трафик в реално време с графики на натоварването и защитни механизми (Rate limiting, WAF, CDN, CAPTCHA).",
-                descEn: "Real-time network traffic simulator with load graphs and mitigation defenses (Rate limiting, WAF, CDN, CAPTCHA).",
-                demoType: "cyber"
-            },
-            {
-                file: "SOC-SImulator_002.html",
-                cat: "informatics",
-                grade: "11-12",
-                gradeLabel: "10. – 12. клас",
-                subjectBg: "Киберсигурност",
-                subjectEn: "Cybersecurity",
-                titleBg: "SOC Център за киберсигурност (Blue Team Lab)",
-                titleEn: "Security Operations Center (SOC) Simulator",
-                descBg: "Професионален център за сигурност с интерактивна мрежова топология, MITRE ATT&CK техники, Firewall правила и Honeypot.",
-                descEn: "Professional Security Operations Center featuring interactive network topology, MITRE ATT&CK techniques, Firewall rules, and Honeypot.",
-                demoType: "cyber"
-            },
-            {
-                file: "Exam_student_001.html",
-                cat: "informatics",
-                grade: "8-10",
-                gradeLabel: "8. – 12. клас",
-                subjectBg: "Информатика и ИТ",
-                subjectEn: "Informatics & IT",
-                titleBg: "EduExam — училищна система за електронно изпитване",
-                titleEn: "EduExam — School E-Assessment Platform",
-                descBg: "Интерактивна платформа за ученици с таймер, създаване на изпити по различни предмети, статистики и история на оценките.",
-                descEn: "Interactive student assessment platform with countdown timer, custom exam builder across subjects, statistics, and grade history.",
-                demoType: "exam"
-            },
-
-            // --- НОВИ НАУЧНИ СИМУЛАЦИИ (ФИЗИКА +1, ХИМИЯ +1) ---
-            {
-                file: "Thermo_Yadren_SIntez.html",
-                cat: "physics",
-                grade: "11-12",
-                gradeLabel: "10. – 12. клас",
-                subjectBg: "Физика и STEM",
-                subjectEn: "Physics & STEM",
-                titleBg: "Симулатор на термоядрен синтез (Токамак реактор)",
-                titleEn: "Thermonuclear Fusion Simulator (Tokamak Reactor)",
-                descBg: "Интерактивен модел на термоядрен реактор с управление на температурата на плазмата, магнитното поле и енергийния добив.",
-                descEn: "Interactive thermonuclear reactor model with plasma temperature control, magnetic confinement field, and energy output.",
-                demoType: "physics"
-            },
-            {
-                file: "Tablica_Mendeleev.html",
-                cat: "biology",
-                grade: "8-10",
-                gradeLabel: "7. – 12. клас",
-                subjectBg: "Химия и STEM",
-                subjectEn: "Chemistry & STEM",
-                titleBg: "Интерактивна периодична таблица на Менделеев (118 елемента)",
-                titleEn: "Interactive Periodic Table of Elements (118 Elements)",
-                descBg: "Пълна интерактивна периодична система с търсачка, филтриране по химични групи, електронни конфигурации и приложения.",
-                descEn: "Complete interactive periodic table with search, chemical group filters, electron configurations, and real-world applications.",
-                demoType: "chemistry"
             },
 
             // --- ИЗПИТИ И ТЕСТОВЕ (6) ---
@@ -860,6 +927,30 @@
         ];
 
         // =========================================================================
+        // DYNAMIC CATEGORY COUNTERS UPDATE
+        // =========================================================================
+        function updateCategoryCounts() {
+            const counts = {
+                all: MATERIALS_DATA.length,
+                math: 0,
+                informatics: 0,
+                exams: 0,
+                physics: 0,
+                biology: 0,
+                tools: 0
+            };
+            MATERIALS_DATA.forEach(item => {
+                if (counts[item.cat] !== undefined) counts[item.cat]++;
+            });
+            document.querySelectorAll('.cat-count').forEach(el => {
+                const c = el.dataset.cat;
+                if (counts[c] !== undefined) el.textContent = counts[c];
+            });
+            const statTotal = document.getElementById('stat-total-count');
+            if (statTotal) statTotal.textContent = counts.all;
+        }
+
+        // =========================================================================
         // THEME & LANGUAGE TOGGLES (SYNCED WITH MAIN PORTFOLIO)
         // =========================================================================
         const langToggleBtn = document.getElementById('lang-toggle-btn');
@@ -909,16 +1000,13 @@
             exams: "fa-file-circle-check",
             physics: "fa-bolt",
             biology: "fa-dna",
-            tools: "fa-calendar-days"
+            tools: "fa-toolbox"
         };
 
         function renderMaterials() {
             const grid = document.getElementById('materials-grid');
-            const statCount = document.getElementById('stat-total-count');
             const visibleCount = document.getElementById('visible-count');
             if (!grid) return;
-
-            if (statCount) statCount.textContent = MATERIALS_DATA.length;
 
             const filtered = MATERIALS_DATA.filter(item => {
                 const matchCat = activeCat === 'all' || item.cat === activeCat;
@@ -1043,7 +1131,7 @@
         }
 
         // =========================================================================
-        // INTERACTIVE MODAL PREVIEW (SANDBOX IN CANVAS + REAL IFRAME ON GITHUB PAGES)
+        // INTERACTIVE MODAL PREVIEW (SANDBOX + LIVE IFRAME WHEN HOSTED)
         // =========================================================================
         function openMaterialPreview(idx) {
             const item = MATERIALS_DATA[idx];
@@ -1071,7 +1159,7 @@
             stage.innerHTML = buildInteractiveDemo(item);
             modal.classList.remove('hidden');
 
-            // If hosted on GitHub Pages where the actual .html file exists in materials/, load it in iframe
+            // Load real HTML file in iframe when hosted via HTTP/HTTPS (e.g., GitHub Pages)
             if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('googleusercontent') && !window.location.hostname.includes('scf.usercontent')) {
                 fetch(item.file, { method: 'HEAD' }).then(res => {
                     if (res.ok) {
@@ -1100,6 +1188,65 @@
                         </div>
                         <div id="pit-res" class="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-xs leading-relaxed">
                             a² + b² = 3² + 4² = 9 + 16 = <strong>25</strong> ⇒ Хипотенуза <strong>c = 5.00 см</strong> · Лице <strong>S = 6.00 см²</strong>
+                        </div>
+                    </div>
+                `;
+            }
+            if (item.demoType === 'network') {
+                return `
+                    <div class="space-y-4 text-xs">
+                        <span class="font-bold text-sm text-purple-600 dark:text-purple-400 block">Интерактивен стенд: Капсулиране на мрежов пакет (OSI / TCP-IP)</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-center font-mono">
+                            <div class="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800">
+                                <div class="text-[10px] text-teal-600 dark:text-teal-300 font-bold">L7–L5 Приложен</div>
+                                <div class="font-bold mt-1">HTTP GET /index</div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800">
+                                <div class="text-[10px] text-sky-600 dark:text-sky-300 font-bold">L4 Транспортен</div>
+                                <div class="font-bold mt-1">TCP Port: 80</div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800">
+                                <div class="text-[10px] text-purple-600 dark:text-purple-300 font-bold">L3 Мрежов</div>
+                                <div class="font-bold mt-1">IP: 192.168.1.10</div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800">
+                                <div class="text-[10px] text-rose-600 dark:text-rose-300 font-bold">L2–L1 Канален</div>
+                                <div class="font-bold mt-1">Ethernet + CRC</div>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Пълният интерактивен симулатор с анимирано движение между клиент и сървър се зарежда автоматично от <code>materials/${item.file}</code>.</p>
+                    </div>
+                `;
+            }
+            if (item.demoType === 'psu') {
+                return `
+                    <div class="space-y-4 text-xs">
+                        <span class="font-bold text-sm text-sky-600 dark:text-sky-400 block">PSU Diagnostic Sandbox — Симулация на натоварване на захранване</span>
+                        <label class="block">Натоварване на системата: <strong id="psu-load-val">50% (375 W)</strong>
+                            <input id="psu-slider" type="range" min="10" max="120" value="50" oninput="calcPsuDemo()" class="mt-1.5 w-full accent-brand-600">
+                        </label>
+                        <div id="psu-res" class="grid grid-cols-3 gap-3 font-mono text-center">
+                            <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">+12V Rail: <strong class="text-amber-500">11.98 V</strong></div>
+                            <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">+5V Rail: <strong class="text-sky-500">4.99 V</strong></div>
+                            <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">Статус: <strong class="text-emerald-500">STABLE</strong></div>
+                        </div>
+                    </div>
+                `;
+            }
+            if (item.demoType === 'grader') {
+                return `
+                    <div class="space-y-4 text-xs">
+                        <span class="font-bold text-sm text-amber-600 dark:text-amber-400 block">Бърз калкулатор на оценка (СмартТест скала)</span>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="block">Спечелени точки:
+                                <input id="grd-pts" type="number" value="16" min="0" max="100" oninput="calcGradeDemo()" class="mt-1 w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-bold">
+                            </label>
+                            <label class="block">Максимум точки:
+                                <input id="grd-max" type="number" value="20" min="1" max="100" oninput="calcGradeDemo()" class="mt-1 w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-bold">
+                            </label>
+                        </div>
+                        <div id="grd-res" class="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono">
+                            Успеваемост: <strong>80%</strong> · Оценка по 6-балната система: <strong class="text-emerald-600 dark:text-emerald-400">5.33</strong>
                         </div>
                     </div>
                 `;
@@ -1175,6 +1322,37 @@
             out.innerHTML = `a² + b² = ${a}² + ${b}² = <strong>${(a*a + b*b).toFixed(2)}</strong> ⇒ Хипотенуза <strong>c = ${c.toFixed(2)} см</strong> · Лице <strong>S = ${s.toFixed(2)} см²</strong>`;
         }
 
+        function calcPsuDemo() {
+            const load = parseFloat(document.getElementById('psu-slider')?.value || 50);
+            const lbl = document.getElementById('psu-load-val');
+            const out = document.getElementById('psu-res');
+            if (lbl) lbl.textContent = `${load}% (${Math.round(load * 7.5)} W)`;
+            if (out) {
+                const isOver = load > 100;
+                const v12 = (12 - (load / 100) * 0.15 - (isOver ? (load - 100) * 0.08 : 0)).toFixed(2);
+                const v5 = (5 - (load / 100) * 0.05).toFixed(2);
+                out.innerHTML = `
+                    <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">+12V Rail: <strong class="text-amber-500">${v12} V</strong></div>
+                    <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">+5V Rail: <strong class="text-sky-500">${v5} V</strong></div>
+                    <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">Статус: <strong class="${isOver ? 'text-rose-500' : 'text-emerald-500'}">${isOver ? 'OVERLOAD!' : 'STABLE'}</strong></div>
+                `;
+            }
+        }
+
+        function calcGradeDemo() {
+            const pts = parseFloat(document.getElementById('grd-pts')?.value || 0);
+            const max = Math.max(1, parseFloat(document.getElementById('grd-max')?.value || 20));
+            const out = document.getElementById('grd-res');
+            if (!out) return;
+            const pct = Math.min(100, Math.max(0, Math.round((pts / max) * 100)));
+            let grade = 2.00;
+            if (pct >= 90) grade = 6.00;
+            else if (pct >= 75) grade = 5.00 + ((pct - 75) / 15);
+            else if (pct >= 55) grade = 4.00 + ((pct - 55) / 20);
+            else if (pct >= 35) grade = 3.00 + ((pct - 35) / 20);
+            out.innerHTML = `Успеваемост: <strong>${pct}%</strong> · Оценка по 6-балната система: <strong class="text-emerald-600 dark:text-emerald-400">${grade.toFixed(2)}</strong>`;
+        }
+
         function calcLogicDemo() {
             const a = document.getElementById('in-a')?.checked ? 1 : 0;
             const b = document.getElementById('in-b')?.checked ? 1 : 0;
@@ -1221,6 +1399,8 @@
             if (e.key === 'Escape') closeMaterialModal();
         });
 
+        // Initialize counters and grid
+        updateCategoryCounts();
         renderMaterials();
     </script>
 </body>
