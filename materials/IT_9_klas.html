@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Изпит - 9 клас | д-р Адем Зейнев</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981; /* Emerald Green */
+            --primary-hover: #059669;
+            --bg: #020617;
+            --card-bg: rgba(15, 23, 42, 0.9);
+            --text: #f8fafc;
+            --error: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 50%, #064e3b 0%, #020617 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .main-wrapper {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+            align-items: stretch;
+        }
+
+        /* SIDEBAR NAVIGATION */
+        .sidebar {
+            width: 80px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+            display: none;
+        }
+
+        .q-square {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .q-square.current { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); color: var(--primary); }
+        .q-square.answered { background: var(--primary); color: white; }
+
+        /* MAIN CARD */
+        .main-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 32px;
+            flex-grow: 1;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            text-align: center;
+        }
+
+        .author-tag { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); margin-bottom: 0.5rem; font-weight: 600; }
+        h1 { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+
+        .btn-main {
+            background: var(--primary);
+            color: white; border: none; padding: 1rem 2rem; border-radius: 12px;
+            font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-main:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn-main:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 2rem; }
+
+        #quiz-ui, #result-ui { display: none; }
+
+        .question-text { font-size: 1.3rem; font-weight: 600; margin-bottom: 2rem; text-align: left; min-height: 80px; line-height: 1.4; }
+
+        .options-list { display: grid; gap: 0.8rem; }
+        .option {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.1rem; border-radius: 14px; cursor: pointer; text-align: left; transition: 0.2s;
+        }
+        .option:hover { background: rgba(16, 185, 129, 0.1); border-color: var(--primary); }
+        .option.selected { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); font-weight: 600; }
+
+        /* ANALYSIS */
+        .analysis-container { text-align: left; margin-top: 1.5rem; max-height: 350px; overflow-y: auto; padding-right: 10px; }
+        .analysis-item { background: rgba(255, 255, 255, 0.03); padding: 1rem; margin-bottom: 10px; border-radius: 12px; border-left: 4px solid var(--primary); }
+        .res-wrong { color: var(--error); font-weight: bold; }
+        .res-correct { color: var(--primary); font-weight: bold; }
+        .grade-display { font-size: 4rem; font-weight: 900; color: var(--primary); margin: 1rem 0; }
+
+        @media (max-width: 768px) {
+            .main-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="sidebar" id="sidebar"></div>
+
+        <div class="main-card">
+            <div id="start-ui">
+                <div class="author-tag">д-р Адем Зейнев представя</div>
+                <h1>ИТ ИЗПИТ - 9 КЛАС</h1>
+                <p style="opacity: 0.7; margin-bottom: 2rem;">Система за проверка на знанията (База: 60 въпроса).</p>
+                <button class="btn-main" onclick="startQuiz()">Започни изпита</button>
+            </div>
+
+            <div id="quiz-ui">
+                <div class="author-tag">Въпрос <span id="q-num-display">1</span> / 10</div>
+                <div class="question-text" id="q-text">Зареждане...</div>
+                <div class="options-list" id="options-box"></div>
+                
+                <div class="nav-buttons">
+                    <button class="btn-main" id="prev-btn" onclick="prevQuestion()" style="background: #334155;">Предишен</button>
+                    <button class="btn-main" id="next-btn" onclick="nextQuestion()">Следващ</button>
+                </div>
+            </div>
+
+            <div id="result-ui">
+                <div class="author-tag">Окончателен анализ</div>
+                <div class="grade-display" id="final-grade">2.00</div>
+                <p id="stats-text" style="font-weight: 600;">Верни: 0 | Грешни: 0</p>
+                
+                <div class="analysis-container" id="analysis-list"></div>
+                <button class="btn-main" onclick="location.reload()">Нов изпит</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        const questionBank = [
+            // КОМПЮТЪРНИ СИСТЕМИ (1-12)
+            { q: "Коя е основната характеристика на многоядрените процесори?", a: ["По-голям размер", "Паралелна обработка на данни", "Липса на кеш памет", "Работа само с Windows"], c: 1 },
+            { q: "Какво представлява виртуалната памет?", a: ["Физическа флашка", "Разширение на RAM върху твърдия диск", "Облачно пространство", "Вид BIOS"], c: 1 },
+            { q: "Какво означава терминът 'Benchmarking'?", a: ["Инсталиране на ОС", "Тестване на производителността", "Почистване от прах", "Триене на файлове"], c: 1 },
+            { q: "Кой софтуер се нарича 'Proprietary' (Собствен)?", a: ["Linux", "MS Office", "LibreOffice", "VLC Player"], c: 1 },
+            { q: "Коя памет е най-бърза?", a: ["RAM", "L1 Cache", "SSD", "L3 Cache"], c: 1 },
+            { q: "Какво е предназначението на чипсета?", a: ["Захранва процесора", "Управлява потока от данни между компонентите", "Съхранява видео", "Охлажда диска"], c: 1 },
+            { q: "Коя архитектура позволява на процесора да обработва 64 бита данни едновременно?", a: ["x86", "x64", "ARM", "RISC"], c: 1 },
+            { q: "Какво е RAID масив?", a: ["Вид вирус", "Технология за обединяване на няколко диска", "Мрежов протокол", "Графична карта"], c: 1 },
+            { q: "Какво е предназначението на драйверите?", a: ["Рисуване", "Връзка между ОС и хардуер", "Антивирусна защита", "Текстообработка"], c: 1 },
+            { q: "Кой софтуер е пример за системен софтуер?", a: ["Photoshop", "Windows 11", "Chrome", "Excel"], c: 1 },
+            { q: "Кое устройство се нарича 'периферно'?", a: ["Процесор", "Принтер", "RAM памет", "Дънна платка"], c: 1 },
+            { q: "Какво измерваме с мерната единица 'FLOPS'?", a: ["Скорост на интернет", "Производителност при изчисления", "Размер на файл", "Яркост на монитор"], c: 1 },
+
+            // КОМПЮТЪРНИ МРЕЖИ (13-24)
+            { q: "Колко бита е дължината на IPv6 адреса?", a: ["32 бита", "64 бита", "128 бита", "256 бита"], c: 2 },
+            { q: "Кой протокол автоматично раздава IP адреси в мрежата?", a: ["HTTP", "DHCP", "FTP", "DNS"], c: 1 },
+            { q: "Какво прави DNS сървърът?", a: ["Защитава от вируси", "Превръща имена на домейни в IP адреси", "Ускорява интернета", "Прехвърля файлове"], c: 1 },
+            { q: "Кое устройство работи на мрежово ниво (Layer 3) и насочва пакети?", a: ["Суич (Switch)", "Рутер (Router)", "Хъб (Hub)", "Повторител"], c: 1 },
+            { q: "Коя топология изисква централно устройство (суич)?", a: ["Шина", "Звезда", "Пръстен", "Мрежа"], c: 1 },
+            { q: "Какво означава съкращението VPN?", a: ["Virtual Public Network", "Virtual Private Network", "Video Private Network", "Very Personal Network"], c: 1 },
+            { q: "Кой протокол се използва за защитено прехвърляне на файлове?", a: ["HTTP", "SFTP", "SMTP", "ICMP"], c: 1 },
+            { q: "Кой слой на OSI модела отговаря за физическото пренасяне на битове?", a: ["Приложен", "Физически", "Транспортен", "Мрежов"], c: 1 },
+            { q: "Какво е MAC адрес?", a: ["IP адрес на Apple", "Физически адрес на мрежовата карта", "Парола за Wi-Fi", "Име на компютър"], c: 1 },
+            { q: "Коя технология позволява безжична връзка на къси разстояния?", a: ["Fiber", "Bluetooth", "Satellite", "Ethernet"], c: 1 },
+            { q: "Какво е 'Ping'?", a: ["Вид игра", "Команда за проверка на връзката", "Разширение на файл", "Мрежова карта"], c: 1 },
+            { q: "Кой кабел осигурява най-висока скорост на пренос?", a: ["UTP", "Оптичен кабел", "Коаксиален", "Телефонен"], c: 1 },
+
+            // БАЗИ ДАННИ (25-36)
+            { q: "Какво е 'Първичен ключ' (Primary Key)?", a: ["Парола за таблицата", "Уникален идентификатор на запис", "Името на базата данни", "Вид файл"], c: 1 },
+            { q: "Кой е основният обект в релационна база данни?", a: ["Форма", "Таблица", "Заявка", "Отчет"], c: 1 },
+            { q: "Какво съдържа едно 'Поле' (Field) в БД?", a: ["Целият запис", "Конкретна характеристика (атрибут)", "Всички данни", "Само цифри"], c: 1 },
+            { q: "Какво прави 'Заявката' (Query)?", a: ["Трие базата", "Извлича данни по зададен критерий", "Принтира отчети", "Прави дизайн"], c: 1 },
+            { q: "Връзка 'One-to-Many' означава:", a: ["Един към един", "Един към много", "Много към много", "Няма връзка"], c: 1 },
+            { q: "Кой тип данни е най-подходящ за ЕГН?", a: ["Число", "Текст (Short Text)", "Дата", "Автоматично число"], c: 1 },
+            { q: "Какво е SQL?", a: ["Език за програмиране на игри", "Език за работа с бази данни", "Операционна система", "Хардуерен компонент"], c: 1 },
+            { q: "Кой обект служи за лесно въвеждане на данни от потребителя?", a: ["Таблица", "Форма", "Отчет", "Макрос"], c: 1 },
+            { q: "Какво представлява 'Запис' (Record) в БД?", a: ["Една колона", "Един ред с информация за един обект", "Цялата таблица", "Името на базата"], c: 1 },
+            { q: "Коя програма е СУБД (DBMS)?", a: ["Excel", "MS Access", "PowerPoint", "Word"], c: 1 },
+            { q: "Какво е 'Външен ключ' (Foreign Key)?", a: ["Резервен ключ", "Ключ за връзка между две таблици", "Парола за интернет", "Вирус"], c: 1 },
+            { q: "Какво прави 'Сортирането' в БД?", a: ["Изтрива данни", "Подрежда данните по азбучен ред или стойност", "Променя данните", "Скрива таблицата"], c: 1 },
+
+            // EXCEL И ФУНКЦИИ (37-48)
+            { q: "Какво прави функцията COUNTIF?", a: ["Събира числа", "Брои клетки по дадено условие", "Намира средно", "Търси текст"], c: 1 },
+            { q: "С коя функция се проверява логическо условие?", a: ["SUM", "IF", "AVERAGE", "MAX"], c: 1 },
+            { q: "Грешката #DIV/0! в Excel означава:", a: ["Липса на данни", "Деление на нула", "Грешно име", "Малка клетка"], c: 1 },
+            { q: "Какво е 'Data Validation'?", a: ["Смяна на цвят", "Ограничаване на типа данни при въвеждане", "Сортиране", "Архивиране"], c: 1 },
+            { q: "Как се фиксира клетка (абсолютен адрес)?", a: ["Със скоби", "Със символа $", "С кавички", "С удивителен"], c: 1 },
+            { q: "Функцията VLOOKUP се използва за:", a: ["Рисуване", "Търсене на стойност в таблица", "Изтриване", "Защита"], c: 1 },
+            { q: "Коя функция събира стойности, ако отговарят на условие?", a: ["COUNTIF", "SUMIF", "AVERAGEIF", "IFSUM"], c: 1 },
+            { q: "Кой символ се използва за обединяване на текст (конкатенация)?", a: ["+", "&", "#", "$"], c: 1 },
+            { q: "Какво прави функцията MIN?", a: ["Изтрива", "Намира най-малката стойност", "Намира средно", "Брои"], c: 1 },
+            { q: "Как се означава диапазон от клетки A1 до B10?", a: ["A1-B10", "A1:B10", "A1 to B10", "A1;B10"], c: 1 },
+            { q: "Какво е 'Pivot Table'?", a: ["Проста таблица", "Обобщаваща таблица за анализ", "Вид графика", "Функция за събиране"], c: 1 },
+            { q: "Коя функция връща текущата дата?", a: ["DATE()", "TODAY()", "NOW()", "TIME()"], c: 1 },
+
+            // СИГУРНОСТ И ОБЛАК (49-60)
+            { q: "Какво е IaaS?", a: ["Инфраструктура като услуга", "Платформа като услуга", "Софтуер като услуга", "Интернет услуга"], c: 0 },
+            { q: "За какво служи дигиталният подпис?", a: ["За красота", "За доказване автентичността на автор и документ", "За плащане", "За рисуване"], c: 1 },
+            { q: "Коя услуга е SaaS?", a: ["Google Docs", "Amazon Web Services", "Microsoft Azure", "Cisco Router"], c: 0 },
+            { q: "Какво представлява криптирането?", a: ["Копиране", "Превръщане на данни в нечетим код", "Компресиране", "Триене"], c: 1 },
+            { q: "Кой протокол е защитен за уеб?", a: ["HTTP", "HTTPS", "FTP", "Telnet"], c: 1 },
+            { q: "Какво е 'Public Key' в криптографията?", a: ["Таен ключ", "Публичен ключ за дешифриране/шифриране", "Парола", "Име"], c: 1 },
+            { q: "Какво е 'Phishing'?", a: ["Вид риболов", "Измама за кражба на лични данни", "Антивирусна програма", "Бърз интернет"], c: 1 },
+            { q: "Какво е Двуфакторна автентикация (2FA)?", a: ["Две пароли", "Влизане с парола и допълнителен код", "Втори имейл", "Два компютъра"], c: 1 },
+            { q: "Коя е главната цел на GDPR?", a: ["По-бърз интернет", "Защита на личните данни", "Евтини компютри", "Игри"], c: 1 },
+            { q: "Какво е 'Malware'?", a: ["Добър софтуер", "Зловреден софтуер", "Мрежов хардуер", "Облачно пространство"], c: 1 },
+            { q: "Какво са 'Cookies' (Бисквитки)?", a: ["Вируси", "Малки файлове със записи за сесии", "Програми за чат", "Хардуерни чипове"], c: 1 },
+            { q: "Кое е облачно хранилище?", a: ["BIOS", "OneDrive", "RAM", "CPU"], c: 1 }
+        ];
+
+        let selectedQuestions = [];
+        let currentIdx = 0;
+        let userAnswers = new Array(10).fill(null);
+
+        function startQuiz() {
+            document.getElementById('start-ui').style.display = 'none';
+            document.getElementById('quiz-ui').style.display = 'block';
+            document.getElementById('sidebar').style.display = 'flex';
+            
+            // Случаен избор на 10 от 60 въпроса
+            selectedQuestions = questionBank.sort(() => 0.5 - Math.random()).slice(0, 10);
+            createSidebar();
+            renderQuestion();
+        }
+
+        function createSidebar() {
+            const side = document.getElementById('sidebar');
+            side.innerHTML = '';
+            for(let i=0; i<10; i++) {
+                const sq = document.createElement('div');
+                sq.className = 'q-square';
+                sq.id = `sq-${i}`;
+                sq.innerText = i + 1;
+                sq.onclick = () => jumpToQuestion(i);
+                side.appendChild(sq);
+            }
+        }
+
+        function renderQuestion() {
+            const data = selectedQuestions[currentIdx];
+            document.getElementById('q-num-display').innerText = currentIdx + 1;
+            document.getElementById('q-text').innerText = data.q;
+            
+            document.getElementById('prev-btn').disabled = (currentIdx === 0);
+            document.getElementById('next-btn').innerText = (currentIdx === 9) ? "Приключи" : "Следващ";
+
+            const box = document.getElementById('options-box');
+            box.innerHTML = '';
+
+            data.a.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = 'option' + (userAnswers[currentIdx] === i ? ' selected' : '');
+                div.innerText = opt;
+                div.onclick = () => selectOption(i);
+                box.appendChild(div);
+            });
+
+            document.querySelectorAll('.q-square').forEach((sq, i) => {
+                sq.classList.remove('current');
+                if (i === currentIdx) sq.classList.add('current');
+                if (userAnswers[i] !== null) sq.classList.add('answered');
+            });
+        }
+
+        function selectOption(idx) {
+            userAnswers[currentIdx] = idx;
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (currentIdx < 9) {
+                currentIdx++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                renderQuestion();
+            }
+        }
+
+        function jumpToQuestion(i) {
+            currentIdx = i;
+            renderQuestion();
+        }
+
+        function finishQuiz() {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            if (unanswered > 0) {
+                if (!confirm(`Имате ${unanswered} непопълнени въпроса. Сигурни ли сте, че искате да приключите?`)) return;
+            }
+
+            document.getElementById('quiz-ui').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('result-ui').style.display = 'block';
+
+            let correct = 0;
+            const analysisList = document.getElementById('analysis-list');
+            analysisList.innerHTML = '';
+
+            selectedQuestions.forEach((q, i) => {
+                const uAns = userAnswers[i];
+                const isCorrect = (uAns === q.c);
+                if (isCorrect) correct++;
+
+                const item = document.createElement('div');
+                item.className = 'analysis-item';
+                item.style.borderLeftColor = isCorrect ? 'var(--primary)' : 'var(--error)';
+                item.innerHTML = `
+                    <div style="font-weight:600; margin-bottom:5px;">${i+1}. ${q.q}</div>
+                    <div style="font-size:0.9rem;">
+                        Твоят избор: <span class="${isCorrect ? 'res-correct' : 'res-wrong'}">${uAns !== null ? q.a[uAns] : 'Не е отговорено'}</span><br>
+                        ${!isCorrect ? `Правилен отговор: <span class="res-correct">${q.a[q.c]}</span>` : ''}
+                    </div>
+                `;
+                analysisList.appendChild(item);
+            });
+
+            const grade = 2 + (correct * 0.4);
+            document.getElementById('final-grade').innerText = grade.toFixed(2);
+            document.getElementById('stats-text').innerText = `Верни: ${correct} | Грешни: ${10 - correct}`;
+
+            if (grade >= 5.5) {
+                confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+            }
+        }
+    </script>
+</body>
+</html>
