@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ИТ 10 клас - д-р Адем Зейнев | Пълен тест</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #a855f7; 
+            --primary-hover: #9333ea;
+            --bg: #030712;
+            --card-bg: rgba(17, 24, 39, 0.85);
+            --text: #f8fafc;
+            --error: #f43f5e;
+            --success: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.15) 0%, transparent 35%),
+                radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.1) 0%, transparent 35%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .main-wrapper {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1050px;
+        }
+
+        .sidebar {
+            width: 80px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            justify-content: center;
+            display: none;
+        }
+
+        .q-square {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .q-square.current { border-color: var(--primary); background: rgba(168, 85, 247, 0.2); color: var(--primary); }
+        .q-square.answered { background: var(--primary); color: white; }
+
+        .main-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3.5rem;
+            border-radius: 32px;
+            flex-grow: 1;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+
+        .author-tag { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; color: var(--primary); margin-bottom: 0.8rem; font-weight: 700; }
+        h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .sub-title { font-size: 1.1rem; opacity: 0.7; margin-bottom: 2.5rem; }
+
+        .btn-main {
+            background: var(--primary);
+            color: white; border: none; padding: 1.2rem 2.5rem; border-radius: 16px;
+            font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-main:hover { background: var(--primary-hover); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(168, 85, 247, 0.3); }
+
+        .question-text { font-size: 1.4rem; font-weight: 600; margin-bottom: 2rem; text-align: left; line-height: 1.4; min-height: 90px; }
+        .options-list { display: grid; gap: 1rem; }
+        .option {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.3rem; border-radius: 18px; cursor: pointer; text-align: left; transition: 0.2s;
+        }
+        .option:hover { background: rgba(168, 85, 247, 0.1); border-color: var(--primary); }
+        .option.selected { border-color: var(--primary); background: rgba(168, 85, 247, 0.2); font-weight: 600; }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 3rem; }
+        #quiz-ui, #result-ui { display: none; }
+        
+        .grade-display { font-size: 5.5rem; font-weight: 900; color: var(--success); margin: 1rem 0; }
+        .analysis-container { text-align: left; margin-top: 2rem; max-height: 350px; overflow-y: auto; padding-right: 15px; }
+        .analysis-item { background: rgba(255, 255, 255, 0.02); padding: 1.2rem; margin-bottom: 12px; border-radius: 16px; border-left: 4px solid var(--primary); }
+
+        @media (max-width: 768px) {
+            .main-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; }
+            .main-card { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="sidebar" id="sidebar"></div>
+        <div class="main-card">
+            <div id="start-ui">
+                <div class="author-tag">д-р Адем Зейнев | ИК Домино</div>
+                <h1>ИНФОРМАЦИОННИ ТЕХНОЛОГИИ</h1>
+                <div class="sub-title">Разширен тест за 10. клас</div>
+                <p style="opacity: 0.5; margin-bottom: 2rem; font-size: 0.9rem;">
+                    База данни с 45 въпроса по актуалната програма.<br>
+                    Системата ще избере 10 случайни въпроса за Вас.
+                </p>
+                <button class="btn-main" onclick="startQuiz()">Започни изпита</button>
+            </div>
+
+            <div id="quiz-ui">
+                <div class="author-tag" id="section-label">Раздел</div>
+                <div class="question-text" id="q-text">Зареждане...</div>
+                <div class="options-list" id="options-box"></div>
+                <div class="nav-buttons">
+                    <button class="btn-main" id="prev-btn" onclick="prevQuestion()" style="background: #4b5563; padding: 1rem 1.5rem;">Назад</button>
+                    <button class="btn-main" id="next-btn" onclick="nextQuestion()">Напред</button>
+                </div>
+            </div>
+
+            <div id="result-ui">
+                <div class="author-tag">Резултат (д-р Адем Зейнев)</div>
+                <div class="grade-display" id="final-grade">2.00</div>
+                <p id="stats-text" style="font-weight: 600; opacity: 0.8;"></p>
+                <div class="analysis-container" id="analysis-list"></div>
+                <button class="btn-main" onclick="location.reload()" style="margin-top: 2rem;">Нов опит</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        const questionBank = [
+            // ОБРАБОТКА НА ИНФОРМАЦИЯТА (Теми 1-2)
+            { s: "Обработка на информацията", q: "Кой аспект на информацията проверява дали тя е пълна и не съдържа съществени пропуски?", a: ["Навременност", "Пълнота", "Обективност", "Форматиране"], c: 1 },
+            { s: "Обработка на информацията", q: "Какво означава 'надеждност' на един уеб източник?", a: ["Сайтът има много последователи", "Източникът е проверен, цитира доказателства и е авторитетен", "Сайтът е направен с модерни технологии", "Сайтът е безплатен"], c: 1 },
+            { s: "Обработка на информацията", q: "Кое от изброените е признак за субективност на информацията?", a: ["Използване само на факти", "Използване на емоционален език и лично мнение", "Наличие на дата на публикуване", "Посочване на научни източници"], c: 1 },
+            { s: "Обработка на информацията", q: "Каква е основната роля на 'История на версиите' в Google Docs?", a: ["Да сменя шрифта автоматично", "Да проследява промените и да позволява връщане към стари варианти", "Да трие документа след 30 дни", "Да проверява за вируси"], c: 1 },
+            { s: "Обработка на информацията", q: "Какво е предимството на синхронното дигитално сътрудничество?", a: ["Работа в различно време", "Едновременна работа на екипа в реално време", "Изпращане на документи по имейл", "Няма нужда от интернет"], c: 1 },
+
+            // АЛГОРИТМИ И СЪЗДАВАНЕ НА СЪДЪРЖАНИЕ (Теми 3-7)
+            { s: "Създаване на съдържание", q: "Кое от изброените НЕ е свойство на алгоритъма?", a: ["Дискретност", "Определеност", "Безкрайност", "Резултатност"], c: 2 },
+            { s: "Създаване на съдържание", q: "Какво означава свойството 'дискретност' на алгоритъма?", a: ["Алгоритъмът е таен", "Алгоритъмът е разделен на отделни последователни стъпки", "Алгоритъмът винаги дава верен резултат", "Алгоритъмът е написан на английски"], c: 1 },
+            { s: "Създаване на съдържание", q: "Кой блок в блок-схемата се използва за въвеждане на данни от клавиатурата?", a: ["Правоъгълник", "Успоредник", "Ромб", "Елипса"], c: 1 },
+            { s: "Създаване на съдържание", q: "Какво описва правоъгълният блок в блок-схемите?", a: ["Логическо условие", "Изпълнение на действие (процес)", "Край на програмата", "Връзка с друга страница"], c: 1 },
+            { s: "Създаване на съдържание", q: "Какъв вид е алгоритъмът, при който стъпките се изпълняват една след друга без повторения?", a: ["Цикличен", "Линеен", "Разклонен", "Сложен"], c: 1 },
+            { s: "Създаване на съдържание", q: "Как се нарича алгоритъм, който съдържа проверка на условие?", a: ["Линеен", "Разклонен", "Елементарен", "Случаен"], c: 1 },
+            { s: "Създаване на съдържание", q: "Коя среда за програмиране използва цветни блокове за изграждане на код?", a: ["Visual Studio", "Scratch", "Notepad++", "MS Word"], c: 1 },
+            { s: "Създаване на съдържание", q: "Защо се използва 'облачно' съхранение на данни?", a: ["За да се пести ток", "За постоянен достъп през интернет от всяко устройство", "Защото е по-сигурно срещу гръмотевици", "За по-бързо принтиране"], c: 1 },
+            { s: "Създаване на съдържание", q: "Кой файлов формат поддържа прозрачност на изображението?", a: [".jpg", ".png", ".bmp", ".txt"], c: 1 },
+            { s: "Създаване на съдържание", q: "Какво представлява компресирането на файлове?", a: ["Промяна на името", "Намаляване на обема на файла чрез премахване на излишна информация", "Изтриване на файла", "Защита с парола"], c: 1 },
+            { s: "Създаване на съдържание", q: "Кое разширение е характерно за видео файл?", a: [".mp3", ".mp4", ".png", ".pdf"], c: 1 },
+
+            // РЕШАВАНЕ НА ПРОБЛЕМИ И МАКРОСИ (Теми 8-13)
+            { s: "Решаване на проблеми", q: "Какво е 'софтуерен проблем'?", a: ["Счупен монитор", "Неправилно функциониране на дадена програма", "Липса на интернет кабел", "Изгоряло захранване"], c: 1 },
+            { s: "Решаване на проблеми", q: "Коя е втората стъпка при решаване на проблем след неговото дефиниране?", a: ["Обаждане в сервиз", "Проучване на причините и търсене на решения", "Изхвърляне на техниката", "Плащане на лиценз"], c: 1 },
+            { s: "Решаване на проблеми", q: "С кой език се програмират сложни макроси в MS Office?", a: ["Python", "VBA (Visual Basic for Applications)", "JavaScript", "C++"], c: 1 },
+            { s: "Решаване на проблеми", q: "Каква е основната цел на макросите?", a: ["Да крадат пароли", "Да автоматизират повтарящи се и рутинни задачи", "Да подобряват интернет връзката", "Да чистят вируси"], c: 1 },
+            { s: "Решаване на проблеми", q: "Какво трябва да направите, ако получите файл с макроси от непознат източник?", a: ["Да ги активирате веднага", "Да ги деактивирате или да не отваряте файла поради риск от вируси", "Да ги препратите на приятел", "Да изтриете Windows"], c: 1 },
+            { s: "Решаване на проблеми", q: "Какво е 'скрипт'?", a: ["Вид монитор", "Малка програма (поредица от команди), която автоматизира действия", "Клавиатурна подредба", "Снимка на код"], c: 1 },
+
+            // БЕЗОПАСНОСТ И ЕРГОНОМИЯ (Теми 14-15)
+            { s: "Безопасност", q: "Какво регламентира правото 'да бъдеш забравен' според GDPR?", a: ["Правото да не ходиш на училище", "Правото да изискаш изтриване на твои лични данни от интернет платформите", "Правото да смениш името си", "Правото да не плащаш данъци"], c: 1 },
+            { s: "Безопасност", q: "Кое НЕ е сигурна парола?", a: ["P@ssw0rd2024!", "123456", "Kuche_Milo_99!", "A1b2C3d4_"], c: 1 },
+            { s: "Безопасност", q: "Какво е 'фишинг' (phishing)?", a: ["Игра с риби", "Опит за измама с цел кражба на лични данни чрез фалшиви съобщения", "Вид бърз интернет", "Компютърна графика"], c: 1 },
+            { s: "Безопасност", q: "Как се нарича защитата на данните чрез превръщането им в нечетим код?", a: ["Форматиране", "Криптиране (шифроване)", "Сортиране", "Архивиране"], c: 1 },
+            { s: "Безопасност", q: "Какво е 'дигитален отпечатък'?", a: ["Скенер за пръсти", "Следите от активност, които оставяме в интернет", "Снимка на ръката", "Вид антивирус"], c: 1 },
+            { s: "Безопасност", q: "Кое е важно за доброто здраве при работа с компютър?", a: ["Ядене пред монитора", "Редовни почивки и правилна ергономична стойка", "Силно осветление директно в очите", "Работа по 12 часа без прекъсване"], c: 1 },
+            { s: "Безопасност", q: "Къде трябва да се изхвърлят старите електронни компоненти?", a: ["В контейнера за битови отпадъци", "В специализирани пунктове за рециклиране на е-отпадъци", "В гората", "Никъде, пазят се вкъщи"], c: 1 },
+            { s: "Безопасност", q: "Какво означава ергономична мишка?", a: ["Мишка, която свети", "Мишка, чиято форма намалява натоварването на китката", "Мишка без кабели", "Мишка с много бутони"], c: 1 },
+
+            // ДОПЪЛНИТЕЛНИ ВЪПРОСИ ЗА ПЪЛНОТА
+            { s: "Създаване на съдържание", q: "Как се нарича процесът на обединяване на няколко файла в един архив?", a: ["Компресиране", "Архивиране", "Инсталиране", "Изтриване"], c: 1 },
+            { s: "Обработка на информацията", q: "Коя услуга позволява съвместно редактиране на таблици онлайн?", a: ["Google Sheets", "Paint", "Calculator", "VLC Player"], c: 0 },
+            { s: "Решаване на проблеми", q: "Какво е 'бъг' (bug)?", a: ["Насекомо в компютъра", "Грешка в програмния код", "Вид кабел", "Нова версия на софтуер"], c: 1 },
+            { s: "Създаване на съдържание", q: "Какво представлява цикличният алгоритъм?", a: ["Алгоритъм без край", "Алгоритъм, в който група от действия се повтарят многократно", "Алгоритъм само с една стъпка", "Алгоритъм за рисуване на кръгове"], c: 1 },
+            { s: "Безопасност", q: "За какво служи защитната стена (Firewall)?", a: ["Да пази компютъра от пожар", "Да контролира входящия и изходящия мрежов трафик", "Да ускорява игрите", "Да чисти прах"], c: 1 },
+            { s: "Обработка на информацията", q: "Кое от изброените е лични данни?", a: ["Любим цвят", "ЕГН и домашен адрес", "Марка на монитора", "Вид на операционната система"], c: 1 },
+            { s: "Създаване на съдържание", q: "Какво е 'разделителна способност' на изображение?", a: ["Името на файла", "Броят пиксели, определящи качеството на картината", "Цветът на рамката", "Времето за зареждане"], c: 1 },
+            { s: "Решаване на проблеми", q: "Кой клавиш обикновено отваря помощното меню (Help) в Windows?", a: ["F1", "F5", "Esc", "Enter"], c: 0 },
+            { s: "Създаване на съдържание", q: "Кое устройство се използва за въвеждане на аналогови изображения в цифров вид?", a: ["Принтер", "Скенер", "Тонколони", "Мишка"], c: 1 },
+            { s: "Безопасност", q: "Какво е 'спам'?", a: ["Важен имейл", "Нежелани рекламни съобщения, пращани масово", "Вид компютърна памет", "Програма за сигурност"], c: 1 },
+            { s: "Обработка на информацията", q: "Коя клауза в GDPR изисква съгласие за събиране на данни?", a: ["Лигитимност и съгласие", "Бързина", "Дизайн", "Достъпност"], c: 0 },
+            { s: "Създаване на съдържание", q: "Какво е PDF?", a: ["Формат за картинки", "Универсален формат за документи, запазващ оформлението", "Музикален формат", "Език за програмиране"], c: 1 },
+            { s: "Решаване на проблеми", q: "Какво означава 'рестартиране'?", a: ["Изтриване на всичко", "Повторно зареждане на операционната система", "Смяна на парола", "Купуване на нова мишка"], c: 1 },
+            { s: "Безопасност", q: "Защо трябва да актуализираме софтуера си?", a: ["За да заема повече място", "За поправка на грешки и запушване на пропуски в сигурността", "За да променим тапета", "Не е нужно"], c: 1 },
+            { s: "Обработка на информацията", q: "Коя е най-голямата глобална мрежа?", a: ["Локална мрежа (LAN)", "Интернет", "Интранет", "Bluetooth"], c: 1 }
+        ];
+
+        let testQuestions = [];
+        let currentIdx = 0;
+        let userAnswers = new Array(10).fill(null);
+
+        function startQuiz() {
+            document.getElementById('start-ui').style.display = 'none';
+            document.getElementById('quiz-ui').style.display = 'block';
+            document.getElementById('sidebar').style.display = 'flex';
+            
+            // Избиране на 10 случайни въпроса
+            testQuestions = questionBank.sort(() => 0.5 - Math.random()).slice(0, 10);
+            createSidebar();
+            renderQuestion();
+        }
+
+        function createSidebar() {
+            const side = document.getElementById('sidebar');
+            side.innerHTML = '';
+            for(let i=0; i<10; i++) {
+                const sq = document.createElement('div');
+                sq.className = 'q-square';
+                sq.id = `sq-${i}`;
+                sq.innerText = i + 1;
+                sq.onclick = () => { currentIdx = i; renderQuestion(); };
+                side.appendChild(sq);
+            }
+        }
+
+        function renderQuestion() {
+            const data = testQuestions[currentIdx];
+            document.getElementById('section-label').innerText = data.s;
+            document.getElementById('q-text').innerText = data.q;
+            
+            document.getElementById('prev-btn').style.visibility = (currentIdx === 0) ? "hidden" : "visible";
+            document.getElementById('next-btn').innerText = (currentIdx === 9) ? "Приключи" : "Напред";
+
+            const box = document.getElementById('options-box');
+            box.innerHTML = '';
+            data.a.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = 'option' + (userAnswers[currentIdx] === i ? ' selected' : '');
+                div.innerText = opt;
+                div.onclick = () => { userAnswers[currentIdx] = i; renderQuestion(); };
+                box.appendChild(div);
+            });
+
+            document.querySelectorAll('.q-square').forEach((sq, i) => {
+                sq.classList.remove('current');
+                if (i === currentIdx) sq.classList.add('current');
+                if (userAnswers[i] !== null) sq.classList.add('answered');
+            });
+        }
+
+        function nextQuestion() {
+            if (currentIdx < 9) { currentIdx++; renderQuestion(); } 
+            else { finishQuiz(); }
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) { currentIdx--; renderQuestion(); }
+        }
+
+        function finishQuiz() {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            if (unanswered > 0 && !confirm(`Остават ${unanswered} непопълнени въпроса. Да приключа ли?`)) return;
+
+            document.getElementById('quiz-ui').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('result-ui').style.display = 'block';
+
+            let correct = 0;
+            const analysisList = document.getElementById('analysis-list');
+            analysisList.innerHTML = '';
+
+            testQuestions.forEach((q, i) => {
+                const uAns = userAnswers[i];
+                const isCorrect = (uAns === q.c);
+                if (isCorrect) correct++;
+
+                analysisList.innerHTML += `
+                    <div class="analysis-item" style="border-left-color: ${isCorrect ? 'var(--success)' : 'var(--error)'}">
+                        <div style="font-weight:600; margin-bottom:5px;">${i+1}. ${q.q}</div>
+                        <div style="font-size:0.85rem; opacity: 0.9;">
+                            Отговор: <span style="color:${isCorrect ? 'var(--success)' : 'var(--error)'}">${uAns !== null ? q.a[uAns] : 'Не е отговорено'}</span>
+                            ${!isCorrect ? `<br>Верен: <span style="color:var(--success)">${q.a[q.c]}</span>` : 'Браво!'}
+                        </div>
+                    </div>`;
+            });
+
+            const grade = 2 + (correct * 0.4);
+            document.getElementById('final-grade').innerText = grade.toFixed(2);
+            document.getElementById('stats-text').innerText = `ВЕРНИ ОТГОВОРИ: ${correct} ОТ 10`;
+
+            if (grade >= 5.50) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+    </script>
+</body>
+</html>

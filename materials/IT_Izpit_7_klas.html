@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Компютърно моделиране и ИТ - 7 клас | д-р Адем Зейнев</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981; 
+            --primary-hover: #059669;
+            --bg: #020617;
+            --card-bg: rgba(15, 23, 42, 0.9);
+            --text: #f8fafc;
+            --error: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 50%, #064e3b 0%, #020617 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .main-wrapper {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+            align-items: stretch;
+        }
+
+        .sidebar {
+            width: 80px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+            display: none;
+        }
+
+        .q-square {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .q-square.current { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); color: var(--primary); }
+        .q-square.answered { background: var(--primary); color: white; }
+
+        .main-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 32px;
+            flex-grow: 1;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            text-align: center;
+        }
+
+        .author-tag { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); margin-bottom: 0.5rem; font-weight: 600; }
+        h1 { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+
+        .btn-main {
+            background: var(--primary);
+            color: white; border: none; padding: 1rem 2rem; border-radius: 12px;
+            font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-main:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn-main:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 2rem; }
+        #quiz-ui, #result-ui { display: none; }
+        .question-text { font-size: 1.3rem; font-weight: 600; margin-bottom: 2rem; text-align: left; min-height: 80px; line-height: 1.4; }
+        .options-list { display: grid; gap: 0.8rem; }
+        .option {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.1rem; border-radius: 14px; cursor: pointer; text-align: left; transition: 0.2s;
+        }
+        .option:hover { background: rgba(16, 185, 129, 0.1); border-color: var(--primary); }
+        .option.selected { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); font-weight: 600; }
+
+        .analysis-container { text-align: left; margin-top: 1.5rem; max-height: 350px; overflow-y: auto; padding-right: 10px; }
+        .analysis-item { background: rgba(255, 255, 255, 0.03); padding: 1rem; margin-bottom: 10px; border-radius: 12px; border-left: 4px solid var(--primary); }
+        .res-wrong { color: var(--error); font-weight: bold; }
+        .res-correct { color: var(--primary); font-weight: bold; }
+        .grade-display { font-size: 4rem; font-weight: 900; color: var(--primary); margin: 1rem 0; }
+
+        @media (max-width: 768px) {
+            .main-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="sidebar" id="sidebar"></div>
+        <div class="main-card">
+            <div id="start-ui">
+                <div class="author-tag">д-р Адем Зейнев представя</div>
+                <h1>КМ И ИТ - 7 КЛАС</h1>
+                <p style="opacity: 0.7; margin-bottom: 2rem;">Изпитна система по програмата на изд. Сиела (60 въпроса).</p>
+                <button class="btn-main" onclick="startQuiz()">Започни изпита</button>
+            </div>
+
+            <div id="quiz-ui">
+                <div class="author-tag">Въпрос <span id="q-num-display">1</span> / 10</div>
+                <div class="question-text" id="q-text">Зареждане...</div>
+                <div class="options-list" id="options-box"></div>
+                <div class="nav-buttons">
+                    <button class="btn-main" id="prev-btn" onclick="prevQuestion()" style="background: #334155;">Предишен</button>
+                    <button class="btn-main" id="next-btn" onclick="nextQuestion()">Следващ</button>
+                </div>
+            </div>
+
+            <div id="result-ui">
+                <div class="author-tag">Окончателен анализ</div>
+                <div class="grade-display" id="final-grade">2.00</div>
+                <p id="stats-text" style="font-weight: 600;">Верни: 0 | Грешни: 0</p>
+                <div class="analysis-container" id="analysis-list"></div>
+                <button class="btn-main" onclick="location.reload()">Нов изпит</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        const questionBank = [
+            // КОМПЮТЪРНИ СИСТЕМИ И МРЕЖИ (1-12)
+            { q: "Какво е предназначението на операционната система?", a: ["Да рисува картинки", "Да управлява хардуерните ресурси и софтуера", "Да свързва кабели", "Да почиства монитора"], c: 1 },
+            { q: "Кой от изброените е системен софтуер?", a: ["MS Word", "Linux", "Scratch", "PowerPoint"], c: 1 },
+            { q: "Какво означава съкращението LAN?", a: ["Локална мрежа", "Глобална мрежа", "Безжична мишка", "Вид процесор"], c: 0 },
+            { q: "Кое устройство свързва компютрите в локална мрежа?", a: ["Монитор", "Комутатор (Switch)", "Принтер", "Твърд диск"], c: 1 },
+            { q: "Какво е IP адрес?", a: ["Име на потребител", "Уникален цифров адрес на устройство в мрежа", "Пощенски код", "Парола за Wi-Fi"], c: 1 },
+            { q: "Коя мрежа е най-голяма по териториален обхват?", a: ["LAN", "PAN", "WAN (Глобална)", "MAN"], c: 2 },
+            { q: "Какво е предназначението на рутера?", a: ["Да печата", "Да насочва пакети данни между мрежи", "Да увеличава звука", "Да съхранява файлове"], c: 1 },
+            { q: "Кой протокол се използва за пренос на уеб страници?", a: ["FTP", "SMTP", "HTTP/HTTPS", "POP3"], c: 2 },
+            { q: "Кое устройство е периферно входно?", a: ["Скенер", "Принтер", "Тонколони", "Монитор"], c: 0 },
+            { q: "Какво представлява 'Облачна услуга'?", a: ["Прогноза за времето", "Съхранение и обработка на данни в интернет", "Вид операционна система", "Безжична клавиатура"], c: 1 },
+            { q: "Кое от изброените е облачно пространство?", a: ["Google Drive", "C: диск", "RAM памет", "DVD"], c: 0 },
+            { q: "Какво е браузър?", a: ["Програма за разглеждане на уеб страници", "Антивирусна програма", "Текстов редактор", "Търсачка"], c: 0 },
+
+            // ЕЛЕКТРОННИ ТАБЛИЦИ - EXCEL (13-24)
+            { q: "Как започва всяка формула в Excel?", a: ["С буква", "Със знака =", "С тире", "Със скоби"], c: 1 },
+            { q: "Коя функция изчислява сбора на клетки?", a: ["AVERAGE", "SUM", "MIN", "MAX"], c: 1 },
+            { q: "Как се означава абсолютен адрес на клетка?", a: ["A1", "$A$1", "#A#1", "@A1"], c: 1 },
+            { q: "Коя функция намира средноаритметично?", a: ["SUM", "AVERAGE", "COUNT", "IF"], c: 1 },
+            { q: "Какво прави функцията MAX?", a: ["Брои клетки", "Намира най-голямата стойност", "Събира", "Сортира"], c: 1 },
+            { q: "Как се нарича пресичането на ред и колона?", a: ["Поле", "Клетка", "Блок", "Лист"], c: 1 },
+            { q: "Кой символ се използва за умножение в Excel?", a: ["x", ":", "*", "."], c: 2 },
+            { q: "Какво прави функцията COUNT?", a: ["Събира числа", "Брои клетки с числови стойности", "Търси текст", "Сменя цвета"], c: 1 },
+            { q: "Как се нарича диаграмата, която представя дялове от цялото?", a: ["Линейна", "Кръгова (Pie)", "Хистограма", "Точкова"], c: 1 },
+            { q: "Как се сортират данни от А до Я?", a: ["Descending", "Ascending", "Filter", "Sum"], c: 1 },
+            { q: "Какво е 'Филтриране' в Excel?", a: ["Изтриване на данни", "Показване само на редове, отговарящи на условие", "Сортиране по име", "Чертане на графики"], c: 1 },
+            { q: "Кой оператор се използва за степенуване?", a: ["^", "*", "/", "&"], c: 0 },
+
+            // КОМПЮТЪРНО МОДЕЛИРАНЕ - SCRATCH/PYTHON (25-48)
+            { q: "Какво е променлива?", a: ["Име на спрайт", "Именувано място в паметта за съхранение на данни", "Цвят на фона", "Вид блок"], c: 1 },
+            { q: "Кой блок в Scratch се използва за проверка на условие?", a: ["repeat", "if-then", "move", "say"], c: 1 },
+            { q: "Какво е цикъл в програмирането?", a: ["Грешка", "Многократно повторение на група команди", "Вид променлива", "Начало на програмата"], c: 1 },
+            { q: "Какво прави операторът 'mod' (остатък)?", a: ["Дели с десетична запетая", "Дава остатъка при целочислено деление", "Умножава", "Закръгля"], c: 1 },
+            { q: "Кой от изброените е логически оператор?", a: ["+", "=", "AND (И)", "move"], c: 2 },
+            { q: "Какво е списък в Scratch?", a: ["Една променлива", "Структура за съхранение на поредица от данни", "Име на сцена", "Костюм"], c: 1 },
+            { q: "Кой блок се използва за безкрайно повторение?", a: ["repeat 10", "forever", "repeat until", "if"], c: 1 },
+            { q: "Какво е алгоритъм?", a: ["Компютърна игра", "Точна последователност от стъпки за решаване на проблем", "Вид монитор", "Снимка"], c: 1 },
+            { q: "Какво прави блокът 'pick random'?", a: ["Изтрива спрайт", "Генерира случайно число", "Сменя фона", "Спира програмата"], c: 1 },
+            { q: "Какво означава 'вложен цикъл'?", a: ["Цикъл, който е поставен вътре в друг цикъл", "Счупен цикъл", "Цикъл с грешка", "Цикъл за звук"], c: 0 },
+            { q: "В Scratch, коя категория блокове отговаря за движението?", a: ["Looks", "Motion", "Sound", "Events"], c: 1 },
+            { q: "Какво става, когато се изпълни блокът 'broadcast'?", a: ["Спрайтът изчезва", "Изпраща се съобщение до всички обекти", "Програмата спира", "Сменя се костюмът"], c: 1 },
+            { q: "Коя стойност може да има типът Boolean?", a: ["Число", "Текст", "True или False", "Списък"], c: 2 },
+            { q: "Какво е 'събитие' (Event) в Scratch?", a: ["Клавиш, щракване с мишка или сигнал, който стартира код", "Краят на програмата", "Вид променлива", "Звуков ефект"], c: 0 },
+            { q: "Какво прави операторът NOT (НЕ)?", a: ["Събира", "Обръща истината в лъжа и обратно", "Спира цикъла", "Нищо"], c: 1 },
+            { q: "Кой блок добавя елемент към списък?", a: ["delete", "add", "replace", "show"], c: 1 },
+            { q: "За какво служи 'сензорът' (Sensing) в Scratch?", a: ["За рисуване", "За засичане на допир, цвят или разстояние", "За смяна на език", "За изключване"], c: 1 },
+            { q: "Кой блок променя стойността на променлива?", a: ["set variable to", "change variable by", "show variable", "hide"], c: 1 },
+            { q: "Какво е 'скрипт'?", a: ["Картинка", "Поредица от свързани блокове (команди)", "Кошче за боклук", "Име на проект"], c: 1 },
+            { q: "Как се нарича фонът в Scratch?", a: ["Sprite", "Stage (Сцена)", "Backdrop", "Costume"], c: 2 },
+            { q: "Какво прави командата 'wait 1 seconds'?", a: ["Забързва кода", "Паузира изпълнението за 1 секунда", "Изключва компютъра", "Брои до 100"], c: 1 },
+            { q: "Какво е 'костюм' в Scratch?", a: ["Дреха за ученик", "Различна визия на един и същ спрайт", "Име на променлива", "Музикален файл"], c: 1 },
+            { q: "Кой блок спира всички скриптове?", a: ["stop all", "pause", "end", "delete"], c: 0 },
+            { q: "Какво прави блокът 'pen down'?", a: ["Пише текст", "Започва да чертае следа при движение", "Спира звука", "Сменя цвета"], c: 1 },
+
+            // ЗВУК, ВИДЕО И СОЦИАЛНИ ТЕМИ (49-60)
+            { q: "Кой формат е за аудио файлове?", a: ["PNG", "MP3", "MP4", "EXE"], c: 1 },
+            { q: "Кой формат е за видео файлове?", a: ["JPEG", "MP3", "AVI/MP4", "TXT"], c: 2 },
+            { q: "Какво е 'битрейт' (bitrate)?", a: ["Тегло на компютъра", "Количество данни за секунда при аудио/видео", "Цвят", "Брой кадри"], c: 1 },
+            { q: "Коя програма се използва за видеомонтаж?", a: ["Excel", "OpenShot / Movie Maker", "Calculator", "Notepad"], c: 1 },
+            { q: "Какво е 'авторско право'?", a: ["Правото да трием файлове", "Законна защита на творбите на авторите", "Парола за компютър", "Вид лиценз за хардуер"], c: 1 },
+            { q: "Какво е 'нетикет'?", a: ["Етикет за дрехи", "Правила за добро поведение в интернет", "Вирус", "Вид мрежа"], c: 1 },
+            { q: "Какво е кибертормоз?", a: ["Бързо писане", "Насилие и тормоз чрез дигитални технологии", "Игра на компютър", "Вид програмиране"], c: 1 },
+            { q: "Какво е дигитален отпечатък?", a: ["Следите, които оставяме в интернет", "Скенер за пръсти", "Парола", "Снимка на екрана"], c: 0 },
+            { q: "Кое е сигурна парола?", a: ["123456", "parola", "A8*kL2_9p", "admin"], c: 2 },
+            { q: "Какво е стрийминг?", a: ["Сваляне на файл", "Гледане/слушане на съдържание в реално време", "Триене на снимки", "Рисуване в облака"], c: 1 },
+            { q: "Коя услуга се използва за видеоконференции?", a: ["Excel", "Zoom / MS Teams", "Word", "Paint"], c: 1 },
+            { q: "Какво представлява 'социална мрежа'?", a: ["Кабелна мрежа", "Онлайн платформа за общуване и споделяне", "Операционна система", "Хардуер"], c: 1 }
+        ];
+
+        let selectedQuestions = [];
+        let currentIdx = 0;
+        let userAnswers = new Array(10).fill(null);
+
+        function startQuiz() {
+            document.getElementById('start-ui').style.display = 'none';
+            document.getElementById('quiz-ui').style.display = 'block';
+            document.getElementById('sidebar').style.display = 'flex';
+            
+            selectedQuestions = questionBank.sort(() => 0.5 - Math.random()).slice(0, 10);
+            createSidebar();
+            renderQuestion();
+        }
+
+        function createSidebar() {
+            const side = document.getElementById('sidebar');
+            side.innerHTML = '';
+            for(let i=0; i<10; i++) {
+                const sq = document.createElement('div');
+                sq.className = 'q-square';
+                sq.id = `sq-${i}`;
+                sq.innerText = i + 1;
+                sq.onclick = () => jumpToQuestion(i);
+                side.appendChild(sq);
+            }
+        }
+
+        function renderQuestion() {
+            const data = selectedQuestions[currentIdx];
+            document.getElementById('q-num-display').innerText = currentIdx + 1;
+            document.getElementById('q-text').innerText = data.q;
+            
+            document.getElementById('prev-btn').disabled = (currentIdx === 0);
+            document.getElementById('next-btn').innerText = (currentIdx === 9) ? "Приключи" : "Следващ";
+
+            const box = document.getElementById('options-box');
+            box.innerHTML = '';
+
+            data.a.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = 'option' + (userAnswers[currentIdx] === i ? ' selected' : '');
+                div.innerText = opt;
+                div.onclick = () => selectOption(i);
+                box.appendChild(div);
+            });
+
+            document.querySelectorAll('.q-square').forEach((sq, i) => {
+                sq.classList.remove('current');
+                if (i === currentIdx) sq.classList.add('current');
+                if (userAnswers[i] !== null) sq.classList.add('answered');
+            });
+        }
+
+        function selectOption(idx) {
+            userAnswers[currentIdx] = idx;
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (currentIdx < 9) {
+                currentIdx++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                renderQuestion();
+            }
+        }
+
+        function jumpToQuestion(i) {
+            currentIdx = i;
+            renderQuestion();
+        }
+
+        function finishQuiz() {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            if (unanswered > 0) {
+                if (!confirm(`Имате ${unanswered} непопълнени въпроса. Сигурни ли сте, че искате да приключите?`)) return;
+            }
+
+            document.getElementById('quiz-ui').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('result-ui').style.display = 'block';
+
+            let correct = 0;
+            const analysisList = document.getElementById('analysis-list');
+            analysisList.innerHTML = '';
+
+            selectedQuestions.forEach((q, i) => {
+                const uAns = userAnswers[i];
+                const isCorrect = (uAns === q.c);
+                if (isCorrect) correct++;
+
+                const item = document.createElement('div');
+                item.className = 'analysis-item';
+                item.style.borderLeftColor = isCorrect ? 'var(--primary)' : 'var(--error)';
+                item.innerHTML = `
+                    <div style="font-weight:600; margin-bottom:5px;">${i+1}. ${q.q}</div>
+                    <div style="font-size:0.9rem;">
+                        Твоят избор: <span class="${isCorrect ? 'res-correct' : 'res-wrong'}">${uAns !== null ? q.a[uAns] : 'Не е отговорено'}</span><br>
+                        ${!isCorrect ? `Правилен отговор: <span class="res-correct">${q.a[q.c]}</span>` : ''}
+                    </div>
+                `;
+                analysisList.appendChild(item);
+            });
+
+            const grade = 2 + (correct * 0.4);
+            document.getElementById('final-grade').innerText = grade.toFixed(2);
+            document.getElementById('stats-text').innerText = `Верни: ${correct} | Грешни: ${10 - correct}`;
+
+            if (grade >= 5.5) {
+                confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ИТ 6 клас - д-р Адем Зейнев | Просвета Плюс & Сиела</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6; 
+            --primary-hover: #2563eb;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --text: #f1f5f9;
+            --error: #f43f5e;
+            --success: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .main-wrapper {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .sidebar {
+            width: 85px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            justify-content: center;
+            display: none;
+        }
+
+        .q-square {
+            width: 55px;
+            height: 55px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .q-square.current { border-color: var(--primary); background: rgba(59, 130, 246, 0.2); color: var(--primary); }
+        .q-square.answered { background: var(--primary); color: white; }
+
+        .main-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3.5rem;
+            border-radius: 35px;
+            flex-grow: 1;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+
+        .author-tag { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; color: var(--primary); margin-bottom: 0.8rem; font-weight: 700; }
+        h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -1px; }
+        .sub-title { font-size: 1.1rem; opacity: 0.7; margin-bottom: 2.5rem; }
+
+        .btn-main {
+            background: var(--primary);
+            color: white; border: none; padding: 1.2rem 2.5rem; border-radius: 18px;
+            font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-main:hover { background: var(--primary-hover); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4); }
+
+        .question-text { font-size: 1.5rem; font-weight: 600; margin-bottom: 2rem; text-align: left; line-height: 1.4; min-height: 100px; }
+        .options-list { display: grid; gap: 1rem; }
+        .option {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.4rem; border-radius: 20px; cursor: pointer; text-align: left; transition: 0.2s;
+        }
+        .option:hover { background: rgba(59, 130, 246, 0.1); border-color: var(--primary); }
+        .option.selected { border-color: var(--primary); background: rgba(59, 130, 246, 0.2); font-weight: 600; }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 3rem; }
+        #quiz-ui, #result-ui { display: none; }
+        
+        .grade-display { font-size: 6rem; font-weight: 900; color: var(--success); margin: 1rem 0; }
+        .analysis-container { text-align: left; margin-top: 2rem; max-height: 350px; overflow-y: auto; padding-right: 15px; }
+        .analysis-item { background: rgba(255, 255, 255, 0.02); padding: 1.3rem; margin-bottom: 12px; border-radius: 18px; border-left: 5px solid var(--primary); }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+
+        @media (max-width: 768px) {
+            .main-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; }
+            .main-card { padding: 2.5rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="sidebar" id="sidebar"></div>
+        <div class="main-card">
+            <div id="start-ui">
+                <div class="author-tag">д-р Адем Зейнев | Просвета Плюс & Сиела</div>
+                <h1>ИТ 6. КЛАС</h1>
+                <div class="sub-title">Информационни технологии - Годишна подготовка</div>
+                <p style="opacity: 0.6; margin-bottom: 2.5rem; line-height: 1.6;">
+                    Тестът обхваща материалите за 6. клас:<br>
+                    Хардуер • Интернет • Звук и Видео • Електронни таблици • Scratch
+                </p>
+                <button class="btn-main" onclick="startQuiz()">Започни изпита</button>
+            </div>
+
+            <div id="quiz-ui">
+                <div class="author-tag" id="section-label">Раздел</div>
+                <div class="question-text" id="q-text">...</div>
+                <div class="options-list" id="options-box"></div>
+                <div class="nav-buttons">
+                    <button class="btn-main" id="prev-btn" onclick="prevQuestion()" style="background: #334155; padding: 1rem 1.5rem;">Назад</button>
+                    <button class="btn-main" id="next-btn" onclick="nextQuestion()">Напред</button>
+                </div>
+            </div>
+
+            <div id="result-ui">
+                <div class="author-tag">Резултат (д-р Адем Зейнев)</div>
+                <div class="grade-display" id="final-grade">2.00</div>
+                <p id="stats-text" style="font-weight: 700; letter-spacing: 1px;"></p>
+                <div class="analysis-container" id="analysis-list"></div>
+                <button class="btn-main" onclick="location.reload()" style="margin-top: 2rem;">Нов опит</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        const questionBank = [
+            // КОМПЮТЪРНИ СИСТЕМИ
+            { s: "Компютърни системи", q: "Кое от изброените е периферно устройство за извеждане на информация?", a: ["Скенер", "Принтер", "Мишка", "Клавиатура"], c: 1 },
+            { s: "Компютърни системи", q: "Какво означава съкращението RAM?", a: ["Оперативна памет", "Постоянна памет", "Твърд диск", "Процесор"], c: 0 },
+            { s: "Компютърни системи", q: "Кое устройство е 'сърцето' на компютъра и извършва изчисленията?", a: ["Монитор", "Процесор (CPU)", "Твърд диск", "Захранващ блок"], c: 1 },
+            { s: "Компютърни системи", q: "Кое разширение е на файл, създаден с програмата MS Word?", a: [".xlsx", ".pptx", ".docx", ".mp3"], c: 2 },
+            { s: "Компютърни системи", q: "Кое от изброените е софтуер (програмно осигуряване)?", a: ["Мишка", "Монитор", "Операционна система", "Клавиатура"], c: 2 },
+
+            // ИНТЕРНЕТ И БЕЗОПАСНОСТ
+            { s: "Интернет", q: "Какво представлява понятието 'Нетакет' (Netiquette)?", a: ["Компютърна мрежа", "Правила за учтиво поведение в интернет", "Вид интернет браузър", "Защитна програма"], c: 1 },
+            { s: "Интернет", q: "Кое от изброените е браузър?", a: ["Google Chrome", "Windows 10", "MS Excel", "Skype"], c: 0 },
+            { s: "Интернет", q: "Какво означава терминът 'авторско право' в интернет?", a: ["Правото да копираме всичко", "Правната защита на произведения на изкуството и науката", "Правото на безплатен интернет", "Правото да променяме чужди снимки"], c: 1 },
+            { s: "Интернет", q: "Какво е 'фишинг'?", a: ["Игра с риби", "Опит за измама с цел кражба на пароли и лични данни", "Бързо теглене на филми", "Вид социална мрежа"], c: 1 },
+            { s: "Интернет", q: "Кой символ се използва в имейл адресите за разделяне на потребителското име от името на сървъра?", a: ["#", "&", "@", "$"], c: 2 },
+
+            // ЗВУК И ВИДЕО
+            { s: "Звук и видео", q: "Кое устройство се използва за въвеждане на звукова информация в компютъра?", a: ["Тонколони", "Микрофон", "Принтер", "Монитор"], c: 1 },
+            { s: "Звук и видео", q: "Кой от изброените е формат за звуков файл?", a: [".jpg", ".mp3", ".docx", ".pdf"], c: 1 },
+            { s: "Звук и видео", q: "Коя програма е подходяща за елементарна обработка на видео?", a: ["Windows Movie Maker / Photos", "Calculator", "MS Word", "Paint"], c: 0 },
+            { s: "Звук и видео", q: "Какво представлява 'стрийминг' (streaming)?", a: ["Теглене на файл за по-късно", "Гледане или слушане на съдържание в реално време през интернет", "Изтриване на музика", "Принтиране на кадри от филм"], c: 1 },
+            { s: "Звук и видео", q: "Кой е най-разпространеният видео формат?", a: [".mp4", ".txt", ".mp3", ".bmp"], c: 0 },
+
+            // ЕЛЕКТРОННИ ТАБЛИЦИ
+            { s: "Електронни таблици", q: "Как се нарича най-малката съставна част на таблицата в Excel?", a: ["Лист", "Колона", "Клетка", "Ред"], c: 2 },
+            { s: "Електронни таблици", q: "С кой знак задължително започва всяка формула в Excel?", a: ["+", "=", "$", "#"], c: 1 },
+            { s: "Електронни таблици", q: "Кой е адресът на клетката, намираща се в колона B и ред 5?", a: ["5B", "B-5", "B5", "CellB5"], c: 2 },
+            { s: "Електронни таблици", q: "Коя функция в Excel се използва за пресмятане на средноаритметично?", a: ["SUM", "MAX", "AVERAGE", "MIN"], c: 2 },
+            { s: "Електронни таблици", q: "Какво означава командата 'Merge Cells'?", a: ["Изтриване на клетки", "Сливане на няколко клетки в една", "Разделяне на таблицата", "Оцветяване на клетки"], c: 1 },
+            { s: "Електронни таблици", q: "Как се обозначават колоните в Excel?", a: ["С цифри", "С цветове", "С латински букви", "Със символи"], c: 2 },
+            { s: "Електронни таблици", q: "Какъв ще е резултатът от формулата =5+2*10?", a: ["70", "25", "52", "17"], c: 1 },
+
+            // ПРЕЗЕНТАЦИИ
+            { s: "Презентации", q: "Как се нарича отделната страница в компютърната презентация?", a: ["Лист", "Слайд", "Кадър", "Документ"], c: 1 },
+            { s: "Презентации", q: "Какво е 'анимация' в презентация?", a: ["Смяната на един слайд с друг", "Раздвижването на отделен обект (текст или картинка)", "Промяна на темата", "Записване на файла"], c: 1 },
+            { s: "Презентации", q: "Кой клавиш стартира презентацията от самото начало в PowerPoint?", a: ["F1", "F5", "Esc", "Enter"], c: 1 },
+            { s: "Презентации", q: "Какво е 'преход' (transition)?", a: ["Ефект при смяна на слайдовете", "Музикален фон", "Вид шрифт", "Връзка към уебсайт"], c: 0 },
+
+            // ПРОГРАМИРАНЕ (SCRATCH)
+            { s: "Програмиране", q: "Как се нарича героят (обектът) в средата Scratch?", a: ["Спрайт", "Актьор", "Блок", "Костюм"], c: 0 },
+            { s: "Програмиране", q: "Кой блок се използва за повтаряне на действия?", a: ["Ако...то", "Винаги / Повтори", "Когато е щракнато", "Кажи Здравей"], c: 1 },
+            { s: "Програмиране", q: "Къде се сглобяват блоковете с инструкции в Scratch?", a: ["В раницата", "В полето за скриптове", "На сцената", "В лентата със задачи"], c: 1 },
+            { s: "Програмиране", q: "Кой блок поставя начало на програмата при натискане на зеленото знаменце?", a: ["Движение", "Събития", "Сетивност", "Оператори"], c: 1 },
+            { s: "Програмиране", q: "Как се променя външният вид на спрайта в Scratch?", a: ["Чрез нов скрипт", "Чрез смяна на костюма", "Чрез нов проект", "Не може да се променя"], c: 1 },
+            { s: "Програмиране", q: "Коя категория блокове в Scratch е синя на цвят?", a: ["Звук", "Движение", "Контрол", "Променливи"], c: 1 },
+
+            // ОЩЕ ВЪПРОСИ ЗА ОБЩА КУЛТУРА
+            { s: "Общи знания", q: "Колко бита съдържа един байт?", a: ["10", "1024", "8", "100"], c: 2 },
+            { s: "Общи знания", q: "Кое е най-голямото количество памет?", a: ["1 KB", "1 GB", "1 MB", "1 TB"], c: 3 },
+            { s: "Интернет", q: "Кое от изброените е социална мрежа?", a: ["Facebook", "MS Word", "Google Search", "Windows 11"], c: 0 },
+            { s: "Компютърни системи", q: "Какво прави командата 'Copy'?", a: ["Мести обект", "Премахва обект", "Създава копие на обекта в клипборда", "Изтрива обекта"], c: 2 },
+            { s: "Електронни таблици", q: "Коя икона се използва за автоматично сумиране (AutoSum)?", a: ["?", "f(x)", "Σ", "%"], c: 2 },
+            { s: "Звук и видео", q: "Какво означава съкращението AVI?", a: ["Вид аудио формат", "Вид видео формат", "Текстов формат", "Процесор"], c: 1 },
+            { s: "Презентации", q: "Кой режим ни позволява да виждаме всички слайдове едновременно като малки картинки?", a: ["Normal", "Slide Sorter", "Slide Show", "Notes Page"], c: 1 },
+            { s: "Програмиране", q: "Координатата X в Scratch определя:", a: ["Движението нагоре-надолу", "Движението наляво-надясно", "Размера на спрайта", "Цвета"], c: 1 }
+        ];
+
+        let selectedQ = [];
+        let currentIdx = 0;
+        let userAns = new Array(10).fill(null);
+
+        function startQuiz() {
+            document.getElementById('start-ui').style.display = 'none';
+            document.getElementById('quiz-ui').style.display = 'block';
+            document.getElementById('sidebar').style.display = 'flex';
+            
+            selectedQ = questionBank.sort(() => 0.5 - Math.random()).slice(0, 10);
+            createSidebar();
+            renderQuestion();
+        }
+
+        function createSidebar() {
+            const side = document.getElementById('sidebar');
+            side.innerHTML = '';
+            for(let i=0; i<10; i++) {
+                const sq = document.createElement('div');
+                sq.className = 'q-square';
+                sq.id = `sq-${i}`;
+                sq.innerText = i + 1;
+                sq.onclick = () => { currentIdx = i; renderQuestion(); };
+                side.appendChild(sq);
+            }
+        }
+
+        function renderQuestion() {
+            const data = selectedQ[currentIdx];
+            document.getElementById('section-label').innerText = data.s;
+            document.getElementById('q-text').innerText = data.q;
+            
+            document.getElementById('prev-btn').style.visibility = (currentIdx === 0) ? "hidden" : "visible";
+            document.getElementById('next-btn').innerText = (currentIdx === 9) ? "Приключи" : "Напред";
+
+            const box = document.getElementById('options-box');
+            box.innerHTML = '';
+            data.a.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = 'option' + (userAns[currentIdx] === i ? ' selected' : '');
+                div.innerText = opt;
+                div.onclick = () => { userAns[currentIdx] = i; renderQuestion(); };
+                box.appendChild(div);
+            });
+
+            document.querySelectorAll('.q-square').forEach((sq, i) => {
+                sq.classList.remove('current');
+                if (i === currentIdx) sq.classList.add('current');
+                if (userAns[i] !== null) sq.classList.add('answered');
+            });
+        }
+
+        function nextQuestion() {
+            if (currentIdx < 9) { currentIdx++; renderQuestion(); } 
+            else { finishQuiz(); }
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) { currentIdx--; renderQuestion(); }
+        }
+
+        function finishQuiz() {
+            const empty = userAns.filter(a => a === null).length;
+            if (empty > 0 && !confirm(`Имате ${empty} непопълнени въпроса. Да приключа ли?`)) return;
+
+            document.getElementById('quiz-ui').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('result-ui').style.display = 'block';
+
+            let correct = 0;
+            const analysisList = document.getElementById('analysis-list');
+            analysisList.innerHTML = '';
+
+            selectedQ.forEach((q, i) => {
+                const isCorrect = (userAns[i] === q.c);
+                if (isCorrect) correct++;
+
+                analysisList.innerHTML += `
+                    <div class="analysis-item" style="border-left-color: ${isCorrect ? 'var(--success)' : 'var(--error)'}">
+                        <div style="font-weight:600; margin-bottom:5px;">${i+1}. ${q.q}</div>
+                        <div style="font-size:0.85rem; opacity: 0.9;">
+                            Отговор: <span style="color:${isCorrect ? 'var(--success)' : 'var(--error)'}">${userAns[i] !== null ? q.a[userAns[i]] : 'Не е отговорено'}</span>
+                            ${!isCorrect ? `<br>Верен: <span style="color:var(--success)">${q.a[q.c]}</span>` : ''}
+                        </div>
+                    </div>`;
+            });
+
+            const grade = 2 + (correct * 0.4);
+            document.getElementById('final-grade').innerText = grade.toFixed(2);
+            document.getElementById('stats-text').innerText = `ВЕРНИ ОТГОВОРИ: ${correct} ОТ 10`;
+
+            if (grade >= 5.50) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#3b82f6', '#10b981', '#ffffff'] });
+            }
+        }
+    </script>
+</body>
+</html>
