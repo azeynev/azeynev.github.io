@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дигитална учебна библиотека | д-р Адем Ибушев Зейнев (PhD)</title>
-    <meta name="description" content="Интерактивна дигитална библиотека с 31 авторски HTML5 симулации, визуализации и учебни лаборатории по Математика, Информатика, Физика и Биология — д-р Адем Ибушев Зейнев.">
+    <meta name="description" content="Интерактивна дигитална библиотека с 45 авторски HTML5 симулации, изпитни системи и учебни лаборатории по Математика, Информатика, Физика и Биология — д-р Адем Ибушев Зейнев.">
     <meta name="author" content="д-р Адем Ибушев Зейнев / Adem ZEINEV, PhD">
     <meta name="theme-color" content="#4338ca">
 
@@ -125,14 +125,14 @@
                     <!-- Quick Hub Stats -->
                     <div class="grid grid-cols-3 gap-2.5 shrink-0 text-center">
                         <div class="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm">
-                            <div id="stat-total-count" class="text-2xl font-extrabold text-white">31</div>
+                            <div id="stat-total-count" class="text-2xl font-extrabold text-white">45</div>
                             <div class="text-[11px] text-indigo-100">
                                 <span class="lang-inline-bg">Разработки</span>
                                 <span class="lang-inline-en">Modules</span>
                             </div>
                         </div>
                         <div class="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm">
-                            <div class="text-2xl font-extrabold text-emerald-300">5</div>
+                            <div class="text-2xl font-extrabold text-emerald-300">6</div>
                             <div class="text-[11px] text-indigo-100">
                                 <span class="lang-inline-bg">Направления</span>
                                 <span class="lang-inline-en">Subjects</span>
@@ -156,22 +156,25 @@
                 <!-- Category Tabs -->
                 <div class="flex flex-wrap gap-2" id="category-tabs">
                     <button data-cat="all" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-600 text-white shadow-sm transition">
-                        <span class="lang-inline-bg">Всички (31)</span><span class="lang-inline-en">All (31)</span>
+                        <span class="lang-inline-bg">Всички (45)</span><span class="lang-inline-en">All (45)</span>
                     </button>
                     <button data-cat="math" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
                         📐 <span class="lang-inline-bg">Математика (7)</span><span class="lang-inline-en">Mathematics (7)</span>
                     </button>
                     <button data-cat="informatics" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
-                        💻 <span class="lang-inline-bg">Информатика и Схемотехника (8)</span><span class="lang-inline-en">Informatics & Logic (8)</span>
+                        💻 <span class="lang-inline-bg">Информатика и Симулатори (13)</span><span class="lang-inline-en">Informatics & Simulators (13)</span>
+                    </button>
+                    <button data-cat="exams" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
+                        📝 <span class="lang-inline-bg">Изпити и Тестове (6)</span><span class="lang-inline-en">Exams & Tests (6)</span>
                     </button>
                     <button data-cat="physics" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
-                        ⚡ <span class="lang-inline-bg">Физика и Техника (6)</span><span class="lang-inline-en">Physics & Tech (6)</span>
+                        ⚡ <span class="lang-inline-bg">Физика и Техника (7)</span><span class="lang-inline-en">Physics & Tech (7)</span>
                     </button>
                     <button data-cat="biology" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
-                        🧬 <span class="lang-inline-bg">Биология и Химия (9)</span><span class="lang-inline-en">Biology & Chemistry (9)</span>
+                        🧬 <span class="lang-inline-bg">Биология и Химия (10)</span><span class="lang-inline-en">Biology & Chemistry (10)</span>
                     </button>
                     <button data-cat="tools" class="mat-cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition">
-                        🏫 <span class="lang-inline-bg">Училищни инструменти (1)</span><span class="lang-inline-en">School Tools (1)</span>
+                        🏫 <span class="lang-inline-bg">Училищни инструменти (2)</span><span class="lang-inline-en">School Tools (2)</span>
                     </button>
                 </div>
 
@@ -196,7 +199,7 @@
                 <span>
                     <span class="lang-inline-bg">Показани разработки:</span>
                     <span class="lang-inline-en">Showing modules:</span>
-                    <strong id="visible-count" class="text-brand-600 dark:text-brand-400">31</strong>
+                    <strong id="visible-count" class="text-brand-600 dark:text-brand-400">45</strong>
                 </span>
                 <button onclick="resetAllFilters()" class="text-brand-600 dark:text-brand-400 hover:underline font-semibold">
                     <i class="fa-solid fa-rotate-left mr-1"></i>
@@ -652,7 +655,7 @@
                 demoType: "population"
             },
 
-            // --- УЧИЛИЩНИ ИНСТРУМЕНТИ (1) ---
+            // --- УЧИЛИЩНИ ИНСТРУМЕНТИ (2) ---
             {
                 file: "students_programator_time_new_FINAL_002.html",
                 cat: "tools",
@@ -665,6 +668,194 @@
                 descBg: "Интерактивен инструмент за съставяне, визуализиране и управление на училищни програми и часове.",
                 descEn: "Interactive tool for creating, visualizing, and managing weekly school class schedules.",
                 demoType: "default"
+            },
+            {
+                file: "Lounch_Pad_002.html",
+                cat: "tools",
+                grade: "all",
+                gradeLabel: "8. – 12. клас",
+                subjectBg: "Училищен инструмент",
+                subjectEn: "School Tool",
+                titleBg: "TECH-LAB Engine — локален HTML5 Launchpad",
+                titleEn: "TECH-LAB Engine — Local HTML5 Module Launchpad",
+                descBg: "Интерактивна среда за зареждане, организиране и мигновено стартиране на локални HTML учебни модули в браузъра.",
+                descEn: "Interactive environment for loading, organizing, and launching local HTML educational modules in the browser.",
+                demoType: "default"
+            },
+
+            // --- НОВИ ИНФОРМАЦИОННИ И КИБЕР СИМУЛАТОРИ (5) ---
+            {
+                file: "Sclad_Simulator_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "9. – 12. клас",
+                subjectBg: "Информатика и ИТ",
+                subjectEn: "Informatics & IT",
+                titleBg: "Складова система — ERP бизнес симулатор",
+                titleEn: "Warehouse Management — ERP Business Simulator",
+                descBg: "Бизнес симулация за управление на складови наличности, автоматично създаване на доставки при критичен минимум и финансови справки.",
+                descEn: "Business simulation for inventory management, automated restocking orders at critical stock levels, and financial reports.",
+                demoType: "erp"
+            },
+            {
+                file: "Biblioteka_School_Simulator_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "8. – 11. клас",
+                subjectBg: "Информатика и ИТ",
+                subjectEn: "Informatics & IT",
+                titleBg: "Училищна библиотека — информационна система",
+                titleEn: "School Library — Information System Simulator",
+                descBg: "Система за дигитално библиотечно обслужване с каталог от книги, търсене, заемане, връщане и проследяване на просрочия.",
+                descEn: "Digital library management system with book catalog, search, borrowing, returns, and overdue tracking.",
+                demoType: "default"
+            },
+            {
+                file: "DDoS_model_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "9. – 12. клас",
+                subjectBg: "Киберсигурност",
+                subjectEn: "Cybersecurity",
+                titleBg: "DDoS Атака и Защита — мрежови симулатор",
+                titleEn: "DDoS Attack & Mitigation — Network Simulator",
+                descBg: "Симулатор на мрежов трафик в реално време с графики на натоварването и защитни механизми (Rate limiting, WAF, CDN, CAPTCHA).",
+                descEn: "Real-time network traffic simulator with load graphs and mitigation defenses (Rate limiting, WAF, CDN, CAPTCHA).",
+                demoType: "cyber"
+            },
+            {
+                file: "SOC-SImulator_002.html",
+                cat: "informatics",
+                grade: "11-12",
+                gradeLabel: "10. – 12. клас",
+                subjectBg: "Киберсигурност",
+                subjectEn: "Cybersecurity",
+                titleBg: "SOC Център за киберсигурност (Blue Team Lab)",
+                titleEn: "Security Operations Center (SOC) Simulator",
+                descBg: "Професионален център за сигурност с интерактивна мрежова топология, MITRE ATT&CK техники, Firewall правила и Honeypot.",
+                descEn: "Professional Security Operations Center featuring interactive network topology, MITRE ATT&CK techniques, Firewall rules, and Honeypot.",
+                demoType: "cyber"
+            },
+            {
+                file: "Exam_student_001.html",
+                cat: "informatics",
+                grade: "8-10",
+                gradeLabel: "8. – 12. клас",
+                subjectBg: "Информатика и ИТ",
+                subjectEn: "Informatics & IT",
+                titleBg: "EduExam — училищна система за електронно изпитване",
+                titleEn: "EduExam — School E-Assessment Platform",
+                descBg: "Интерактивна платформа за ученици с таймер, създаване на изпити по различни предмети, статистики и история на оценките.",
+                descEn: "Interactive student assessment platform with countdown timer, custom exam builder across subjects, statistics, and grade history.",
+                demoType: "exam"
+            },
+
+            // --- НОВИ НАУЧНИ СИМУЛАЦИИ (ФИЗИКА +1, ХИМИЯ +1) ---
+            {
+                file: "Thermo_Yadren_SIntez.html",
+                cat: "physics",
+                grade: "11-12",
+                gradeLabel: "10. – 12. клас",
+                subjectBg: "Физика и STEM",
+                subjectEn: "Physics & STEM",
+                titleBg: "Симулатор на термоядрен синтез (Токамак реактор)",
+                titleEn: "Thermonuclear Fusion Simulator (Tokamak Reactor)",
+                descBg: "Интерактивен модел на термоядрен реактор с управление на температурата на плазмата, магнитното поле и енергийния добив.",
+                descEn: "Interactive thermonuclear reactor model with plasma temperature control, magnetic confinement field, and energy output.",
+                demoType: "physics"
+            },
+            {
+                file: "Tablica_Mendeleev.html",
+                cat: "biology",
+                grade: "8-10",
+                gradeLabel: "7. – 12. клас",
+                subjectBg: "Химия и STEM",
+                subjectEn: "Chemistry & STEM",
+                titleBg: "Интерактивна периодична таблица на Менделеев (118 елемента)",
+                titleEn: "Interactive Periodic Table of Elements (118 Elements)",
+                descBg: "Пълна интерактивна периодична система с търсачка, филтриране по химични групи, електронни конфигурации и приложения.",
+                descEn: "Complete interactive periodic table with search, chemical group filters, electron configurations, and real-world applications.",
+                demoType: "chemistry"
+            },
+
+            // --- ИЗПИТИ И ТЕСТОВЕ (6) ---
+            {
+                file: "NIP_Exam_Master.html",
+                cat: "exams",
+                grade: "11-12",
+                gradeLabel: "12. клас • Професия",
+                subjectBg: "Държавен изпит",
+                subjectEn: "State Exam",
+                titleBg: "Държавен изпит: Компютърен техник (NIP Master)",
+                titleEn: "State Qualification Exam: Computer Technician",
+                descBg: "Изпитен симулатор по теория на професията с 90 въпроса, 20-минутен таймер, навигационна матрица и генератор на варианти.",
+                descEn: "Vocational theory exam simulator with 90 questions, 20-minute timer, navigation matrix, and randomized exam generator.",
+                demoType: "exam"
+            },
+            {
+                file: "IT_Izpit_6_klas.html",
+                cat: "exams",
+                grade: "5-7",
+                gradeLabel: "6. клас",
+                subjectBg: "Изпит по ИТ",
+                subjectEn: "IT Exam",
+                titleBg: "Интерактивен изпит по ИТ — 6. клас",
+                titleEn: "Interactive IT Exam — 6th Grade",
+                descBg: "Годишен тест с 40 въпроса по програмата на Просвета Плюс и Сиела (Хардуер, Интернет, Звук и видео, Електронни таблици, Scratch).",
+                descEn: "Annual test with 40 questions covering hardware, Internet, audio/video, spreadsheets, and Scratch programming.",
+                demoType: "exam"
+            },
+            {
+                file: "IT_Izpit_7_klas.html",
+                cat: "exams",
+                grade: "5-7",
+                gradeLabel: "7. клас",
+                subjectBg: "Изпит по КМ и ИТ",
+                subjectEn: "CS & IT Exam",
+                titleBg: "Компютърно моделиране и ИТ — 7. клас",
+                titleEn: "Computer Modeling & IT Exam — 7th Grade",
+                descBg: "Изпитна система с 60 въпроса по програмата на изд. Сиела (Компютърни мрежи, Excel, Scratch/Python, Дигитална сигурност).",
+                descEn: "60-question assessment system covering computer networks, Excel, Scratch/Python, and digital safety.",
+                demoType: "exam"
+            },
+            {
+                file: "IT_Izpit_8_klas.html",
+                cat: "exams",
+                grade: "8-10",
+                gradeLabel: "8. клас",
+                subjectBg: "Изпит по ИТ",
+                subjectEn: "IT Exam",
+                titleBg: "Интерактивен изпит по ИТ — 8. клас (ИК Домино)",
+                titleEn: "Interactive IT Exam — 8th Grade",
+                descBg: "Система за проверка на знанията с 60 въпроса (Хардуер, Операционни системи, Мрежови топологии, Облачни услуги, Excel).",
+                descEn: "60-question knowledge assessment covering hardware, operating systems, network topologies, cloud services, and Excel.",
+                demoType: "exam"
+            },
+            {
+                file: "IT_9_klas.html",
+                cat: "exams",
+                grade: "8-10",
+                gradeLabel: "9. клас",
+                subjectBg: "Изпит по ИТ",
+                subjectEn: "IT Exam",
+                titleBg: "Разширен изпит по ИТ — 9. клас (5 модула)",
+                titleEn: "Comprehensive IT Exam — 9th Grade (5 Modules)",
+                descBg: "Разширен изпит с 60 въпроса (Компютърни системи, IPv6 и мрежи, Бази данни и SQL, Excel функции, Криптиране и облак).",
+                descEn: "60-question exam covering computer systems, IPv6 & networking, databases & SQL, Excel functions, and encryption.",
+                demoType: "exam"
+            },
+            {
+                file: "IT_Izpit_10_klas.html",
+                cat: "exams",
+                grade: "8-10",
+                gradeLabel: "10. клас",
+                subjectBg: "Изпит по ИТ",
+                subjectEn: "IT Exam",
+                titleBg: "Интерактивен изпит по ИТ — 10. клас (ИК Домино)",
+                titleEn: "Interactive IT Exam — 10th Grade",
+                descBg: "Тест с 45 въпроса по актуалната програма на ИК Домино (Обработка на информацията, Алгоритми, Макроси, GDPR и ергономия).",
+                descEn: "45-question exam covering information processing, algorithms, spreadsheet macros, GDPR, and ergonomics.",
+                demoType: "exam"
             }
         ];
 
@@ -706,6 +897,7 @@
         const catBadgeStyles = {
             math: "bg-brand-50 text-brand-700 dark:bg-brand-950/70 dark:text-brand-300 border-brand-200 dark:border-brand-800",
             informatics: "bg-purple-50 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300 border-purple-200 dark:border-purple-800",
+            exams: "bg-rose-50 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border-rose-200 dark:border-rose-800",
             physics: "bg-sky-50 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border-sky-200 dark:border-sky-800",
             biology: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
             tools: "bg-amber-50 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border-amber-200 dark:border-amber-800"
@@ -714,6 +906,7 @@
         const catIcons = {
             math: "fa-square-root-variable",
             informatics: "fa-microchip",
+            exams: "fa-file-circle-check",
             physics: "fa-bolt",
             biology: "fa-dna",
             tools: "fa-calendar-days"
