@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Launchpad: Абсолютно Изчистване и Пълен Контрол</title>
+    <style>
+        /* === WOW ЕФЕКТ: ТЪМЕН РЕЖИМ И СВЕТЕЩИ АКЦЕНТИ === */
+        :root {
+            --dark-bg: #10161a;           
+            --card-bg: #1c242a;           
+            --primary-color: #00bcd4;     
+            --secondary-color: #ff9800;   
+            --danger-color: #f44336;      
+            --text-color: #ecf0f1;
+            --shadow-glow: rgba(0, 188, 212, 0.4); 
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 50px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* === ХЕДЪР === */
+        .header {
+            margin-bottom: 50px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.8em;
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+            font-weight: 300;
+            text-shadow: 0 0 10px var(--shadow-glow);
+            letter-spacing: 1px;
+        }
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+        
+        /* === БУТОН ИЗЧИСТИ ВСИЧКО === */
+        #clear-all-button {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 0 5px rgba(244, 67, 54, 0.5);
+        }
+        #clear-all-button:hover {
+            background-color: #d32f2f;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.8);
+        }
+
+        /* === ЗОНА ЗА DRAG & DROP === */
+        #drop-area {
+            width: 100%;
+            max-width: 900px;
+            height: 140px;
+            margin-bottom: 40px;
+            border: 3px dashed var(--primary-color);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: border-color 0.4s, background-color 0.4s, box-shadow 0.4s;
+            background-color: var(--card-bg);
+            box-shadow: 0 0 5px var(--shadow-glow);
+        }
+        #drop-area.drag-over {
+            border-color: var(--secondary-color);
+            background-color: #2a3842;
+            box-shadow: 0 0 20px rgba(255, 152, 0, 0.7); 
+        }
+        #drop-area p {
+            font-size: 1.4em;
+            color: var(--primary-color);
+            font-weight: 400;
+            margin: 5px 0;
+        }
+
+        /* === СПИСЪК С ПРОЕКТИ === */
+        #project-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .project-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 5px solid var(--secondary-color);
+            min-height: 160px;
+            opacity: 0; 
+            animation: fadeIn 0.5s forwards;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 15px var(--shadow-glow);
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .project-card h2 { font-size: 1.6em; color: var(--primary-color); margin-top: 0; margin-bottom: 5px; font-weight: 500; }
+        .project-card p { font-size: 0.9em; opacity: 0.6; margin-bottom: 20px; }
+
+        .action-row { display: flex; justify-content: space-between; align-items: center; }
+
+        .launch-button {
+            padding: 10px 20px;
+            background-color: var(--secondary-color);
+            color: var(--dark-bg);
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 1em;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .launch-button:hover { background-color: #e68a00; transform: scale(1.02); }
+        
+        .remove-button {
+            padding: 10px 15px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            line-height: 1;
+            font-size: 1em;
+        }
+        .remove-button:hover { background-color: #d32f2f; }
+        
+        .file-input-hidden { display: none; }
+        
+        /* Анимация при успешно качване */
+        @keyframes successGlow {
+            0% { box-shadow: 0 0 0 rgba(46, 204, 113, 0); }
+            50% { box-shadow: 0 0 30px rgba(46, 204, 113, 0.8); }
+            100% { box-shadow: 0 0 0 rgba(46, 204, 113, 0); }
+        }
+        .upload-success {
+            animation: successGlow 1.5s ease-out;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>✨ Launchpad: Мениджър на Проекти (Пълен Контрол)</h1>
+        <p>Плъзнете `.html` файл от компютъра си, за да го добавите, стартирате и управлявате.</p>
+        <button id="clear-all-button" onclick="clearAllProjects()">🗑️ ИЗЧИСТИ ВСИЧКО</button>
+    </div>
+    
+    <div id="drop-area" onclick="document.getElementById('file-input').click()">
+        <p>⬇️ ПЛЪЗНЕТЕ HTML ФАЙЛ ТУК ⬇️</p>
+        <p style="font-size: 0.9em; color: var(--primary-color);">или кликнете, за да изберете файл</p>
+        <input type="file" id="file-input" class="file-input-hidden" accept=".html" multiple>
+    </div>
+
+    <div id="project-list">
+        </div>
+
+    <script>
+        // === JAVASCRIPT: УПРАВЛЕНИЕ НА ПРОЕКТИ ЧРЕЗ LOCALSTORAGE И FILE API ===
+
+        const STORAGE_KEY = 'cleanLaunchpadProjectsV3';
+        const projectListContainer = document.getElementById('project-list');
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
+        
+        // Вградените проекти са премахнати, Launchpad-ът стартира празен.
+
+        /** Взима текущия списък с проекти (само custom). */
+        function getProjects() {
+            const storedData = localStorage.getItem(STORAGE_KEY);
+            if (storedData) {
+                // Връщаме само internal проектите (качените)
+                return JSON.parse(storedData).filter(p => p.type === 'internal');
+            }
+            return []; // Започваме празни
+        }
+
+        /** Запазва списъка с проекти в LocalStorage. */
+        function saveProjects(projects) {
+            // Запазваме само 'internal' проектите, тъй като няма 'external' или 'removed' флагове
+            const internalProjects = projects.filter(p => p.type === 'internal');
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(internalProjects));
+        }
+
+        // --- РЕНДИРАНЕ И UI ---
+
+        /** Генерира URL от съдържанието на файла (Blob URL). */
+        function generateBlobUrl(content) {
+             const blob = new Blob([content], { type: 'text/html' });
+             return URL.createObjectURL(blob);
+        }
+
+        /** Рендира (показва) всички проекти на екрана. */
+        function renderProjects() {
+            const projects = getProjects();
+            projectListContainer.innerHTML = ''; 
+
+            if (projects.length === 0) {
+                 projectListContainer.innerHTML = '<p style="text-align: center; opacity: 0.5; color: var(--text-color); grid-column: 1 / -1;">Списъкът е празен. Плъзнете нов HTML файл, за да започнете.</p>';
+                 return;
+            }
+
+            projects.forEach((project, index) => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.style.animationDelay = `${index * 0.1}s`; 
+
+                const linkHref = project.blobUrl;
+                const descriptionText = `(Качен файл) ${project.description}`;
+
+                card.innerHTML = `
+                    <div>
+                        <h2>${project.title}</h2>
+                        <p>${descriptionText}</p>
+                    </div>
+                    <div class="action-row">
+                        <a href="${linkHref}" target="_blank" class="launch-button" title="Отваря във нов раздел">
+                            ▶️ СТАРТ
+                        </a>
+                        <button class="remove-button" onclick="removeProject(${project.id})">🗑️</button>
+                    </div>
+                `;
+                projectListContainer.appendChild(card);
+            });
+        }
+
+        // --- ФУНКЦИОНАЛНОСТ ЗА "КАЧВАНЕ" (DRAG & DROP) ---
+
+        /** Добавя нов проект към списъка след успешно четене на файл. */
+        function addNewProject(file, content) {
+            if (!file.name.toLowerCase().endsWith('.html')) {
+                alert('Моля, плъзнете само HTML файлове (.html).');
+                return;
+            }
+            
+            const newProject = {
+                id: Date.now(),
+                title: file.name.replace('.html', '').replace('.HTML', ''),
+                filename: file.name,
+                description: `Файл с размер ${Math.round(file.size / 1024)} KB.`,
+                removable: true,
+                type: 'internal', 
+                blobUrl: generateBlobUrl(content) 
+            };
+
+            const projects = getProjects();
+            projects.push(newProject);
+            saveProjects(projects);
+            
+            dropArea.classList.add('upload-success');
+            setTimeout(() => dropArea.classList.remove('upload-success'), 1500);
+
+            renderProjects();
+        }
+
+        /** Обработва плъзгането и пускането на файл. */
+        function handleFileDrop(e) {
+            e.preventDefault();
+            dropArea.classList.remove('drag-over');
+            
+            const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+
+            if (files.length === 0) return;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    addNewProject(file, event.target.result);
+                };
+                
+                reader.readAsText(file);
+            }
+        }
+        
+        // --- ДРУГА ФУНКЦИОНАЛНОСТ ---
+
+        /** Премахва проект от списъка. */
+        window.removeProject = function(idToRemove) {
+            if (!confirm('Сигурни ли сте, че искате да премахнете този проект от Launchpad-а?')) {
+                return;
+            }
+
+            let projects = getProjects();
+            const projectToRemove = projects.find(p => p.id === idToRemove);
+
+            if (projectToRemove && projectToRemove.blobUrl) {
+                // Освобождаване на паметта от Blob URL
+                URL.revokeObjectURL(projectToRemove.blobUrl);
+            }
+            
+            projects = projects.filter(p => p.id !== idToRemove);
+            
+            saveProjects(projects);
+            renderProjects();
+        }
+
+        /** ФУНКЦИЯ ЗА ИЗЧИСТВАНЕ: Изчиства всичко! */
+        window.clearAllProjects = function() {
+            if (!confirm('ВНИМАНИЕ: Сигурни ли сте, че искате да ИЗЧИСТИТЕ ВСИЧКИ проекти? Това ще премахне всички качени файлове от Launchpad-а.')) {
+                return;
+            }
+
+            // Освобождаваме Blob URLS (за по-чиста памет)
+            const projects = getProjects();
+            projects.filter(p => p.blobUrl).forEach(p => {
+                 URL.revokeObjectURL(p.blobUrl);
+            });
+
+            // Изтриваме всичко от LocalStorage
+            localStorage.removeItem(STORAGE_KEY);
+            
+            // Презареждаме списъка, който вече ще е чист и празен
+            renderProjects();
+        }
+
+        // --- ИНИЦИАЛИЗАЦИЯ И СЪБИТИЯ ---
+
+        function setupDragAndDrop() {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => dropArea.classList.add('drag-over'), false);
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => dropArea.classList.remove('drag-over'), false);
+            });
+
+            dropArea.addEventListener('drop', handleFileDrop, false);
+            fileInput.addEventListener('change', handleFileDrop, false);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProjects();
+            setupDragAndDrop();
+        });
+    </script>
+</body>
+</html>

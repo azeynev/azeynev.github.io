@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Учебен Програматор</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --light: #ffffff;
+            --dark: #1a1a2e;
+            --success: #00d26a;
+            --warning: #ffbd2e;
+            --danger: #ff2d75;
+            --break-color: #9b59b6;
+            --long-break-color: #e67e22;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark), #16213e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(106, 17, 203, 0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: fit-content;
+        }
+        
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .panel-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-title i {
+            color: var(--accent);
+        }
+        
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .digital-clock {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 8px;
+        }
+        
+        .date-display {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+        }
+        
+        .current-lesson {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--success);
+            transition: all 0.3s;
+        }
+        
+        .current-lesson.active {
+            border-left-color: var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        .current-lesson.break {
+            border-left-color: var(--break-color);
+        }
+        
+        .current-lesson.long-break {
+            border-left-color: var(--long-break-color);
+        }
+        
+        .current-lesson.finished {
+            border-left-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .lesson-title {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+        
+        .lesson-time {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+        
+        .countdown {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            width: 0%;
+            transition: width 1s;
+        }
+        
+        .progress.break {
+            background: linear-gradient(90deg, var(--break-color), #8e44ad);
+        }
+        
+        .progress.long-break {
+            background: linear-gradient(90deg, var(--long-break-color), #d35400);
+        }
+        
+        .schedule-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .control-group {
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        select, input, button {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.3);
+        }
+        
+        button {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .schedule-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .schedule-item.active {
+            border-left-color: var(--success);
+            background: rgba(0, 210, 106, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .schedule-item.break {
+            border-left-color: var(--break-color);
+            background: rgba(155, 89, 182, 0.1);
+        }
+        
+        .schedule-item.long-break {
+            border-left-color: var(--long-break-color);
+            background: rgba(230, 126, 34, 0.1);
+        }
+        
+        .schedule-item.finished {
+            opacity: 0.6;
+        }
+        
+        .lesson-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .lesson-number {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .lesson-duration {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .lesson-time-range {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .analog-clock {
+            width: 150px;
+            height: 150px;
+            border: 6px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            position: relative;
+            margin: 15px auto;
+            background: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .clock-center {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        
+        .hour-hand, .minute-hand, .second-hand {
+            position: absolute;
+            transform-origin: bottom center;
+            border-radius: 4px;
+            bottom: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .hour-hand {
+            width: 4px;
+            height: 45px;
+            background: var(--light);
+            z-index: 3;
+        }
+        
+        .minute-hand {
+            width: 3px;
+            height: 60px;
+            background: var(--light);
+            z-index: 2;
+        }
+        
+        .second-hand {
+            width: 2px;
+            height: 65px;
+            background: var(--accent);
+            z-index: 1;
+        }
+        
+        .clock-mark {
+            position: absolute;
+            width: 2px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .clock-mark-12 {
+            top: 8px;
+        }
+        
+        .clock-mark-3 {
+            top: 50%;
+            right: 8px;
+            left: auto;
+            transform: translateY(-50%) rotate(90deg);
+        }
+        
+        .clock-mark-6 {
+            bottom: 8px;
+        }
+        
+        .clock-mark-9 {
+            top: 50%;
+            left: 8px;
+            transform: translateY(-50%) rotate(90deg);
+        }
+        
+        .melody-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .melody-controls button {
+            flex: 1;
+            padding: 8px;
+        }
+        
+        .melody-controls button i {
+            font-size: 1rem;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(150%);
+            transition: transform 0.5s;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.warning {
+            background: var(--warning);
+        }
+        
+        .notification.danger {
+            background: var(--danger);
+        }
+        
+        .notification.break {
+            background: var(--break-color);
+        }
+        
+        .notification.long-break {
+            background: var(--long-break-color);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 210, 106, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 210, 106, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 210, 106, 0); }
+        }
+        
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px rgba(106, 17, 203, 0.7); }
+            50% { text-shadow: 0 0 20px rgba(106, 17, 203, 0.9), 0 0 30px rgba(37, 117, 252, 0.6); }
+            100% { text-shadow: 0 0 5px rgba(106, 17, 203, 0.7); }
+        }
+        
+        .glow-text {
+            animation: glow 2s infinite;
+        }
+        
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-element {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(106, 17, 203, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            100% {
+                transform: translate(100px, 100px) rotate(360deg);
+            }
+        }
+        
+        /* Стилове за скролбар */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+        }
+        
+        .melody-settings {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .melody-settings select {
+            flex: 1;
+        }
+        
+        /* Стилове за по-компактно оформление */
+        .compact-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .compact-controls .control-group {
+            min-width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-element" style="top: 10%; left: 5%; animation-delay: 0s;"></div>
+        <div class="floating-element" style="top: 20%; left: 80%; animation-delay: 1s;"></div>
+        <div class="floating-element" style="top: 60%; left: 10%; animation-delay: 2s;"></div>
+        <div class="floating-element" style="top: 80%; left: 70%; animation-delay: 3s;"></div>
+        <div class="floating-element" style="top: 40%; left: 90%; animation-delay: 4s;"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1 class="glow-text">Учебен Програматор</h1>
+            <p class="subtitle">Организирай учебния си ден с лекота и стил</p>
+        </header>
+        
+        <!-- ТРИ ПАНЕЛА НА ЕДИН РЕД -->
+        <div class="main-content">
+            <!-- Първи панел - Часовник -->
+            <div class="panel">
+                <h2 class="panel-title"><i class="fas fa-clock"></i> Реален часовник</h2>
+                <div class="clock-container">
+                    <div class="digital-clock" id="digitalClock">00:00:00</div>
+                    <div class="date-display" id="dateDisplay">понеделник, 1 януари 2023 г.</div>
+                    
+                    <div class="analog-clock">
+                        <div class="clock-mark clock-mark-12"></div>
+                        <div class="clock-mark clock-mark-3"></div>
+                        <div class="clock-mark clock-mark-6"></div>
+                        <div class="clock-mark clock-mark-9"></div>
+                        <div class="hour-hand" id="hourHand"></div>
+                        <div class="minute-hand" id="minuteHand"></div>
+                        <div class="second-hand" id="secondHand"></div>
+                        <div class="clock-center"></div>
+                    </div>
+                </div>
+                
+                <div class="current-lesson active" id="currentLesson">
+                    <div class="lesson-title" id="lessonTitle">Текущ час</div>
+                    <div class="lesson-time" id="lessonTime">00:00 - 00:00</div>
+                    <div class="countdown" id="countdown">Остава: --:--</div>
+                    <div class="progress-bar">
+                        <div class="progress" id="lessonProgress"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Втори панел - Настройки -->
+            <div class="panel">
+                <h2 class="panel-title"><i class="fas fa-cogs"></i> Настройки</h2>
+                
+                <div class="compact-controls">
+                    <div class="control-group">
+                        <label for="lessonCount"><i class="fas fa-list-ol"></i> Брой часове:</label>
+                        <select id="lessonCount">
+                            <option value="1">1 час</option>
+                            <option value="2">2 часа</option>
+                            <option value="3">3 часа</option>
+                            <option value="4">4 часа</option>
+                            <option value="5" selected>5 часа</option>
+                            <option value="6">6 часа</option>
+                            <option value="7">7 часа</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="lessonDuration"><i class="fas fa-hourglass-half"></i> Продължителност (мин):</label>
+                        <input type="number" id="lessonDuration" min="5" max="120" value="45">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="breakDuration"><i class="fas fa-coffee"></i> Междучасие (мин):</label>
+                        <input type="number" id="breakDuration" min="5" max="30" value="10">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="longBreakDuration"><i class="fas fa-utensils"></i> Голямо междучасие (мин):</label>
+                        <input type="number" id="longBreakDuration" min="10" max="60" value="20">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="longBreakAfter"><i class="fas fa-calendar-alt"></i> Голямо междучасие след:</label>
+                    <select id="longBreakAfter">
+                        <option value="2">След 2-ри урок</option>
+                        <option value="3" selected>След 3-ти урок</option>
+                        <option value="4">След 4-ти урок</option>
+                        <option value="5">След 5-ти урок</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="startTime"><i class="fas fa-play-circle"></i> Начален час:</label>
+                    <input type="time" id="startTime" value="08:00">
+                </div>
+                
+                <div class="melody-settings">
+                    <div class="control-group">
+                        <label for="startMelodySelect"><i class="fas fa-play"></i> Начална мелодия:</label>
+                        <select id="startMelodySelect">
+                            <option value="bell">Камбана</option>
+                            <option value="chime">Звънец</option>
+                            <option value="beep">Сигнал</option>
+                            <option value="digital">Дигитален звук</option>
+                            <option value="school" selected>Училищен звънец</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="endMelodySelect"><i class="fas fa-stop"></i> Крайна мелодия:</label>
+                        <select id="endMelodySelect">
+                            <option value="bell">Камбана</option>
+                            <option value="chime">Звънец</option>
+                            <option value="beep">Сигнал</option>
+                            <option value="digital" selected>Дигитален звук</option>
+                            <option value="school">Училищен звънец</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button id="generateSchedule"><i class="fas fa-calendar-alt"></i> Генерирай програма</button>
+                
+                <div class="melody-controls">
+                    <button id="testStartMelody"><i class="fas fa-play"></i> Тест на мелодия</button>
+                    <button id="testEndMelody"><i class="fas fa-stop"></i> Тест на мелодия</button>
+                    <button id="stopMelody"><i class="fas fa-stop-circle"></i> Спиране</button>
+                </div>
+            </div>
+            
+            <!-- Трети панел - Програма -->
+            <div class="panel">
+                <h2 class="panel-title"><i class="fas fa-calendar-day"></i> Учебна програма</h2>
+                <div class="schedule-list" id="scheduleList">
+                    <!-- Тук ще се генерира програмата -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-bell"></i>
+        <span id="notificationText">Сигнал!</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM елементи
+            const digitalClock = document.getElementById('digitalClock');
+            const dateDisplay = document.getElementById('dateDisplay');
+            const hourHand = document.getElementById('hourHand');
+            const minuteHand = document.getElementById('minuteHand');
+            const secondHand = document.getElementById('secondHand');
+            const lessonTitle = document.getElementById('lessonTitle');
+            const lessonTime = document.getElementById('lessonTime');
+            const countdown = document.getElementById('countdown');
+            const lessonProgress = document.getElementById('lessonProgress');
+            const currentLesson = document.getElementById('currentLesson');
+            const lessonCount = document.getElementById('lessonCount');
+            const lessonDuration = document.getElementById('lessonDuration');
+            const breakDuration = document.getElementById('breakDuration');
+            const longBreakDuration = document.getElementById('longBreakDuration');
+            const longBreakAfter = document.getElementById('longBreakAfter');
+            const startTime = document.getElementById('startTime');
+            const startMelodySelect = document.getElementById('startMelodySelect');
+            const endMelodySelect = document.getElementById('endMelodySelect');
+            const generateSchedule = document.getElementById('generateSchedule');
+            const testStartMelody = document.getElementById('testStartMelody');
+            const testEndMelody = document.getElementById('testEndMelody');
+            const stopMelody = document.getElementById('stopMelody');
+            const scheduleList = document.getElementById('scheduleList');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            // Променливи за състоянието
+            let schedule = [];
+            let currentInterval = null;
+            let audioContext = null;
+            let oscillator = null;
+            let lastPlayedLessonStart = null;
+            let lastPlayedLessonEnd = null;
+            
+            // Инициализация на часовника
+            function updateClock() {
+                const now = new Date();
+                
+                // Цифров часовник
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                digitalClock.textContent = `${hours}:${minutes}:${seconds}`;
+                
+                // Дата
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                dateDisplay.textContent = now.toLocaleDateString('bg-BG', options);
+                
+                // Аналогов часовник
+                const hourDeg = (now.getHours() % 12) * 30 + now.getMinutes() * 0.5;
+                const minuteDeg = now.getMinutes() * 6 + now.getSeconds() * 0.1;
+                const secondDeg = now.getSeconds() * 6;
+                
+                hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+                minuteHand.style.transform = `translateX(-50%) rotate(${minuteDeg}deg)`;
+                secondHand.style.transform = `translateX(-50%) rotate(${secondDeg}deg)`;
+                
+                // Проверка за текущ учебен час
+                checkCurrentLesson(now);
+            }
+            
+            // Проверка за текущ учебен час
+            function checkCurrentLesson(now) {
+                if (schedule.length === 0) return;
+                
+                const currentTime = now.getHours() * 60 + now.getMinutes();
+                let activeLesson = null;
+                let nextLesson = null;
+                
+                // Маркиране на всички часове като неактивни
+                document.querySelectorAll('.schedule-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                for (let i = 0; i < schedule.length; i++) {
+                    const lesson = schedule[i];
+                    const startMinutes = lesson.start.hours * 60 + lesson.start.minutes;
+                    const endMinutes = lesson.end.hours * 60 + lesson.end.minutes;
+                    
+                    if (currentTime >= startMinutes && currentTime <= endMinutes) {
+                        activeLesson = lesson;
+                        // Маркиране на активния час
+                        document.querySelectorAll('.schedule-item')[i].classList.add('active');
+                        break;
+                    } else if (currentTime < startMinutes) {
+                        nextLesson = lesson;
+                        break;
+                    }
+                }
+                
+                if (activeLesson) {
+                    // Активен час
+                    const startMinutes = activeLesson.start.hours * 60 + activeLesson.start.minutes;
+                    const endMinutes = activeLesson.end.hours * 60 + activeLesson.end.minutes;
+                    const totalDuration = endMinutes - startMinutes;
+                    const elapsed = currentTime - startMinutes;
+                    const progress = (elapsed / totalDuration) * 100;
+                    const remaining = totalDuration - elapsed;
+                    
+                    lessonProgress.style.width = `${progress}%`;
+                    
+                    // Обратен брояч
+                    const remainingMinutes = Math.floor(remaining);
+                    const remainingSeconds = 60 - now.getSeconds();
+                    countdown.textContent = `Остава: ${String(remainingMinutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+                    
+                    if (activeLesson.type === 'lesson') {
+                        lessonTitle.textContent = `Урок ${activeLesson.number}`;
+                        currentLesson.className = 'current-lesson active';
+                        lessonProgress.className = 'progress';
+                    } else if (activeLesson.type === 'break') {
+                        lessonTitle.textContent = 'Междучасие';
+                        currentLesson.className = 'current-lesson break';
+                        lessonProgress.className = 'progress break';
+                    } else if (activeLesson.type === 'long-break') {
+                        lessonTitle.textContent = 'Голямо междучасие';
+                        currentLesson.className = 'current-lesson long-break';
+                        lessonProgress.className = 'progress long-break';
+                    }
+                    
+                    lessonTime.textContent = `${formatTime(activeLesson.start.hours, activeLesson.start.minutes)} - ${formatTime(activeLesson.end.hours, activeLesson.end.minutes)}`;
+                    
+                    // Проверка за начало на час (точно в началния момент)
+                    if (elapsed === 0 && lastPlayedLessonStart !== activeLesson.id) {
+                        let message = '';
+                        let type = 'warning';
+                        
+                        if (activeLesson.type === 'lesson') {
+                            message = `Урок ${activeLesson.number} започва!`;
+                        } else if (activeLesson.type === 'break') {
+                            message = 'Междучасие започва!';
+                            type = 'break';
+                        } else if (activeLesson.type === 'long-break') {
+                            message = 'Голямо междучасие започва!';
+                            type = 'long-break';
+                        }
+                        
+                        showNotification(message, type);
+                        playMelody('start');
+                        lastPlayedLessonStart = activeLesson.id;
+                    }
+                    
+                    // Проверка за край на час (точно в крайния момент)
+                    if (remaining === 0 && lastPlayedLessonEnd !== activeLesson.id) {
+                        let message = '';
+                        let type = 'info';
+                        
+                        if (activeLesson.type === 'lesson') {
+                            message = `Урок ${activeLesson.number} приключи!`;
+                        } else if (activeLesson.type === 'break') {
+                            message = 'Междучасие приключи!';
+                            type = 'break';
+                        } else if (activeLesson.type === 'long-break') {
+                            message = 'Голямо междучасие приключи!';
+                            type = 'long-break';
+                        }
+                        
+                        showNotification(message, type);
+                        playMelody('end');
+                        lastPlayedLessonEnd = activeLesson.id;
+                    }
+                } else if (nextLesson) {
+                    // Следващ час
+                    lessonTitle.textContent = 'Свободно време';
+                    lessonTime.textContent = `Следващ: ${formatTime(nextLesson.start.hours, nextLesson.start.minutes)}`;
+                    currentLesson.className = 'current-lesson finished';
+                    lessonProgress.style.width = '0%';
+                    countdown.textContent = 'Остава: --:--';
+                    
+                    // Нулиране на последните изсвирени часове
+                    lastPlayedLessonStart = null;
+                    lastPlayedLessonEnd = null;
+                } else {
+                    // Учебният ден е приключил
+                    lessonTitle.textContent = 'Учебният ден приключи';
+                    lessonTime.textContent = 'Чудесен ден!';
+                    currentLesson.className = 'current-lesson finished';
+                    lessonProgress.style.width = '0%';
+                    countdown.textContent = 'Остава: --:--';
+                    
+                    // Нулиране на последните изсвирени часове
+                    lastPlayedLessonStart = null;
+                    lastPlayedLessonEnd = null;
+                }
+            }
+            
+            // Форматиране на време
+            function formatTime(hours, minutes) {
+                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            }
+            
+            // Генериране на учебна програма
+            function generateScheduleFunc() {
+                const count = parseInt(lessonCount.value);
+                const lessonMin = parseInt(lessonDuration.value);
+                const breakMin = parseInt(breakDuration.value);
+                const longBreakMin = parseInt(longBreakDuration.value);
+                const longBreakAfterLesson = parseInt(longBreakAfter.value);
+                const start = startTime.value.split(':');
+                const startHour = parseInt(start[0]);
+                const startMinute = parseInt(start[1]);
+                
+                schedule = [];
+                let currentHour = startHour;
+                let currentMinute = startMinute;
+                let lessonId = 1;
+                
+                for (let i = 1; i <= count; i++) {
+                    // Учебен час
+                    const lessonStart = { hours: currentHour, minutes: currentMinute };
+                    
+                    // Изчисляване на края на часа
+                    currentMinute += lessonMin;
+                    if (currentMinute >= 60) {
+                        currentHour += Math.floor(currentMinute / 60);
+                        currentMinute = currentMinute % 60;
+                    }
+                    
+                    const lessonEnd = { hours: currentHour, minutes: currentMinute };
+                    
+                    schedule.push({
+                        id: `lesson-${lessonId++}`,
+                        number: i,
+                        type: 'lesson',
+                        start: lessonStart,
+                        end: lessonEnd
+                    });
+                    
+                    // Междучасие (след всеки час, освен последния)
+                    if (i < count) {
+                        const breakStart = { hours: currentHour, minutes: currentMinute };
+                        
+                        // Определяне дали е голямо междучасие
+                        const isLongBreak = i === longBreakAfterLesson;
+                        const breakType = isLongBreak ? 'long-break' : 'break';
+                        const breakDurationToUse = isLongBreak ? longBreakMin : breakMin;
+                        
+                        // Изчисляване на края на междучасието
+                        currentMinute += breakDurationToUse;
+                        if (currentMinute >= 60) {
+                            currentHour += Math.floor(currentMinute / 60);
+                            currentMinute = currentMinute % 60;
+                        }
+                        
+                        const breakEnd = { hours: currentHour, minutes: currentMinute };
+                        
+                        schedule.push({
+                            id: `break-${lessonId++}`,
+                            number: i,
+                            type: breakType,
+                            start: breakStart,
+                            end: breakEnd
+                        });
+                    }
+                }
+                
+                displaySchedule();
+                
+                // Нулиране на последните изсвирени часове
+                lastPlayedLessonStart = null;
+                lastPlayedLessonEnd = null;
+            }
+            
+            // Показване на учебната програма
+            function displaySchedule() {
+                scheduleList.innerHTML = '';
+                
+                schedule.forEach((item, index) => {
+                    const scheduleItem = document.createElement('div');
+                    scheduleItem.className = 'schedule-item';
+                    scheduleItem.id = item.id;
+                    
+                    if (item.type === 'lesson') {
+                        scheduleItem.innerHTML = `
+                            <div class="lesson-info">
+                                <div class="lesson-number">Урок ${item.number}</div>
+                                <div class="lesson-duration">${lessonDuration.value} минути</div>
+                            </div>
+                            <div class="lesson-time-range">${formatTime(item.start.hours, item.start.minutes)} - ${formatTime(item.end.hours, item.end.minutes)}</div>
+                        `;
+                    } else if (item.type === 'break') {
+                        scheduleItem.className += ' break';
+                        scheduleItem.innerHTML = `
+                            <div class="lesson-info">
+                                <div class="lesson-number">Междучасие</div>
+                                <div class="lesson-duration">${breakDuration.value} минути</div>
+                            </div>
+                            <div class="lesson-time-range">${formatTime(item.start.hours, item.start.minutes)} - ${formatTime(item.end.hours, item.end.minutes)}</div>
+                        `;
+                    } else if (item.type === 'long-break') {
+                        scheduleItem.className += ' long-break';
+                        scheduleItem.innerHTML = `
+                            <div class="lesson-info">
+                                <div class="lesson-number">Голямо междучасие</div>
+                                <div class="lesson-duration">${longBreakDuration.value} минути</div>
+                            </div>
+                            <div class="lesson-time-range">${formatTime(item.start.hours, item.start.minutes)} - ${formatTime(item.end.hours, item.end.minutes)}</div>
+                        `;
+                    }
+                    
+                    scheduleList.appendChild(scheduleItem);
+                });
+            }
+            
+            // Възпроизвеждане на мелодия
+            function playMelody(type) {
+                // Спиране на текущата мелодия
+                stopMelodyFunc();
+                
+                // Създаване на аудио контекст
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    // Настройки според избраната мелодия
+                    const melody = type === 'start' ? startMelodySelect.value : endMelodySelect.value;
+                    let frequency = 800;
+                    let duration = 0.5;
+                    
+                    switch(melody) {
+                        case 'bell':
+                            frequency = 1000;
+                            duration = 1;
+                            break;
+                        case 'chime':
+                            frequency = 1200;
+                            duration = 0.7;
+                            break;
+                        case 'beep':
+                            frequency = 800;
+                            duration = 0.3;
+                            break;
+                        case 'digital':
+                            frequency = 600;
+                            duration = 0.2;
+                            break;
+                        case 'school':
+                            frequency = 1000;
+                            duration = 0.5;
+                            break;
+                    }
+                    
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = frequency;
+                    gainNode.gain.value = 0.3;
+                    
+                    oscillator.start();
+                    
+                    // Спиране на звука след определена продължителност
+                    setTimeout(() => {
+                        if (oscillator) {
+                            oscillator.stop();
+                        }
+                    }, duration * 1000);
+                } catch (e) {
+                    console.error('Грешка при възпроизвеждане на звук:', e);
+                }
+            }
+            
+            // Спиране на мелодията
+            function stopMelodyFunc() {
+                if (oscillator) {
+                    oscillator.stop();
+                    oscillator = null;
+                }
+                if (audioContext) {
+                    audioContext.close();
+                    audioContext = null;
+                }
+            }
+            
+            // Показване на известие
+            function showNotification(message, type = 'info') {
+                notificationText.textContent = message;
+                notification.className = 'notification';
+                
+                if (type === 'warning') {
+                    notification.classList.add('warning');
+                } else if (type === 'danger') {
+                    notification.classList.add('danger');
+                } else if (type === 'break') {
+                    notification.classList.add('break');
+                } else if (type === 'long-break') {
+                    notification.classList.add('long-break');
+                }
+                
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Слушатели за събития
+            generateSchedule.addEventListener('click', generateScheduleFunc);
+            testStartMelody.addEventListener('click', () => playMelody('start'));
+            testEndMelody.addEventListener('click', () => playMelody('end'));
+            stopMelody.addEventListener('click', stopMelodyFunc);
+            
+            // Инициализация
+            updateClock();
+            setInterval(updateClock, 1000);
+            generateScheduleFunc();
+            
+            // Добавяне на ефекти при зареждане
+            setTimeout(() => {
+                document.querySelector('h1').classList.add('glow-text');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
