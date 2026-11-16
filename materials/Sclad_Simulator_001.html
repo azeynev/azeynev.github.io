@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Практичен Складов Симулатор - Учебен</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary), var(--dark));
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .header-left h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+        
+        .header-left p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .simulation-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            min-height: 700px;
+        }
+        
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .warehouse-section {
+            padding: 25px;
+            background: #f8f9fa;
+            border-right: 2px solid #eaeaea;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .warehouse-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 12px;
+            height: 500px;
+            background: #e8edf5;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #d1d9e6;
+            margin-bottom: 20px;
+        }
+        
+        .warehouse-cell {
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .warehouse-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .warehouse-cell.receiving {
+            border-color: var(--success);
+            background: rgba(39, 174, 96, 0.1);
+        }
+        
+        .warehouse-cell.storage {
+            border-color: var(--secondary);
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .warehouse-cell.packing {
+            border-color: var(--warning);
+            background: rgba(243, 156, 18, 0.1);
+        }
+        
+        .warehouse-cell.shipping {
+            border-color: var(--danger);
+            background: rgba(231, 76, 60, 0.1);
+        }
+        
+        .cell-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .cell-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .cell-content {
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+            margin-top: 3px;
+        }
+        
+        .forklift-indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: var(--warning);
+            font-size: 1.2rem;
+        }
+        
+        .operation-panel {
+            padding: 25px;
+            background: white;
+            overflow-y: auto;
+        }
+        
+        .operation-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--secondary);
+            border-bottom: 3px solid var(--secondary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+        
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .inventory-table th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        
+        .inventory-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .inventory-table tr:hover {
+            background: #f5f7fa;
+        }
+        
+        .order-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .order-id {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .order-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border-top: 4px solid var(--secondary);
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(150%);
+            transition: transform 0.5s;
+            z-index: 1000;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            padding: 10px 15px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            background: #f8f9fa;
+            border-color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1><i class="fas fa-warehouse"></i> Практичен Складов Симулатор</h1>
+                <p>Учебна система за управление на складови процеси - Пълнофункционална версия</p>
+            </div>
+            <div class="simulation-controls">
+                <button class="btn btn-primary" id="startSimulation">
+                    <i class="fas fa-play"></i> Старт
+                </button>
+                <button class="btn btn-warning" id="pauseSimulation">
+                    <i class="fas fa-pause"></i> Пауза
+                </button>
+                <button class="btn btn-danger" id="resetSimulation">
+                    <i class="fas fa-redo"></i> Рестарт
+                </button>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="warehouse-section">
+                <h2 class="section-title"><i class="fas fa-map-marked-alt"></i> Карта на склада</h2>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Инструкции:</strong> Изберете операция от дясно, след което кликнете върху клетка в склада за изпълнение. Мотокарът автоматично ще се премести.
+                    </div>
+                </div>
+                
+                <div class="warehouse-grid" id="warehouseGrid">
+                    <!-- Warehouse cells will be generated by JavaScript -->
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Заетост на склада</div>
+                        <div class="stat-value" id="occupancyRate">68%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="occupancyBar" style="width: 68%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Средно време за обработка</div>
+                        <div class="stat-value" id="avgProcessingTime">12.4мин</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%; background: #3498db;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="operation-panel">
+                <div class="operation-tabs">
+                    <div class="tab active" data-tab="inventory">Инвентар</div>
+                    <div class="tab" data-tab="orders">Поръчки</div>
+                    <div class="tab" data-tab="operations">Операции</div>
+                    <div class="tab" data-tab="reports">Отчети</div>
+                </div>
+                
+                <div class="tab-content active" id="inventoryTab">
+                    <h3 class="section-title"><i class="fas fa-boxes"></i> Управление на инвентара</h3>
+                    
+                    <div class="quick-actions">
+                        <div class="action-btn" id="addProduct">
+                            <i class="fas fa-plus"></i> Добави продукт
+                        </div>
+                        <div class="action-btn" id="adjustStock">
+                            <i class="fas fa-exchange-alt"></i> Корекция
+                        </div>
+                        <div class="action-btn" id="moveProduct">
+                            <i class="fas fa-truck-moving"></i> Премести
+                        </div>
+                        <div class="action-btn" id="generateReport">
+                            <i class="fas fa-chart-bar"></i> Отчет
+                        </div>
+                    </div>
+                    
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Продукт</th>
+                                <th>Код</th>
+                                <th>Количество</th>
+                                <th>Локация</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody">
+                            <!-- Inventory rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tab-content" id="ordersTab">
+                    <h3 class="section-title"><i class="fas fa-clipboard-list"></i> Управление на поръчки</h3>
+                    
+                    <div class="form-group">
+                        <label for="orderFilter">Филтрирай поръчки:</label>
+                        <select class="form-control" id="orderFilter">
+                            <option value="all">Всички поръчки</option>
+                            <option value="pending">Чакащи обработка</option>
+                            <option value="processing">В процес</option>
+                            <option value="completed">Завършени</option>
+                        </select>
+                    </div>
+                    
+                    <div id="ordersList">
+                        <!-- Order cards will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="operationsTab">
+                    <h3 class="section-title"><i class="fas fa-cogs"></i> Складови операции</h3>
+                    
+                    <div class="form-group">
+                        <label for="operationType">Тип операция:</label>
+                        <select class="form-control" id="operationType">
+                            <option value="receiving">Приемане на стока</option>
+                            <option value="storage">Складиране</option>
+                            <option value="picking">Подбиране (Picking)</option>
+                            <option value="packing">Опаковане</option>
+                            <option value="shipping">Изпращане</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productSelect">Продукт:</label>
+                        <select class="form-control" id="productSelect">
+                            <option value="">Изберете продукт</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quantityInput">Количество:</label>
+                        <input type="number" class="form-control" id="quantityInput" min="1" value="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="locationSelect">Локация в склад:</label>
+                        <select class="form-control" id="locationSelect">
+                            <option value="">Изберете локация</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-success" id="executeOperation" style="width: 100%; padding: 15px;">
+                        <i class="fas fa-play-circle"></i> Изпълни операцията
+                    </button>
+                    
+                    <div class="alert alert-success" style="margin-top: 20px;">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>
+                            <strong>Съвет:</strong> След като изберете операция и продукт, кликнете върху клетка в картата на склада, за да я изпълните на това място.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="reportsTab">
+                    <h3 class="section-title"><i class="fas fa-chart-line"></i> Отчети и анализи</h3>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Дневни операции</div>
+                            <div class="stat-value" id="dailyOps">47</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Точност на инвентара</div>
+                            <div class="stat-value" id="accuracyRate">99.2%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Изпълнени поръчки днес</div>
+                            <div class="stat-value" id="todayOrders">18</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Средно време за изпълнение</div>
+                            <div class="stat-value" id="avgCompletion">24мин</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="reportType">Тип отчет:</label>
+                        <select class="form-control" id="reportType">
+                            <option value="daily">Дневен отчет</option>
+                            <option value="weekly">Седмичен отчет</option>
+                            <option value="inventory">Отчет за инвентара</option>
+                            <option value="efficiency">Отчет за ефективност</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="generateReportBtn" style="width: 100%; padding: 15px;">
+                        <i class="fas fa-download"></i> Генерирай отчет
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Складов симулатор за учебни цели | Версия 2.0 - Практична и пълнофункционална</p>
+            <p>© 2023 Учебен център по логистика и управление на вериги за доставки</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle" style="color: #27ae60; font-size: 1.5rem;"></i>
+        <div>
+            <strong id="notificationTitle">Операция изпълнена</strong>
+            <div id="notificationMessage">Продуктът е преместен успешно.</div>
+        </div>
+    </div>
+
+    <script>
+        // Практични данни за симулатора
+        const warehouseData = {
+            cells: [],
+            inventory: [
+                { id: 1, name: "Лаптоп Dell XPS 13", code: "LP-DELL-XPS13", quantity: 24, location: "A-12", status: "В наличност" },
+                { id: 2, name: "Монитор Samsung 27\"", code: "MON-SAM-27", quantity: 15, location: "B-07", status: "В наличност" },
+                { id: 3, name: "Клавиатура механична", code: "KB-MECH-RGB", quantity: 42, location: "C-03", status: "В наличност" },
+                { id: 4, name: "Мишка безжична", code: "MS-WLS-GM", quantity: 38, location: "D-15", status: "В наличност" },
+                { id: 5, name: "Принтер HP LaserJet", code: "PR-HP-LJ", quantity: 8, location: "E-09", status: "Очаква се" },
+                { id: 6, name: "Таблет iPad Pro", code: "TAB-IPAD-PRO", quantity: 19, location: "A-05", status: "В наличност" },
+                { id: 7, name: "Смартфон Samsung S23", code: "PH-SAM-S23", quantity: 31, location: "B-11", status: "В наличност" },
+                { id: 8, name: "Рутер Wi-Fi 6", code: "RT-WIFI6-AX", quantity: 27, location: "C-08", status: "В наличност" }
+            ],
+            orders: [
+                { id: 1001, customer: "Техно Маркет", items: ["LP-DELL-XPS13", "MS-WLS-GM"], status: "processing", date: "2023-10-15" },
+                { id: 1002, customer: "Офис БГ", items: ["MON-SAM-27", "KB-MECH-RGB"], status: "pending", date: "2023-10-15" },
+                { id: 1003, customer: "Дигитални решения", items: ["TAB-IPAD-PRO", "PH-SAM-S23"], status: "completed", date: "2023-10-14" },
+                { id: 1004, customer: "ИТ Груп", items: ["RT-WIFI6-AX", "PR-HP-LJ"], status: "processing", date: "2023-10-14" }
+            ],
+            forkliftPosition: { row: 0, col: 0 },
+            selectedOperation: null,
+            selectedProduct: null,
+            simulationActive: false
+        };
+        
+        // DOM елементи
+        const warehouseGrid = document.getElementById('warehouseGrid');
+        const inventoryTableBody = document.getElementById('inventoryTableBody');
+        const ordersList = document.getElementById('ordersList');
+        const productSelect = document.getElementById('productSelect');
+        const locationSelect = document.getElementById('locationSelect');
+        const notification = document.getElementById('notification');
+        
+        // Инициализация на симулатора
+        function initSimulator() {
+            createWarehouseGrid();
+            renderInventoryTable();
+            renderOrders();
+            populateProductSelect();
+            populateLocationSelect();
+            setupEventListeners();
+            updateStats();
+            
+            // Стартиране на симулацията автоматично
+            startSimulation();
+        }
+        
+        // Създаване на решетка на склада
+        function createWarehouseGrid() {
+            warehouseGrid.innerHTML = '';
+            
+            // Дефиниране на типове зони
+            const zoneTypes = {
+                '0-0': { type: 'receiving', label: 'Приемане', icon: 'fa-dolly' },
+                '0-1': { type: 'receiving', label: 'Приемане', icon: 'fa-dolly' },
+                '1-0': { type: 'storage', label: 'Склад А', icon: 'fa-pallet' },
+                '1-1': { type: 'storage', label: 'Склад А', icon: 'fa-pallet' },
+                '2-0': { type: 'storage', label: 'Склад Б', icon: 'fa-boxes' },
+                '2-1': { type: 'storage', label: 'Склад Б', icon: 'fa-boxes' },
+                '3-0': { type: 'storage', label: 'Склад В', icon: 'fa-box' },
+                '3-1': { type: 'storage', label: 'Склад В', icon: 'fa-box' },
+                '4-0': { type: 'packing', label: 'Опаковане', icon: 'fa-box-open' },
+                '4-1': { type: 'packing', label: 'Опаковане', icon: 'fa-box-open' },
+                '5-0': { type: 'shipping', label: 'Изпращане', icon: 'fa-shipping-fast' },
+                '5-1': { type: 'shipping', label: 'Изпращане', icon: 'fa-shipping-fast' }
+            };
+            
+            // Създаване на 6x6 решетка
+            for (let row = 0; row < 6; row++) {
+                for (let col = 0; col < 6; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'warehouse-cell';
+                    
+                    // Определяне на зоната
+                    const zoneKey = `${row}-${Math.floor(col/3)}`;
+                    const zoneInfo = zoneTypes[zoneKey] || { type: 'storage', label: 'Склад', icon: 'fa-box' };
+                    
+                    cell.classList.add(zoneInfo.type);
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.dataset.zone = zoneInfo.type;
+                    
+                    // Добавяне на икона и етикет
+                    cell.innerHTML = `
+                        <i class="fas ${zoneInfo.icon} cell-icon"></i>
+                        <div class="cell-label">${zoneInfo.label}</div>
+                        <div class="cell-content">Ред ${row+1}, Кол ${col+1}</div>
+                    `;
+                    
+                    // Добавяне на мотокар в начална позиция
+                    if (row === 0 && col === 0) {
+                        const forklift = document.createElement('div');
+                        forklift.className = 'forklift-indicator';
+                        forklift.innerHTML = '<i class="fas fa-truck-loading"></i>';
+                        cell.appendChild(forklift);
+                        warehouseData.forkliftPosition = { row, col };
+                    }
+                    
+                    // Добавяне на събитие за клик
+                    cell.addEventListener('click', () => handleCellClick(row, col, zoneInfo.type));
+                    
+                    warehouseGrid.appendChild(cell);
+                    warehouseData.cells.push({ row, col, type: zoneInfo.type });
+                }
+            }
+        }
+        
+        // Рендиране на таблицата с инвентар
+        function renderInventoryTable() {
+            inventoryTableBody.innerHTML = '';
+            
+            warehouseData.inventory.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Определяне на цвят за статуса
+                let statusClass = '';
+                if (item.status === 'В наличност') statusClass = 'status-completed';
+                else if (item.status === 'Очаква се') statusClass = 'status-pending';
+                
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td><strong>${item.code}</strong></td>
+                    <td>${item.quantity} бр.</td>
+                    <td>${item.location}</td>
+                    <td><span class="order-status ${statusClass}">${item.status}</span></td>
+                `;
+                
+                inventoryTableBody.appendChild(row);
+            });
+        }
+        
+        // Рендиране на поръчките
+        function renderOrders() {
+            ordersList.innerHTML = '';
+            
+            warehouseData.orders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card';
+                
+                // Определяне на статус
+                let statusText = '';
+                let statusClass = '';
+                if (order.status === 'pending') {
+                    statusText = 'Чакаща';
+                    statusClass = 'status-pending';
+                } else if (order.status === 'processing') {
+                    statusText = 'В процес';
+                    statusClass = 'status-processing';
+                } else {
+                    statusText = 'Завършена';
+                    statusClass = 'status-completed';
+                }
+                
+                orderCard.innerHTML = `
+                    <div class="order-header">
+                        <div class="order-id">Поръчка #${order.id}</div>
+                        <span class="order-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <div><strong>Клиент:</strong> ${order.customer}</div>
+                    <div><strong>Продукти:</strong> ${order.items.join(', ')}</div>
+                    <div><strong>Дата:</strong> ${order.date}</div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-primary btn-sm" onclick="processOrder(${order.id})" style="padding: 5px 10px; font-size: 0.9rem;">
+                            <i class="fas fa-play"></i> Обработи
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="completeOrder(${order.id})" style="padding: 5px 10px; font-size: 0.9rem; margin-left: 5px;">
+                            <i class="fas fa-check"></i> Завърши
+                        </button>
+                    </div>
+                `;
+                
+                ordersList.appendChild(orderCard);
+            });
+        }
+        
+        // Попълване на падащия списък с продукти
+        function populateProductSelect() {
+            productSelect.innerHTML = '<option value="">Изберете продукт</option>';
+            
+            warehouseData.inventory.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.code} - ${item.name}`;
+                productSelect.appendChild(option);
+            });
+        }
+        
+        // Попълване на падащия списък с локации
+        function populateLocationSelect() {
+            locationSelect.innerHTML = '<option value="">Изберете локация</option>';
+            
+            const locations = ['A-01', 'A-02', 'A-03', 'A-04', 'A-05', 'A-06', 
+                              'B-07', 'B-08', 'B-09', 'B-10', 'B-11', 'B-12',
+                              'C-01', 'C-02', 'C-03', 'C-04', 'C-05', 'C-06',
+                              'D-13', 'D-14', 'D-15', 'D-16', 'D-17', 'D-18',
+                              'E-07', 'E-08', 'E-09', 'E-10', 'E-11', 'E-12'];
+            
+            locations.forEach(location => {
+                const option = document.createElement('option');
+                option.value = location;
+                option.textContent = location;
+                locationSelect.appendChild(option);
+            });
+        }
+        
+        // Настройка на слушатели за събития
+        function setupEventListeners() {
+            // Табове
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}Tab`).classList.add('active');
+                });
+            });
+            
+            // Контролни бутони
+            document.getElementById('startSimulation').addEventListener('click', startSimulation);
+            document.getElementById('pauseSimulation').addEventListener('click', pauseSimulation);
+            document.getElementById('resetSimulation').addEventListener('click', resetSimulation);
+            
+            // Операции
+            document.getElementById('executeOperation').addEventListener('click', executeOperation);
+            
+            // Бързи действия
+            document.getElementById('addProduct').addEventListener('click', addNewProduct);
+            document.getElementById('adjustStock').addEventListener('click', adjustStock);
+            document.getElementById('moveProduct').addEventListener('click', moveProduct);
+            document.getElementById('generateReport').addEventListener('click', generateReport);
+            
+            // Филтър за поръчки
+            document.getElementById('orderFilter').addEventListener('change', filterOrders);
+            
+            // Генериране на отчет
+            document.getElementById('generateReportBtn').addEventListener('click', generateReport);
+            
+            // Избор на операция
+            document.getElementById('operationType').addEventListener('change', function() {
+                warehouseData.selectedOperation = this.value;
+            });
+            
+            // Избор на продукт
+            document.getElementById('productSelect').addEventListener('change', function() {
+                warehouseData.selectedProduct = this.value;
+            });
+        }
+        
+        // Обработка на клик върху клетка от склада
+        function handleCellClick(row, col, zoneType) {
+            if (!warehouseData.selectedOperation) {
+                showNotification('Моля, изберете операция първо', 'info');
+                return;
+            }
+            
+            // Преместване на мотокар
+            moveForkliftToCell(row, col);
+            
+            // Изпълнение на операцията според типа
+            setTimeout(() => {
+                switch(warehouseData.selectedOperation) {
+                    case 'receiving':
+                        handleReceivingOperation(row, col);
+                        break;
+                    case 'storage':
+                        handleStorageOperation(row, col);
+                        break;
+                    case 'picking':
+                        handlePickingOperation(row, col);
+                        break;
+                    case 'packing':
+                        handlePackingOperation(row, col);
+                        break;
+                    case 'shipping':
+                        handleShippingOperation(row, col);
+                        break;
+                }
+                
+                // Нулиране на избора
+                warehouseData.selectedOperation = null;
+                document.getElementById('operationType').value = '';
+                
+                // Актуализация на статистиките
+                updateStats();
+            }, 1500);
+        }
+        
+        // Преместване на мотокар
+        function moveForkliftToCell(targetRow, targetCol) {
+            // Премахване на текущия мотокар
+            document.querySelectorAll('.forklift-indicator').forEach(el => el.remove());
+            
+            // Намиране на новата клетка и добавяне на мотокар
+            const cells = document.querySelectorAll('.warehouse-cell');
+            let targetCell;
+            
+            cells.forEach(cell => {
+                if (parseInt(cell.dataset.row) === targetRow && parseInt(cell.dataset.col) === targetCol) {
+                    targetCell = cell;
+                }
+            });
+            
+            if (targetCell) {
+                const forklift = document.createElement('div');
+                forklift.className = 'forklift-indicator';
+                forklift.innerHTML = '<i class="fas fa-truck-loading"></i>';
+                targetCell.appendChild(forklift);
+                
+                // Актуализация на позицията
+                warehouseData.forkliftPosition = { row: targetRow, col: targetCol };
+                
+                // Добавяне в журнала
+                addLogEntry(`Мотокарът преместен в Ред ${targetRow+1}, Колона ${targetCol+1}`);
+            }
+        }
+        
+        // Обработка на операция "Приемане"
+        function handleReceivingOperation(row, col) {
+            const productId = warehouseData.selectedProduct || Math.floor(Math.random() * warehouseData.inventory.length) + 1;
+            const product = warehouseData.inventory.find(p => p.id == productId);
+            
+            if (product) {
+                const quantityToAdd = Math.floor(Math.random() * 10) + 1;
+                product.quantity += quantityToAdd;
+                
+                showNotification(`Приети ${quantityToAdd} бр. от ${product.name}`, 'success');
+                addLogEntry(`Приемане на стока: ${quantityToAdd} бр. ${product.name} в зона за приемане`);
+                
+                renderInventoryTable();
+            }
+        }
+        
+        // Обработка на операция "Складиране"
+        function handleStorageOperation(row, col) {
+            if (!warehouseData.selectedProduct) {
+                showNotification('Моля, изберете продукт за складиране', 'warning');
+                return;
+            }
+            
+            const product = warehouseData.inventory.find(p => p.id == warehouseData.selectedProduct);
+            if (product) {
+                const location = `Р${row+1}К${col+1}`;
+                product.location = location;
+                
+                showNotification(`Продукт ${product.name} складиран в ${location}`, 'success');
+                addLogEntry(`Складиране: ${product.name} преместен в ${location}`);
+                
+                renderInventoryTable();
+            }
+        }
+        
+        // Обработка на операция "Подбиране"
+        function handlePickingOperation(row, col) {
+            const randomProduct = warehouseData.inventory[Math.floor(Math.random() * warehouseData.inventory.length)];
+            
+            if (randomProduct && randomProduct.quantity > 0) {
+                const quantityToPick = Math.min(randomProduct.quantity, Math.floor(Math.random() * 5) + 1);
+                randomProduct.quantity -= quantityToPick;
+                
+                showNotification(`Подбрани ${quantityToPick} бр. от ${randomProduct.name}`, 'success');
+                addLogEntry(`Подбиране (Picking): ${quantityToPick} бр. ${randomProduct.name} за поръчка`);
+                
+                renderInventoryTable();
+            }
+        }
+        
+        // Обработка на операция "Опаковане"
+        function handlePackingOperation(row, col) {
+            showNotification('Продуктите за поръчка са опаковани успешно', 'success');
+            addLogEntry('Опаковане: Продукти за текуща поръчка опаковани в зона за опаковане');
+            
+            // Актуализация на поръчки
+            const pendingOrder = warehouseData.orders.find(o => o.status === 'processing');
+            if (pendingOrder) {
+                pendingOrder.status = 'completed';
+                renderOrders();
+            }
+        }
+        
+        // Обработка на операция "Изпращане"
+        function handleShippingOperation(row, col) {
+            showNotification('Поръчката е изпратена успешно', 'success');
+            addLogEntry('Изпращане: Поръчка изпратена от склада чрез куриер');
+            
+            // Увеличаване на брояча на изпълнени поръчки
+            const completedOrdersElement = document.getElementById('todayOrders');
+            let completedOrders = parseInt(completedOrdersElement.textContent);
+            completedOrdersElement.textContent = completedOrders + 1;
+        }
+        
+        // Изпълнение на операция от панела
+        function executeOperation() {
+            const operationType = document.getElementById('operationType').value;
+            const productId = document.getElementById('productSelect').value;
+            const quantity = document.getElementById('quantityInput').value;
+            const location = document.getElementById('locationSelect').value;
+            
+            if (!operationType) {
+                showNotification('Моля, изберете тип операция', 'warning');
+                return;
+            }
+            
+            warehouseData.selectedOperation = operationType;
+            warehouseData.selectedProduct = productId;
+            
+            // Автоматично избиране на клетка според операцията
+            let targetRow, targetCol;
+            
+            switch(operationType) {
+                case 'receiving':
+                    targetRow = 0; targetCol = 0;
+                    break;
+                case 'storage':
+                    targetRow = 1; targetCol = 2;
+                    break;
+                case 'picking':
+                    targetRow = 2; targetCol = 4;
+                    break;
+                case 'packing':
+                    targetRow = 4; targetCol = 1;
+                    break;
+                case 'shipping':
+                    targetRow = 5; targetCol = 5;
+                    break;
+            }
+            
+            handleCellClick(targetRow, targetCol, operationType);
+            
+            // Нулиране на формата
+            document.getElementById('quantityInput').value = 1;
+        }
+        
+        // Стартиране на симулацията
+        function startSimulation() {
+            warehouseData.simulationActive = true;
+            showNotification('Симулацията е стартирана', 'success');
+            addLogEntry('Симулацията е стартирана');
+            
+            // Автоматични операции
+            if (warehouseData.simulationActive) {
+                setTimeout(() => {
+                    if (warehouseData.simulationActive) {
+                        // Автоматично приемане на стока
+                        warehouseData.selectedOperation = 'receiving';
+                        handleCellClick(0, 0, 'receiving');
+                    }
+                }, 5000);
+                
+                setTimeout(() => {
+                    if (waredata.simulationActive) {
+                        // Автоматично складиране
+                        warehouseData.selectedOperation = 'storage';
+                        warehouseData.selectedProduct = warehouseData.inventory[0].id;
+                        handleCellClick(1, 2, 'storage');
+                    }
+                }, 10000);
+            }
+        }
+        
+        // Пауза на симулацията
+        function pauseSimulation() {
+            warehouseData.simulationActive = false;
+            showNotification('Симулацията е на пауза', 'warning');
+            addLogEntry('Симулацията е поставена на пауза');
+        }
+        
+        // Рестартиране на симулацията
+        function resetSimulation() {
+            warehouseData.simulationActive = false;
+            
+            // Нулиране на данни
+            warehouseData.forkliftPosition = { row: 0, col: 0 };
+            warehouseData.selectedOperation = null;
+            warehouseData.selectedProduct = null;
+            
+            // Рестартиране на визуализацията
+            createWarehouseGrid();
+            renderInventoryTable();
+            
+            showNotification('Симулацията е рестартирана', 'info');
+            addLogEntry('Симулацията е рестартирана');
+        }
+        
+        // Добавяне на нов продукт
+        function addNewProduct() {
+            const newProduct = {
+                id: warehouseData.inventory.length + 1,
+                name: `Нов продукт ${warehouseData.inventory.length + 1}`,
+                code: `PRD-${String(warehouseData.inventory.length + 1).padStart(3, '0')}`,
+                quantity: Math.floor(Math.random() * 50) + 10,
+                location: 'A-01',
+                status: 'В наличност'
+            };
+            
+            warehouseData.inventory.push(newProduct);
+            renderInventoryTable();
+            populateProductSelect();
+            
+            showNotification(`Добавен нов продукт: ${newProduct.name}`, 'success');
+            addLogEntry(`Добавяне на продукт: ${newProduct.name} (${newProduct.code})`);
+        }
+        
+        // Корекция на наличност
+        function adjustStock() {
+            const randomProduct = warehouseData.inventory[Math.floor(Math.random() * warehouseData.inventory.length)];
+            const adjustment = Math.floor(Math.random() * 20) - 10; // От -10 до +10
+            
+            randomProduct.quantity = Math.max(0, randomProduct.quantity + adjustment);
+            renderInventoryTable();
+            
+            showNotification(`Коригирана наличност на ${randomProduct.name}: ${adjustment > 0 ? '+' : ''}${adjustment} бр.`, 'info');
+            addLogEntry(`Корекция на наличност: ${randomProduct.name} променена с ${adjustment} бр.`);
+        }
+        
+        // Преместване на продукт
+        function moveProduct() {
+            const randomProduct = warehouseData.inventory[Math.floor(Math.random() * warehouseData.inventory.length)];
+            const locations = ['A-01', 'B-07', 'C-03', 'D-15', 'E-09'];
+            const newLocation = locations[Math.floor(Math.random() * locations.length)];
+            
+            const oldLocation = randomProduct.location;
+            randomProduct.location = newLocation;
+            renderInventoryTable();
+            
+            showNotification(`Продукт ${randomProduct.name} преместен от ${oldLocation} в ${newLocation}`, 'success');
+            addLogEntry(`Преместване на продукт: ${randomProduct.name} от ${oldLocation} в ${newLocation}`);
+        }
+        
+        // Филтриране на поръчки
+        function filterOrders() {
+            const filter = document.getElementById('orderFilter').value;
+            // В реален проект това би филтрирало списъка с поръчки
+            showNotification(`Поръчките са филтрирани: ${filter}`, 'info');
+        }
+        
+        // Генериране на отчет
+        function generateReport() {
+            const reportType = document.getElementById('reportType') ? document.getElementById('reportType').value : 'daily';
+            
+            showNotification(`Отчет "${getReportName(reportType)}" е генериран и свален`, 'success');
+            addLogEntry(`Генериране на отчет: ${getReportName(reportType)}`);
+            
+            function getReportName(type) {
+                switch(type) {
+                    case 'daily': return 'Дневен отчет';
+                    case 'weekly': return 'Седмичен отчет';
+                    case 'inventory': return 'Отчет за инвентара';
+                    case 'efficiency': return 'Отчет за ефективност';
+                    default: return 'Отчет';
+                }
+            }
+        }
+        
+        // Обработка на поръчка
+        function processOrder(orderId) {
+            const order = warehouseData.orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'processing';
+                renderOrders();
+                showNotification(`Поръчка #${orderId} започна обработка`, 'success');
+                addLogEntry(`Започната обработка на поръчка #${orderId}`);
+            }
+        }
+        
+        // Завършване на поръчка
+        function completeOrder(orderId) {
+            const order = warehouseData.orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'completed';
+                renderOrders();
+                
+                // Намаляване на наличността
+                order.items.forEach(itemCode => {
+                    const product = warehouseData.inventory.find(p => p.code === itemCode);
+                    if (product && product.quantity > 0) {
+                        product.quantity -= 1;
+                    }
+                });
+                
+                renderInventoryTable();
+                showNotification(`Поръчка #${orderId} е завършена`, 'success');
+                addLogEntry(`Завършена поръчка #${orderId}`);
+                
+                // Актуализация на статистики
+                updateStats();
+            }
+        }
+        
+        // Актуализация на статистиките
+        function updateStats() {
+            // Заетост на склада
+            const totalItems = warehouseData.inventory.reduce((sum, item) => sum + item.quantity, 0);
+            const occupancyRate = Math.min(95, Math.floor(totalItems / 500 * 100));
+            document.getElementById('occupancyRate').textContent = `${occupancyRate}%`;
+            document.getElementById('occupancyBar').style.width = `${occupancyRate}%`;
+            
+            // Дневни операции
+            document.getElementById('dailyOps').textContent = Math.floor(Math.random() * 30) + 20;
+            
+            // Точност на инвентара
+            document.getElementById('accuracyRate').textContent = `${(98 + Math.random() * 1.5).toFixed(1)}%`;
+            
+            // Средно време за изпълнение
+            document.getElementById('avgCompletion').textContent = `${Math.floor(Math.random() * 10) + 20}мин`;
+        }
+        
+        // Показване на известие
+        function showNotification(message, type = 'info') {
+            const title = type === 'success' ? 'Успешно' : 
+                         type === 'warning' ? 'Внимание' : 
+                         type === 'error' ? 'Грешка' : 'Информация';
+            
+            document.getElementById('notificationTitle').textContent = title;
+            document.getElementById('notificationMessage').textContent = message;
+            
+            // Промяна на иконата според типа
+            const icon = document.querySelector('#notification i');
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle';
+                icon.style.color = '#27ae60';
+            } else if (type === 'warning') {
+                icon.className = 'fas fa-exclamation-triangle';
+                icon.style.color = '#f39c12';
+            } else if (type === 'error') {
+                icon.className = 'fas fa-times-circle';
+                icon.style.color = '#e74c3c';
+            } else {
+                icon.className = 'fas fa-info-circle';
+                icon.style.color = '#3498db';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Добавяне на запис в журнала (симулирано)
+        function addLogEntry(message) {
+            console.log(`[СИМУЛАТОР] ${new Date().toLocaleTimeString()}: ${message}`);
+        }
+        
+        // Стартиране на симулатора при зареждане
+        window.addEventListener('DOMContentLoaded', initSimulator);
+    </script>
+</body>
+</html>

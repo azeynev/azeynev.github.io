@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DDoS Simulator — PRO (educational)</title>
+<style>
+  :root{
+    --bg:#071025; --panel:#0b1b2a; --accent:#29a3ff; --danger:#ff6b6b; --good:#4ae39a;
+    --muted:#9db6d9; --card:#071a2b; --warn:#ffbf00;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;color:#e6eef8;background:linear-gradient(180deg,#041020,#071025);-webkit-font-smoothing:antialiased}
+  .wrap{display:grid;grid-template-columns:380px 1fr;gap:12px;padding:12px;height:100vh;box-sizing:border-box}
+  .left{background:var(--panel);padding:12px;border-radius:10px;overflow:auto}
+  .right{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:12px;border-radius:10px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+  h1{margin:0 0 8px;font-size:18px}
+  label{font-size:13px;color:var(--muted);display:block;margin-top:8px}
+  .row{display:flex;gap:8px;align-items:center}
+  input[type=range]{width:100%}
+  input[type=number]{width:76px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8}
+  select,button{padding:8px;border-radius:6px;border:none;background:var(--accent);color:#072033;font-weight:700;cursor:pointer}
+  .small{font-size:13px;color:var(--muted)}
+  .panel{background:rgba(255,255,255,0.018);padding:10px;border-radius:8px}
+  .network{position:relative;height:520px;border-radius:8px;background:linear-gradient(180deg,#051427,#071025);padding:12px;overflow:hidden}
+  .device{position:absolute;text-align:center;border-radius:8px;padding:8px;color:white}
+  .server{width:220px;height:140px;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#0b3a66,#07324f);box-shadow:0 8px 30px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .client{width:84px;height:46px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;position:absolute}
+  .client.legit{background:linear-gradient(180deg,#1db954,#11914e)}
+  .client.bot{background:linear-gradient(180deg,#ff6b6b,#cc4a4a)}
+  .meter{width:80%;height:12px;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden;margin:6px 0}
+  .meterFill{height:100%;width:0%;background:linear-gradient(90deg,#4ae39a,#ffd54d)}
+  .controls{display:flex;flex-direction:column;gap:8px}
+  .log{height:180px;overflow:auto;background:rgba(0,0,0,0.12);padding:8px;border-radius:8px;font-family:monospace;font-size:12px}
+  .statGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+  .stat{background:rgba(255,255,255,0.02);padding:8px;border-radius:6px;text-align:center}
+  canvas{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.02));border-radius:6px}
+  .muted{color:var(--muted);font-size:13px}
+  .presetRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .pill{padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.03);cursor:pointer}
+  .explain{background:var(--warn);color:#072033}
+  .download{background:linear-gradient(90deg,#4ae39a,#29a3ff);color:#072033}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="left">
+    <h1>DDoS Simulator — PRO (educational)</h1>
+    <div class="small">Цел: учебна, визуална и защитна симулация. Без реални мрежови действия.</div>
+
+    <div class="panel">
+      <div class="controls">
+        <label>Attack type</label>
+        <select id="attackType">
+          <option value="http">HTTP GET flood</option>
+          <option value="syn">SYN flood (simulated)</option>
+          <option value="udp">UDP flood</option>
+        </select>
+
+        <label>Presets</label>
+        <div class="presetRow">
+          <div class="pill" data-bots="50" data-rate="2" data-legit="1" data-cap="300">Small</div>
+          <div class="pill" data-bots="300" data-rate="4" data-legit="1" data-cap="500">Medium</div>
+          <div class="pill" data-bots="1200" data-rate="6" data-legit="1" data-cap="800">Large</div>
+          <div class="pill" data-bots="4000" data-rate="8" data-legit="1" data-cap="1200">Massive</div>
+        </div>
+
+        <label>Брой ботове: <span id="botCountLabel">200</span></label>
+        <input id="botCount" type="range" min="0" max="5000" value="200"/>
+
+        <label>Честота заявки/бот (req/sec): <span id="botRateLabel">2</span></label>
+        <input id="botRate" type="range" min="0" max="20" value="2"/>
+
+        <label>Легитимни заявки/сек: <span id="legitRateLabel">1</span></label>
+        <input id="legitRate" type="range" min="0" max="50" value="1"/>
+
+        <label>Сървър капацитет (req/sec): <span id="srvCapacityLabel">500</span></label>
+        <input id="srvCapacity" type="range" min="50" max="5000" value="500"/>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="small">Mitigations</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+        <label><input type="checkbox" id="rateLimit" checked/> Rate limit per IP (simulated)</label>
+        <label><input type="checkbox" id="blacklist"/> Auto blacklist top talkers</label>
+        <label><input type="checkbox" id="autoscale"/> Autoscale (add capacity)</label>
+        <label><input type="checkbox" id="cdn"/> CDN/WAF (offload)</label>
+        <label><input type="checkbox" id="challenge"/> Challenge (CAPTCHA simulate)</label>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="stopBtn">Stop</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="explainBtn" class="explain">Explain (step)</button>
+        <button id="downloadBtn" class="download">Download report</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="small">Live stats</div>
+      <div class="statGrid">
+        <div class="stat">RPS <div id="rps" style="font-size:20px">0</div></div>
+        <div class="stat">Avg latency ms <div id="lat" style="font-size:20px">0</div></div>
+        <div class="stat">Queue <div id="queue" style="font-size:20px">0</div></div>
+        <div class="stat">Blocked <div id="blocked" style="font-size:20px">0</div></div>
+        <div class="stat">Capacity <div id="cap" style="font-size:20px">0</div></div>
+        <div class="stat">Top talker <div id="toptalker" style="font-size:14px">-</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="small">Log</div>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="network">
+      <!-- visual elements -->
+      <div id="clientLegit" class="client legit" style="left:18px;top:220px">Client</div>
+      <div id="switch" class="device" style="left:220px;top:40px;width:120px;height:64px;background:#225e9e">Switch</div>
+      <div id="router" class="device" style="left:420px;top:40px;width:120px;height:64px;background:#f08b1a">Router</div>
+      <div id="server" class="server">
+        <h3>Учебен сървър</h3>
+        <div class="meter"><div id="cpuFill" class="meterFill"></div></div>
+        <div id="serverQueueText" class="muted">Обработва: 0 / Капацитет: 500 req/s</div>
+      </div>
+
+      <!-- dynamic bots container -->
+      <div id="botsContainer"></div>
+
+      <!-- canvas charts overlay -->
+      <div style="position:absolute;right:12px;bottom:12px;width:420px">
+        <canvas id="chartRps" width="420" height="120"></canvas>
+        <canvas id="chartLat" width="420" height="120" style="margin-top:6px"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* DDoS Simulator PRO — single-file educational simulation
+   - no network calls
+   - purely client-side visual & statistical simulation
+*/
+
+// --- state & elements
+const botCountEl = document.getElementById('botCount');
+const botRateEl = document.getElementById('botRate');
+const legitRateEl = document.getElementById('legitRate');
+const srvCapacityEl = document.getElementById('srvCapacity');
+const botCountLabel = document.getElementById('botCountLabel');
+const botRateLabel = document.getElementById('botRateLabel');
+const legitRateLabel = document.getElementById('legitRateLabel');
+const srvCapacityLabel = document.getElementById('srvCapacityLabel');
+
+const startBtn = document.getElementById('startBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const stopBtn = document.getElementById('stopBtn');
+const resetBtn = document.getElementById('resetBtn');
+const explainBtn = document.getElementById('explainBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+
+const rateLimitChk = document.getElementById('rateLimit');
+const blacklistChk = document.getElementById('blacklist');
+const autoscaleChk = document.getElementById('autoscale');
+const cdnChk = document.getElementById('cdn');
+const challengeChk = document.getElementById('challenge');
+
+const attackTypeEl = document.getElementById('attackType');
+const presetPills = document.querySelectorAll('.pill');
+
+const logBox = document.getElementById('log');
+const rpsEl = document.getElementById('rps');
+const latEl = document.getElementById('lat');
+const queueEl = document.getElementById('queue');
+const blockedEl = document.getElementById('blocked');
+const capEl = document.getElementById('cap');
+const topTalkerEl = document.getElementById('toptalker');
+
+const cpuFill = document.getElementById('cpuFill');
+const serverQueueText = document.getElementById('serverQueueText');
+const botsContainer = document.getElementById('botsContainer');
+const topo = document.querySelector('.network');
+const clientLegit = document.getElementById('clientLegit');
+const switchEl = document.getElementById('switch');
+const routerEl = document.getElementById('router');
+const serverEl = document.getElementById('server');
+
+const chartRps = document.getElementById('chartRps');
+const chartLat = document.getElementById('chartLat');
+const ctxRps = chartRps.getContext('2d');
+const ctxLat = chartLat.getContext('2d');
+
+let simulationInterval = null;
+let tickMs = 1000; // base tick
+let running = false;
+let paused = false;
+let bots = []; // DOM elements for bots
+let ipStats = {}; // ip -> {count, lastSeen}
+let blacklist = new Set();
+let report = {events:[],samples:[]};
+let timeSeries = {rps:[],lat:[],queue:[]};
+
+// init labels and layout
+function syncLabels(){
+  botCountLabel.textContent = botCountEl.value;
+  botRateLabel.textContent = botRateEl.value;
+  legitRateLabel.textContent = legitRateEl.value;
+  srvCapacityLabel.textContent = srvCapacityEl.value;
+}
+[botCountEl,botRateEl,legitRateEl,srvCapacityEl].forEach(el=>{
+  el.addEventListener('input',()=>{ syncLabels(); serverState.capacity = parseInt(srvCapacityEl.value,10); updateServerText(); });
+});
+syncLabels();
+
+// preset clicks
+presetPills.forEach(p=>{
+  p.addEventListener('click', ()=> {
+    botCountEl.value=p.dataset.bots;
+    botRateEl.value=p.dataset.rate;
+    legitRateEl.value=p.dataset.legit;
+    srvCapacityEl.value=p.dataset.cap;
+    syncLabels();
+  });
+});
+
+// server state
+let serverState = {
+  capacity: parseInt(srvCapacityEl.value,10),
+  queue: 0,
+  processedLastSec: 0,
+  avgLatency: 20,
+  blocked: 0,
+  totalProcessed: 0
+};
+
+// layout bots
+function createBotElements(n){
+  botsContainer.innerHTML = '';
+  bots = [];
+  ipStats = {};
+  blacklist = new Set();
+  for(let i=0;i<n;i++){
+    const b = document.createElement('div');
+    b.className = 'client bot';
+    const rect = topo.getBoundingClientRect();
+    // randomly position around edges (left/right/top)
+    const zone = Math.random();
+    let x, y;
+    if(zone<0.4){ x = 10 + Math.random()*80; y = 30 + Math.random()*(rect.height-60); } // left
+    else if(zone<0.8){ x = rect.width-110 + Math.random()*40; y = 30 + Math.random()*(rect.height-60); } // right
+    else { x = 80 + Math.random()*(rect.width-160); y = Math.random()<0.5?10:rect.height-60; } // top/bottom
+    b.style.left = `${x}px`; b.style.top = `${y}px`;
+    b.dataset.ip = `10.0.${Math.floor(i/256)}.${i%256}`;
+    b.dataset.id = i;
+    b.dataset.requests = 0;
+    b.addEventListener('click', ()=> {
+      // manual blacklist toggle
+      const ip = b.dataset.ip;
+      if(blacklist.has(ip)){ blacklist.delete(ip); log(`Removed ${ip} from blacklist`, '#ffd54d'); b.style.opacity='1'; }
+      else { blacklist.add(ip); log(`Manually blacklisted ${ip}`, '#ff6b6b'); b.style.opacity='0.35'; }
+      updateTopTalker();
+    });
+    botsContainer.appendChild(b);
+    bots.push(b);
+  }
+  updateTopTalker();
+}
+
+// helper log
+function log(msg, color){
+  const d=document.createElement('div'); d.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
+  if(color) d.style.color=color;
+  logBox.prepend(d);
+  report.events.push({t:Date.now(),msg});
+  if(logBox.children.length>800) logBox.removeChild(logBox.lastChild);
+}
+
+// visual animate small dot
+function animateDot(fromEl,toEl,color,fast=false){
+  const dot = document.createElement('div');
+  dot.className='packet';
+  dot.style.width='10px'; dot.style.height='10px'; dot.style.borderRadius='6px';
+  dot.style.background = color; dot.style.opacity='0.95';
+  document.body.appendChild(dot);
+  const f = fromEl.getBoundingClientRect(); const t = toEl.getBoundingClientRect();
+  dot.style.left = (f.left + f.width/2) + 'px'; dot.style.top = (f.top + f.height/2) + 'px';
+  // force reflow
+  void dot.offsetWidth;
+  const dur = fast? 300 : (500 + Math.random()*600);
+  dot.style.transition = `left ${dur}ms linear, top ${dur}ms linear, opacity 200ms`;
+  dot.style.left = (t.left + t.width/2) + 'px'; dot.style.top = (t.top + t.height/2) + 'px';
+  setTimeout(()=> dot.style.opacity='0', dur-80);
+  setTimeout(()=> dot.remove(), dur+200);
+}
+
+// main tick (approx 1s)
+function tick(){
+  if(!running || paused) return;
+  const attackType = attackTypeEl.value;
+  const botCount = Math.max(0, parseInt(botCountEl.value,10));
+  const botRate = parseFloat(botRateEl.value);
+  const legitRate = parseFloat(legitRateEl.value);
+  const isRateLimit = rateLimitChk.checked;
+  const isBlacklistAuto = blacklistChk.checked;
+  const isAutoscale = autoscaleChk.checked;
+  const isCDN = cdnChk.checked;
+  const isChallenge = challengeChk.checked;
+
+  // autoscale logic (adds capacity when queue large)
+  if(isAutoscale && serverState.queue > serverState.capacity * 0.75){
+    const add = Math.round(serverState.capacity * 0.35);
+    serverState.capacity = Math.min(5000, serverState.capacity + add);
+    log(`Autoscale: added capacity ${add}, total ${serverState.capacity}`, '#ffd54d');
+  }
+
+  // compute requests
+  // bot requests approx botCount * botRate (Poisson approx)
+  let effectiveBotRateFactor = isCDN ? 0.35 : 1.0; // CDN offloads
+  let botReq = Math.round(botCount * botRate * effectiveBotRateFactor);
+  let legitReq = Math.round(legitRate);
+
+  // rate limit simulation: per-IP cap
+  if(isRateLimit){
+    const perIpCap = attackType==='syn' ? 8 : 6; // stricter for SYN maybe
+    const maxAllowed = botCount * perIpCap;
+    if(botReq > maxAllowed){
+      const dropped = botReq - maxAllowed;
+      botReq = maxAllowed + Math.round(dropped * 0.25); // some still get through
+      serverState.blocked += Math.round(dropped*0.75);
+    }
+  }
+
+  // blacklist auto: find top talkers and blacklist some
+  if(isBlacklistAuto){
+    // aggregate counts: randomly simulate larger counts for some bots
+    for(let i=0;i<Math.min(bots.length, 50); i++){
+      const b = bots[Math.floor(Math.random()*bots.length)];
+      const ip = b.dataset.ip;
+      ipStats[ip] = ipStats[ip] || {count:0,ip};
+      ipStats[ip].count += Math.round(Math.random()*5*botRate);
+    }
+    // find top
+    const arr = Object.values(ipStats).sort((a,b)=>b.count-a.count).slice(0,5);
+    arr.forEach(s=>{
+      if(s.count > 100 && !blacklist.has(s.ip)){
+        blacklist.add(s.ip);
+        log(`Auto-blacklist ${s.ip} (high volume)`, '#ff6b6b');
+        // visually dim bots with that ip
+        bots.forEach(b=>{ if(b.dataset.ip===s.ip) b.style.opacity='0.35'; });
+      }
+    });
+  }
+
+  // clip botReq based on blacklist
+  if(blacklist.size>0){
+    const approxBlocked = Math.round(botReq * Math.min(0.6, blacklist.size / Math.max(1, botCount)));
+    botReq = Math.max(0, botReq - approxBlocked);
+    serverState.blocked += approxBlocked;
+  }
+
+  const incoming = botReq + legitReq;
+
+  // animate sample traffic
+  const sample = Math.min(60, incoming);
+  for(let i=0;i<sample;i++){
+    const isBot = Math.random() < (botReq/(incoming||1));
+    if(isBot && bots.length>0){
+      const b = bots[Math.floor(Math.random()*bots.length)];
+      // skip if blacklisted
+      if(blacklist.has(b.dataset.ip)) continue;
+      const color = attackType==='udp' ? 'rgba(160,74,255,0.95)' : (attackType==='syn' ? 'rgba(255,140,30,0.95)' : 'rgba(255,100,100,0.95)');
+      animateDot(b, switchEl, color, attackType==='syn');
+    } else {
+      animateDot(clientLegit, switchEl, 'rgba(75,220,140,0.95)', true);
+    }
+  }
+
+  // server queue & processing
+  serverState.queue += incoming;
+  serverState.processedLastSec = Math.min(serverState.capacity, serverState.queue);
+  serverState.queue -= serverState.processedLastSec;
+  serverState.totalProcessed += serverState.processedLastSec;
+
+  // latency calc (baseline + queue factor + randomness)
+  const baseline = 20;
+  const qFactor = Math.min(1, serverState.queue / Math.max(1, serverState.capacity));
+  const latency = Math.round(baseline + qFactor*800 + Math.random()*60);
+
+  // update stats UI
+  rpsEl.textContent = incoming;
+  latEl.textContent = latency;
+  queueEl.textContent = serverState.queue;
+  blockedEl.textContent = serverState.blocked;
+  capEl.textContent = serverState.capacity;
+  serverQueueText.textContent = `Обработва: ${serverState.processedLastSec} / Капацитет: ${serverState.capacity} req/s`;
+  const util = Math.min(1, serverState.processedLastSec / Math.max(1, serverState.capacity));
+  cpuFill.style.width = `${Math.round(util*100)}%`;
+  cpuFill.style.background = util>0.9 ? "linear-gradient(90deg,#ff6b6b,#ffb09a)" : "linear-gradient(90deg,#4ae39a,#ffd54d)";
+
+  // record time series
+  timeSeries.rps.push(incoming); timeSeries.lat.push(latency); timeSeries.queue.push(serverState.queue);
+  if(timeSeries.rps.length>60){ timeSeries.rps.shift(); timeSeries.lat.shift(); timeSeries.queue.shift(); }
+
+  // update charts
+  drawCharts();
+
+  // sample top talker for UI
+  updateTopTalker();
+
+  // save sample to report
+  report.samples.push({t:Date.now(), incoming, latency, queue:serverState.queue, capacity:serverState.capacity});
+
+  // some conditional logs
+  if(qFactor>0.7 && Math.random()<0.4) log(`High queue: ${serverState.queue}`, '#ffb86b');
+  if(incoming > serverState.capacity*2 && Math.random()<0.25) log(`Traffic >> capacity (${incoming} req/s)`, '#ff6b6b');
+}
+
+// chart drawing (simple)
+function drawCharts(){
+  // clear
+  ctxRps.clearRect(0,0,chartRps.width,chartRps.height);
+  ctxLat.clearRect(0,0,chartLat.width,chartLat.height);
+  // draw axes
+  ctxRps.fillStyle = 'rgba(255,255,255,0.06)'; ctxRps.fillRect(0,0,chartRps.width,chartRps.height);
+  ctxLat.fillStyle = 'rgba(255,255,255,0.06)'; ctxLat.fillRect(0,0,chartLat.width,chartLat.height);
+  // rps line
+  const arr = timeSeries.rps;
+  if(arr.length>1){
+    const maxv = Math.max(...arr, 1);
+    ctxRps.beginPath(); ctxRps.strokeStyle='#29a3ff'; ctxRps.lineWidth=2;
+    arr.forEach((v,i)=>{ const x = i*(chartRps.width/(arr.length-1)); const y = chartRps.height - (v/maxv)*(chartRps.height-8) -4; if(i===0) ctxRps.moveTo(x,y); else ctxRps.lineTo(x,y); });
+    ctxRps.stroke();
+  }
+  // latency
+  const la = timeSeries.lat;
+  if(la.length>1){
+    const maxv2 = Math.max(...la,1);
+    ctxLat.beginPath(); ctxLat.strokeStyle='#ffd54d'; ctxLat.lineWidth=2;
+    la.forEach((v,i)=>{ const x = i*(chartLat.width/(la.length-1)); const y = chartLat.height - (v/maxv2)*(chartLat.height-8) -4; if(i===0) ctxLat.moveTo(x,y); else ctxLat.lineTo(x,y); });
+    ctxLat.stroke();
+  }
+  // labels
+  ctxRps.fillStyle='rgba(255,255,255,0.6)'; ctxRps.font='12px sans-serif'; ctxRps.fillText('RPS (last samples)',6,14);
+  ctxLat.fillStyle='rgba(255,255,255,0.6)'; ctxLat.font='12px sans-serif'; ctxLat.fillText('Latency ms (last samples)',6,14);
+}
+
+// update top talker UI
+function updateTopTalker(){
+  // pick top from ipStats
+  const arr = Object.values(ipStats).sort((a,b)=>b.count-a.count).slice(0,5);
+  if(arr.length===0){ topTalkerEl.textContent = '-'; return; }
+  topTalkerEl.textContent = `${arr[0].ip} (${arr[0].count})`;
+}
+
+// create initial bots
+function layout() { createBotElements(parseInt(botCountEl.value,10)); }
+window.addEventListener('resize', ()=> layout());
+layout();
+
+// start/pause/stop/reset logic
+startBtn.addEventListener('click', ()=> {
+  if(running) return;
+  running = true; paused = false;
+  serverState.capacity = parseInt(srvCapacityEl.value,10);
+  report = {events:[],samples:[]};
+  log('Simulation started',' #29a3ff');
+  simulationInterval = setInterval(tick, tickMs);
+});
+pauseBtn.addEventListener('click', ()=> {
+  paused = !paused; log(paused? 'Simulation paused':'Simulation resumed', '#ffd54d');
+});
+stopBtn.addEventListener('click', ()=> {
+  clearInterval(simulationInterval); running=false; paused=false; log('Simulation stopped', '#ff6b6b');
+});
+resetBtn.addEventListener('click', ()=> {
+  clearInterval(simulationInterval); running=false; paused=false;
+  serverState = {capacity: parseInt(srvCapacityEl.value,10), queue:0, processedLastSec:0, avgLatency:20, blocked:0, totalProcessed:0};
+  timeSeries = {rps:[],lat:[],queue:[]};
+  ipStats = {}; blacklist = new Set(); report = {events:[],samples:[]};
+  rpsEl.textContent='0'; latEl.textContent='0'; queueEl.textContent='0'; blockedEl.textContent='0'; capEl.textContent=serverState.capacity;
+  cpuFill.style.width='0%'; serverQueueText.textContent=`Обработва: 0 / Капацитет: ${serverState.capacity} req/s`;
+  createBotElements(parseInt(botCountEl.value,10));
+  log('Simulation reset',' #4ae39a');
+});
+
+// explain mode (stepwise)
+let explainStep = 0;
+explainBtn.addEventListener('click', async ()=>{
+  // step through a small scripted scenario
+  clearInterval(simulationInterval); running=false;
+  // small controlled scenario
+  const saved = {
+    bots: botCountEl.value, rate: botRateEl.value, legit: legitRateEl.value, cap: srvCapacityEl.value
+  };
+  botCountEl.value = 200; botRateEl.value = 6; legitRateEl.value = 1; srvCapacityEl.value = 300; syncLabels(); createBotElements(200);
+  log('Explain: Stepwise demo started', '#ffd54d');
+  // steps:
+  const steps = [
+    {msg:'Normal traffic — server healthy', bots:50, rate:1, sec:2, highlight:'#4ae39a'},
+    {msg:'Attacker bots ramp up — increased RPS', bots:800, rate:6, sec:4, highlight:'#ffb86b'},
+    {msg:'Rate limiting enabled: per-IP cap applied', action:()=>{ rateLimitChk.checked=true; }, sec:3, highlight:'#ffd54d'},
+    {msg:'Top talkers auto-blacklisted', action:()=>{ blacklistChk.checked=true; }, sec:3, highlight:'#ff6b6b'},
+    {msg:'CDN offload engaged — traffic reduced', action:()=>{ cdnChk.checked=true; }, sec:3, highlight:'#4ae39a'},
+    {msg:'Autoscale added capacity to absorb bursts', action:()=>{ autoscaleChk.checked=true; }, sec:3, highlight:'#4ae39a'},
+    {msg:'Result: legitimate traffic served again — mitigation success', sec:3, highlight:'#4ae39a'}
+  ];
+  for(let s of steps){
+    log(`Explain: ${s.msg}`, s.highlight);
+    if(s.action) s.action();
+    // run this scenario for s.sec seconds
+    const end = Date.now() + (s.sec*1000);
+    while(Date.now()<end){
+      // simulate one tick with current parameters
+      await new Promise(r=>setTimeout(r, 400));
+      // small internal tick: call tick logic but without starting interval
+      if(!running){ tick(); }
+    }
+  }
+  log('Explain demo finished — restoring settings', '#29a3ff');
+  // restore saved
+  botCountEl.value = saved.bots; botRateEl.value = saved.rate; legitRateEl.value = saved.legit; srvCapacityEl.value = saved.cap;
+  syncLabels(); createBotElements(parseInt(botCountEl.value,10));
+});
+
+// download report
+downloadBtn.addEventListener('click', ()=>{
+  const data = {
+    meta: {time: new Date().toISOString(), attack: attackTypeEl.value, bots: botCountEl.value, botRate: botRateEl.value},
+    events: report.events,
+    samples: report.samples
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'ddos_report.json'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+// simple top talker simulation updater
+setInterval(()=>{
+  // randomly bump ipStats to simulate activity
+  for(let i=0;i<5;i++){
+    if(bots.length===0) break;
+    const b = bots[Math.floor(Math.random()*bots.length)];
+    const ip = b.dataset.ip;
+    ipStats[ip] = ipStats[ip] || {ip, count:0};
+    ipStats[ip].count += Math.round(Math.random()*10);
+  }
+  updateTopTalker();
+}, 2000);
+
+// safety note
+log('Ready. This is an educational, offline simulator. No real network traffic.', '#ffd54d');
+
+</script>
+</body>
+</html>
