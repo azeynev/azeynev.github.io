@@ -956,17 +956,7 @@
                     : MATERIALS_DATA.filter(item => item.cat === cat).length;
             });
         }
-            MATERIALS_DATA.forEach(item => {
-                if (counts[item.cat] !== undefined) counts[item.cat]++;
-            });
-            document.querySelectorAll('.cat-count').forEach(el => {
-                const c = el.dataset.cat;
-                if (counts[c] !== undefined) el.textContent = counts[c];
-            });
-            const statTotal = document.getElementById('stat-total-count');
-            if (statTotal) statTotal.textContent = counts.all;
-        
-
+           
         // =========================================================================
         // THEME & LANGUAGE TOGGLES (SYNCED WITH MAIN PORTFOLIO)
         // =========================================================================
