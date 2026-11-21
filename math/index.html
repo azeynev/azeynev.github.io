@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STEM-DERIVE Studio · Дедуктивен конструктор & НВО Арена (7. и 10. клас)</title>
-    <meta name="description" content="Интерактивен дедуктивен конструктор и изпитен тренажор за НВО 7. и 10. клас по математика (Част 1, 2021–2026) — д-р Адем Ибушев Зейнев.">
+    <title>STEM-DERIVE Studio · Дедуктивен конструктор & НВО Арена (Част 1 и Част 2)</title>
+    <meta name="description" content="Интерактивен дедуктивен конструктор и изпитен тренажор за НВО 7. и 10. клас по математика (Част 1 и Част 2 с критерии на МОН, 2021–2026) — д-р Адем Ибушев Зейнев.">
     <meta name="author" content="д-р Адем Ибушев Зейнев / Adem ZEINEV, PhD">
     <meta name="theme-color" content="#4f46e5">
 
@@ -12,12 +12,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- KaTeX за красива математическа типография -->
+    <!-- KaTeX за математическа типография -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 
-    <!-- Math.js за безопасен символен и числен математически парсинг -->
+    <!-- Math.js за безопасен символен и числен парсинг -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.0.0/math.min.js"></script>
 
     <script>
@@ -111,9 +111,9 @@
             <div class="truncate">
                 <div class="flex items-center gap-1.5">
                     <span class="font-mono font-extrabold text-xs sm:text-sm tracking-tight text-slate-900 dark:text-white">STEM-DERIVE Studio</span>
-                    <span class="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-300 font-mono text-[10px] font-extrabold hidden sm:inline">+ НВО 7. & 10. КЛАС</span>
+                    <span class="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-300 font-mono text-[10px] font-extrabold hidden sm:inline">+ НВО ЧАСТ 1 & 2</span>
                 </div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 block truncate">д-р Адем Ибушев Зейнев · Дедуктивно моделиране & НВО Част 1 (2021–2026)</span>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 block truncate">д-р Адем Ибушев Зейнев · Дедуктивно моделиране & НВО Арена (2021–2026)</span>
             </div>
         </div>
 
@@ -131,7 +131,7 @@
                 <i class="fa-solid fa-diagram-project text-[11px]"></i><span class="hidden sm:inline">Конструктор</span><span class="sm:hidden">Стъпки</span>
             </button>
             <button id="main-mode-nvo" onclick="switchMasterMode('nvo')" class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition flex items-center gap-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
-                <i class="fa-solid fa-graduation-cap text-[11px] text-amber-500"></i><span class="hidden sm:inline">НВО Арена (258)</span><span class="sm:hidden">НВО</span>
+                <i class="fa-solid fa-graduation-cap text-[11px] text-amber-500"></i><span class="hidden sm:inline">НВО Арена (294)</span><span class="sm:hidden">НВО</span>
             </button>
         </div>
 
@@ -335,33 +335,44 @@
 
     <!-- MODE 2: NVO ARENA -->
     <div id="workspace-nvo" class="hidden flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0">
-        <aside class="lg:col-span-3 bg-white dark:bg-lab-900 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 p-3.5 overflow-y-auto space-y-4">
+        <aside class="lg:col-span-3 bg-white dark:bg-lab-900 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 p-3.5 overflow-y-auto space-y-3.5">
             <div class="space-y-1.5">
-                <label class="text-[10px] font-mono font-bold uppercase text-amber-600 dark:text-amber-400 block">1. ИЗБОР НА КЛАС (ЧАСТ 1 НА МОН)</label>
+                <label class="text-[10px] font-mono font-bold uppercase text-amber-600 dark:text-amber-400 block">1. ИЗБОР НА КЛАС</label>
                 <div class="grid grid-cols-2 gap-1.5 bg-slate-100 dark:bg-lab-850 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <button id="nvo-grade-7-btn" onclick="setNvoGrade('7')" class="py-2 px-2 rounded-lg text-xs font-extrabold transition bg-amber-600 text-white shadow-sm">7. клас (20/год.)</button>
-                    <button id="nvo-grade-10-btn" onclick="setNvoGrade('10')" class="py-2 px-2 rounded-lg text-xs font-extrabold transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">10. клас (23/год.)</button>
+                    <button id="nvo-grade-7-btn" onclick="setNvoGrade('7')" class="py-2 px-2 rounded-lg text-xs font-extrabold transition bg-amber-600 text-white shadow-sm">7. клас (23/год.)</button>
+                    <button id="nvo-grade-10-btn" onclick="setNvoGrade('10')" class="py-2 px-2 rounded-lg text-xs font-extrabold transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">10. клас (26/год.)</button>
                 </div>
             </div>
+
             <div class="space-y-1.5">
-                <label id="nvo-year-label" class="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400 block">2. ГОДИНА (МАКС. БРОЙ ЗА ЧАСТ 1)</label>
+                <label class="text-[10px] font-mono font-bold uppercase text-indigo-600 dark:text-cyan-400 block">2. МОДУЛ НА ИЗПИТА (МОН)</label>
+                <div class="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-lab-850 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-[11px] font-extrabold">
+                    <button id="nvo-part-1-btn" onclick="setNvoPart('1')" class="py-1.5 px-1 rounded-lg bg-indigo-600 text-white shadow-sm transition">Част 1</button>
+                    <button id="nvo-part-2-btn" onclick="setNvoPart('2')" class="py-1.5 px-1 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition">Част 2 (МОН)</button>
+                    <button id="nvo-part-all-btn" onclick="setNvoPart('ALL')" class="py-1.5 px-1 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition">Пълен (100 т.)</button>
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400 block">3. ГОДИНА (2021–2026)</label>
                 <select id="nvo-year-filter" onchange="buildNvoSession()" class="w-full rounded-xl bg-slate-50 dark:bg-lab-800 border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold focus:outline-none focus:border-amber-500">
-                    <option value="2026" selected>2026 г. (Пълен Модул 1)</option>
-                    <option value="2025">2025 г. (Пълен Модул 1)</option>
-                    <option value="2024">2024 г. (Пълен Модул 1)</option>
-                    <option value="2023">2023 г. (Пълен Модул 1)</option>
-                    <option value="2022">2022 г. (Пълен Модул 1)</option>
-                    <option value="2021">2021 г. (Пълен Модул 1)</option>
+                    <option value="2026" selected>2026 г. (Пълен изпит)</option>
+                    <option value="2025">2025 г. (Пълен изпит)</option>
+                    <option value="2024">2024 г. (Пълен изпит)</option>
+                    <option value="2023">2023 г. (Пълен изпит)</option>
+                    <option value="2022">2022 г. (Пълен изпит)</option>
+                    <option value="2021">2021 г. (Пълен изпит)</option>
                     <option value="ALL">Всички години (2021–2026)</option>
                 </select>
                 <button id="nvo-gen-variant-btn" onclick="generateFullExamVariantForYear()" class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:opacity-95 text-white text-xs font-extrabold shadow-sm transition flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i><span id="nvo-gen-variant-label">Нов вариант с други числа (20 зад.)</span>
+                    <i class="fa-solid fa-wand-magic-sparkles"></i><span id="nvo-gen-variant-label">Нов вариант с други числа</span>
                 </button>
             </div>
+
             <div class="space-y-1.5">
-                <label class="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400 block">3. ТЕМА</label>
+                <label class="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400 block">4. ТЕМА</label>
                 <select id="nvo-topic-filter" onchange="buildNvoSession()" class="w-full rounded-xl bg-slate-50 dark:bg-lab-800 border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-semibold focus:outline-none focus:border-amber-500">
-                    <option value="ALL">Всички задачи от Част 1</option>
+                    <option value="ALL">Всички теми от избрания модул</option>
                     <option value="ALGEBRA">Алгебра и изрази</option>
                     <option value="EQUATIONS">Уравнения и неравенства</option>
                     <option value="MODELING">Текстови, функции и моделиране</option>
@@ -369,22 +380,24 @@
                     <option value="STATS">Вероятности, комбинаторика и данни</option>
                 </select>
             </div>
+
             <div class="space-y-1.5">
-                <label class="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400 block">4. РЕЖИМ</label>
-                <div class="grid grid-cols-1 gap-1.5">
-                    <button id="nvo-mode-practice-btn" onclick="setNvoMode('practice')" class="p-2.5 rounded-xl border-2 border-cyan-500 bg-cyan-500/10 text-left transition">
-                        <div class="text-xs font-extrabold text-cyan-700 dark:text-cyan-300 flex items-center justify-between"><span><i class="fa-solid fa-lightbulb mr-1"></i> Упражнение</span><span class="text-[10px] font-mono">ВЕДНАГА</span></div>
-                        <span class="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">Моментална проверка</span>
+                <label class="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400 block">5. РЕЖИМ</label>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <button id="nvo-mode-practice-btn" onclick="setNvoMode('practice')" class="p-2 rounded-xl border-2 border-cyan-500 bg-cyan-500/10 text-left transition">
+                        <div class="text-xs font-extrabold text-cyan-700 dark:text-cyan-300"><i class="fa-solid fa-lightbulb mr-1"></i> Упражнение</div>
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 block">С подсказки</span>
                     </button>
-                    <button id="nvo-mode-exam-btn" onclick="setNvoMode('exam')" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-lab-850 text-left transition hover:border-amber-500">
-                        <div class="text-xs font-extrabold text-slate-700 dark:text-slate-200 flex items-center justify-between"><span><i class="fa-solid fa-stopwatch mr-1 text-amber-500"></i> Изпит</span><span class="text-[10px] font-mono">С ТАЙМЕР</span></div>
-                        <span class="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">Резултат накрая</span>
+                    <button id="nvo-mode-exam-btn" onclick="setNvoMode('exam')" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-lab-850 text-left transition hover:border-amber-500">
+                        <div class="text-xs font-extrabold text-slate-700 dark:text-slate-200"><i class="fa-solid fa-stopwatch mr-1 text-amber-500"></i> Изпит</div>
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 block">С таймер</span>
                     </button>
                 </div>
             </div>
-            <div class="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
+
+            <div class="pt-2.5 border-t border-slate-200 dark:border-slate-800 space-y-2">
                 <div class="flex items-center justify-between text-xs font-bold">
-                    <span class="text-slate-500 dark:text-slate-400">Таймер (Част 1):</span>
+                    <span class="text-slate-500 dark:text-slate-400">Таймер:</span>
                     <span id="nvo-timer-display" class="font-mono text-amber-600 dark:text-amber-400">Без ограничение</span>
                 </div>
                 <button onclick="finishNvoExam()" class="w-full py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold shadow-sm transition">
@@ -410,18 +423,18 @@
         <aside class="lg:col-span-3 bg-white dark:bg-lab-900 p-4 overflow-y-auto space-y-4">
             <div class="rounded-2xl bg-slate-50 dark:bg-lab-850 border border-slate-200 dark:border-slate-800 p-3.5 space-y-2.5">
                 <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400">КАРТА НА ЧАСТ 1</span>
+                    <span id="nvo-map-title" class="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400">КАРТА НА ТЕСТА</span>
                     <span id="nvo-answered-count" class="text-[10px] font-mono font-bold text-cyan-500">0 / 20 решени</span>
                 </div>
                 <div id="nvo-map-grid" class="grid grid-cols-5 gap-1.5 max-h-[320px] overflow-y-auto pr-1"></div>
             </div>
             <div id="nvo-score-card" class="rounded-2xl bg-slate-900 text-white p-4 border border-slate-800 space-y-2">
-                <span class="text-[10px] font-mono font-bold text-amber-400 uppercase block">ТЕКУЩ РЕЗУЛТАТ (ЧАСТ 1)</span>
+                <span id="nvo-score-header" class="text-[10px] font-mono font-bold text-amber-400 uppercase block">ТЕКУЩ РЕЗУЛТАТ</span>
                 <div class="flex items-baseline justify-between">
                     <span id="nvo-points-text" class="text-2xl font-mono font-extrabold text-emerald-400">0 / 65 т.</span>
                     <span id="nvo-grade-text" class="text-xs font-mono text-slate-400">Оценка: —</span>
                 </div>
-                <p id="nvo-feedback-text" class="text-xs text-slate-300 leading-relaxed">Избери отговор или натисни „Реши в Конструктора“, за да разпишеш задачата стъпка по стъпка.</p>
+                <p id="nvo-feedback-text" class="text-xs text-slate-300 leading-relaxed">В Част 2 разпиши решението в тетрадката на екрана, отметни изпълнените критерии на МОН или разкрий еталонното решение.</p>
             </div>
         </aside>
     </div>
@@ -467,8 +480,8 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'stem_derive_metrics_v3';
-        const TEACHER_PIN = '1qaz2';
+        const STORAGE_KEY = 'stem_derive_metrics_v4';
+        const TEACHER_PIN = '1234';
 
         // ================= STATE =================
         const state = {
@@ -482,6 +495,7 @@
             metrics: { eq: 100, ax: 100, al: 88, lo: 92, st: 95 },
             nvo: {
                 grade: '7',
+                part: '1', // '1', '2', 'ALL'
                 mode: 'practice',
                 questions: [],
                 currentIdx: 0,
@@ -504,147 +518,135 @@
             { badge: 'НВО 10. КЛАС · ПРАВОЪГЪЛЕН ТРИЪГЪЛНИК', sub: 'Намери радиуса R на описаната окръжност.', root: 'sqrt(6^2 + 8^2) / 2 = x', steps: ['sqrt(36 + 64) / 2 = x', '10 / 2 = x', 'x = 5'] }
         ];
 
-        // ================= 20 ЗАДАЧИ ЗА 7. КЛАС (МАКСИМУМ ЗА ЧАСТ 1 НА МОН: 18 MCQ + 2 КРАТЪК ОТГОВОР = 65 Т.) =================
-        const BASE_TEMPLATES_7 = [
-            // Зад. 1 (2 т.) - Числен израз
+        // ================= 20 ЗАДАЧИ ЗА 7. КЛАС — ЧАСТ 1 (65 Т.) =================
+        const BASE_TEMPLATES_7_PART1 = [
             (y, k) => {
                 const a = 2 + (k % 3), b = 3 + (k % 2);
                 const val = Math.pow(a, 3) - b * b + (k % 5);
                 return {
-                    id: `7-${y}-1`, grade: '7', year: y, topic: 'ALGEBRA', pts: 2, type: 'mcq',
+                    id: `7-${y}-1`, grade: '7', part: '1', year: y, topic: 'ALGEBRA', pts: 2, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 1] Стойността на числовия израз $${a}^3 - ${b}^2 + ${k % 5}$ е:`,
                     options: [`$${val}$`, `$${val + 4}$`, `$${val - 3}$`, `$${a * 3 - b * 2}$`], correct: 0,
                     deriveExpr: `${a}^3 - ${b}^2 + ${k % 5} = x`,
                     deriveSteps: [`${Math.pow(a,3)} - ${b*b} + ${k % 5} = x`, `x = ${val}`]
                 };
             },
-            // Зад. 2 (2 т.) - Степени
             (y, k) => {
                 const p1 = 5 + (k % 4), p2 = 3 + (k % 3), p3 = 6 + (k % 3);
                 const exp = p1 + p2 - p3;
                 const val = Math.pow(2, exp);
                 return {
-                    id: `7-${y}-2`, grade: '7', year: y, topic: 'ALGEBRA', pts: 2, type: 'mcq',
+                    id: `7-${y}-2`, grade: '7', part: '1', year: y, topic: 'ALGEBRA', pts: 2, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 2] Стойността на израза $\\frac{2^{${p1}} \\cdot 2^{${p2}}}{2^{${p3}}}$ е:`,
                     options: [`$${val}$`, `$${val * 2}$`, `$${exp}$`, `$${val / 2}$`], correct: 0,
                     deriveExpr: `(2^${p1} * 2^${p2}) / 2^${p3} = x`,
                     deriveSteps: [`2^${exp} = x`, `x = ${val}`]
                 };
             },
-            // Зад. 3 (3 т.) - Тъждествени преобразувания
             (y, k) => {
                 const c = 2 + (k % 4);
                 return {
-                    id: `7-${y}-3`, grade: '7', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
+                    id: `7-${y}-3`, grade: '7', part: '1', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 3] Стойността на израза $A = (x - ${c})^2 - x(x - ${2*c})$ за $x = -4,7$ е:`,
                     options: [`$${c*c}$`, `$-${c*c}$`, `$${2*c}$`, `$0$`], correct: 0,
                     deriveExpr: `(x - ${c})^2 - x*(x - ${2*c}) = ${c*c}`,
                     deriveSteps: [`x^2 - ${2*c}*x + ${c*c} - x^2 + ${2*c}*x = ${c*c}`, `${c*c} = ${c*c}`]
                 };
             },
-            // Зад. 4 (3 т.) - Разлагане на множители
             (y, k) => {
                 const a = 2 + (k % 4), b = 3 + (k % 5);
                 return {
-                    id: `7-${y}-4`, grade: '7', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
+                    id: `7-${y}-4`, grade: '7', part: '1', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 4] Разложете на множители многочлена $${a*a}x^2 - ${b*b}y^2$:`,
                     options: [`$(${a}x - ${b}y)^2$`, `$(${a}x - ${b}y)(${a}x + ${b}y)$`, `$(${a*a}x - ${b*b}y)(x + y)$`, `$${a}(x - ${b}y)(x + ${b}y)$`], correct: 1,
                     deriveExpr: `${a*a}*x^2 - ${b*b} = 0`,
                     deriveSteps: [`(${a}*x - ${b})*(${a}*x + ${b}) = 0`, `x = ${b/a}; x = ${-b/a}`]
                 };
             },
-            // Зад. 5 (3 т.) - Линейно уравнение
             (y, k) => {
                 const a = 2 + (k % 4), b = 1 + (k % 3), xSol = 3 + (k % 5);
                 const rhs = a * (2 * xSol - b) - 4 * (xSol + 1);
                 return {
-                    id: `7-${y}-5`, grade: '7', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
+                    id: `7-${y}-5`, grade: '7', part: '1', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 5] Коренът на уравнението $${a}(2x - ${b}) - 4(x + 1) = ${rhs}$ е:`,
                     options: [`$${xSol}$`, `$${xSol + 2}$`, `$${-xSol}$`, `$${xSol - 1}$`], correct: 0,
                     deriveExpr: `${a}*(2*x - ${b}) - 4*(x + 1) = ${rhs}`,
                     deriveSteps: [`${2*a}*x - ${a*b} - 4*x - 4 = ${rhs}`, `${2*a - 4}*x = ${rhs + a*b + 4}`, `x = ${xSol}`]
                 };
             },
-            // Зад. 6 (3 т.) - Модулно уравнение
             (y, k) => {
                 const m = 3 + (k % 5), rhs = 5 + (k % 4);
                 const x1 = (m + rhs) / 2, x2 = (m - rhs) / 2;
                 return {
-                    id: `7-${y}-6`, grade: '7', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
+                    id: `7-${y}-6`, grade: '7', part: '1', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 6] Решенията на модулното уравнение $|2x - ${m}| = ${rhs}$ са:`,
                     options: [`$${x1}$ и $${x2}$`, `$${x1}$ и $${-x2}$`, `$${-x1}$ и $${x2}$`, `$${m + rhs}$ и $${m - rhs}$`], correct: 0,
                     deriveExpr: `abs(2*x - ${m}) = ${rhs}`,
                     deriveSteps: [`(2*x - ${m})^2 = ${rhs*rhs}`, `x = ${x1}; x = ${x2}`]
                 };
             },
-            // Зад. 7 (3 т.) - Линейно неравенство
             (y, k) => {
                 const a = 2 + (k % 3), b = 5 + (k % 4);
                 const bound = 4 + (k % 5);
                 const rhs = a * bound + b;
                 return {
-                    id: `7-${y}-7`, grade: '7', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
+                    id: `7-${y}-7`, grade: '7', part: '1', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 7] Най-голямото цяло число $x$, което е решение на неравенството $${a}x + ${b} < ${rhs}$, е:`,
                     options: [`$${bound}$`, `$${bound - 1}$`, `$${bound + 1}$`, `$${bound - 2}$`], correct: 1,
                     deriveExpr: `${a}*x + ${b} = ${rhs}`,
                     deriveSteps: [`${a}*x = ${rhs - b}`, `x = ${bound}`]
                 };
             },
-            // Зад. 8 (3 т.) - Тъждество a^2 + b^2
             (y, k) => {
                 const sum = 6 + (k % 4), prod = 5 + (k % 4);
                 const ans = sum * sum - 2 * prod;
                 return {
-                    id: `7-${y}-8`, grade: '7', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
+                    id: `7-${y}-8`, grade: '7', part: '1', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 8] Ако $a + b = ${sum}$ и $ab = ${prod}$, намерете стойността на израза $a^2 + b^2$.`,
                     options: [`$${sum * sum}$`, `$${ans}$`, `$${sum * sum + 2 * prod}$`, `$${ans - 4}$`], correct: 1,
                     deriveExpr: `${sum}^2 - 2*${prod} = x`,
                     deriveSteps: [`${sum*sum} - ${2*prod} = x`, `x = ${ans}`]
                 };
             },
-            // Зад. 9 (3 т.) - Координатна система
             (y, k) => {
                 const a = 2 + (k % 3), b = 4 + 2 * (k % 4);
                 const ans = b / a;
                 return {
-                    id: `7-${y}-9`, grade: '7', year: y, topic: 'MODELING', pts: 3, type: 'mcq',
+                    id: `7-${y}-9`, grade: '7', part: '1', year: y, topic: 'MODELING', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 9] Точка $M(${a}m - ${b};\\; 7)$ лежи на ординатната ос $Oy$. Намерете стойността на параметъра $m$.`,
                     options: [`$0$`, `$${ans}$`, `$-${ans}$`, `$${b}$`], correct: 1,
                     deriveExpr: `${a}*x - ${b} = 0`,
                     deriveSteps: [`${a}*x = ${b}`, `x = ${ans}`]
                 };
             },
-            // Зад. 10 (3 т.) - Съседни ъгли
             (y, k) => {
                 const diff = 20 + 10 * (k % 5);
                 const small = (180 - diff) / 2;
                 const large = small + diff;
                 return {
-                    id: `7-${y}-10`, grade: '7', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `7-${y}-10`, grade: '7', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 10] Два съседни ъгъла се различават с $${diff}^\\circ$. Намерете големината на по-големия от тях.`,
                     options: [`$${small}^\\circ$`, `$${large}^\\circ$`, `$${90 + diff}^\\circ$`, `$${180 - diff}^\\circ$`], correct: 1,
                     deriveExpr: `x + (x - ${diff}) = 180`,
                     deriveSteps: [`2*x - ${diff} = 180`, `2*x = ${180 + diff}`, `x = ${large}`]
                 };
             },
-            // Зад. 11 (3 т.) - Успоредни прави и секуща
             (y, k) => {
                 const ang = 45 + 5 * (k % 6);
                 const adj = 180 - ang;
                 return {
-                    id: `7-${y}-11`, grade: '7', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `7-${y}-11`, grade: '7', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 11] Две успоредни прави $a \\parallel b$ са пресечени със секуща $c$. Ако един от острите ъгли е $${ang}^\\circ$, то прилежащият му вътрешен ъгъл е:`,
                     options: [`$${ang}^\\circ$`, `$${90 - ang}^\\circ$`, `$${adj}^\\circ$`, `$${2 * ang}^\\circ$`], correct: 2,
                     deriveExpr: `${ang} + x = 180`,
                     deriveSteps: [`x = 180 - ${ang}`, `x = ${adj}`]
                 };
             },
-            // Зад. 12 (3 т.) - Равнобедрен триъгълник
             (y, k) => {
                 const topAngle = [30, 40, 50, 60, 70, 80][k % 6];
                 const ans = topAngle / 2;
                 return {
-                    id: `7-${y}-12`, grade: '7', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `7-${y}-12`, grade: '7', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 12] В равнобедрен $\\triangle ABC$ ($AC = BC$) ъгълът при върха $C$ е $${topAngle}^\\circ$. Намерете $\\angle HAB$ между височината $AH$ към бедрото $BC$ и основата $AB$.`,
                     svg: `<svg viewBox="0 0 220 150" class="w-48 h-36 mx-auto text-indigo-500 dark:text-cyan-400"><polygon points="110,15 40,130 180,130" fill="none" stroke="currentColor" stroke-width="2"/><line x1="40" y1="130" x2="152" y2="84" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="4"/><text x="102" y="12" fill="currentColor" font-size="11" font-weight="bold">C (${topAngle}°)</text><text x="26" y="136" fill="currentColor" font-size="11" font-weight="bold">A</text><text x="184" y="136" fill="currentColor" font-size="11" font-weight="bold">B</text><text x="158" y="84" fill="#f59e0b" font-size="11" font-weight="bold">H</text></svg>`,
                     options: [`$${ans}^\\circ$`, `$${topAngle}^\\circ$`, `$${90 - ans}^\\circ$`, `$${180 - topAngle}^\\circ$`], correct: 0,
@@ -652,12 +654,11 @@
                     deriveSteps: [`90 - ${(180 - topAngle)/2} = x`, `x = ${ans}`]
                 };
             },
-            // Зад. 13 (3 т.) - Правоъгълен триъгълник 30°
             (y, k) => {
                 const hyp = 10 + 2 * (k % 5);
                 const leg = hyp / 2;
                 return {
-                    id: `7-${y}-13`, grade: '7', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `7-${y}-13`, grade: '7', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 13] В правоъгълен $\\triangle ABC$ ($\\angle C = 90^\\circ$) $\\angle B = 30^\\circ$ и хипотенузата $AB = ${hyp}\\text{ см}$. Намерете катета $AC$.`,
                     svg: `<svg viewBox="0 0 220 130" class="w-48 h-32 mx-auto text-indigo-500 dark:text-cyan-400"><polygon points="40,105 180,105 40,30" fill="none" stroke="currentColor" stroke-width="2"/><rect x="40" y="93" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="26" y="112" fill="currentColor" font-size="11" font-weight="bold">C</text><text x="26" y="25" fill="currentColor" font-size="11" font-weight="bold">A</text><text x="184" y="112" fill="currentColor" font-size="11" font-weight="bold">B (30°)</text><text x="105" y="60" fill="#f59e0b" font-size="11" font-weight="bold">${hyp} см</text></svg>`,
                     options: [`$${leg}\\text{ см}$`, `$${hyp}\\text{ см}$`, `$${hyp * 2}\\text{ см}$`, `$${leg + 2}\\text{ см}$`], correct: 0,
@@ -665,76 +666,70 @@
                     deriveSteps: [`x = ${leg}`]
                 };
             },
-            // Зад. 14 (3 т.) - Симетрала
             (y, k) => {
                 const ac = 5 + (k % 5), bc = 7 + (k % 4);
                 const perim = ac + bc;
                 return {
-                    id: `7-${y}-14`, grade: '7', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `7-${y}-14`, grade: '7', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 14] Симетралата на страната $AB$ в $\\triangle ABC$ пресича страната $BC$ в точка $M$. Ако $AC = ${ac}\\text{ см}$ и $BC = ${bc}\\text{ см}$, периметърът на $\\triangle AMC$ е:`,
                     options: [`$${perim}\\text{ см}$`, `$${perim + 2}\\text{ см}$`, `$${2 * ac + bc}\\text{ см}$`, `$${bc}\\text{ см}$`], correct: 0,
                     deriveExpr: `${ac} + ${bc} = x`,
                     deriveSteps: [`x = ${perim}`]
                 };
             },
-            // Зад. 15 (3 т.) - Ъглополовяща
             (y, k) => {
                 const a = 50 + 2 * (k % 6), b = 40 + 2 * (k % 5);
                 const c = 180 - a - b;
                 const halfC = c / 2;
                 const ans = 180 - a - halfC;
                 return {
-                    id: `7-${y}-15`, grade: '7', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `7-${y}-15`, grade: '7', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 15] В $\\triangle ABC$ $\\angle A = ${a}^\\circ$, $\\angle B = ${b}^\\circ$, а $CL$ е ъглополовяща на $\\angle C$. Намерете големината на $\\angle ALC$.`,
                     options: [`$${ans}^\\circ$`, `$${halfC}^\\circ$`, `$${180 - ans}^\\circ$`, `$${a + halfC}^\\circ$`], correct: 0,
                     deriveExpr: `180 - ${a} - (180 - ${a} - ${b})/2 = x`,
                     deriveSteps: [`180 - ${a} - ${halfC} = x`, `x = ${ans}`]
                 };
             },
-            // Зад. 16 (3 т.) - Вероятност
             (y, k) => {
                 const red = 4 + (k % 4), blue = 6 + (k % 3), green = 10 - (k % 3);
                 const total = red + blue + green;
                 const nonBlue = red + green;
                 return {
-                    id: `7-${y}-16`, grade: '7', year: y, topic: 'STATS', pts: 3, type: 'mcq',
+                    id: `7-${y}-16`, grade: '7', part: '1', year: y, topic: 'STATS', pts: 3, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 16] В кутия има $${red}$ червени, $${blue}$ сини и $${green}$ зелени топчета. Каква е вероятността случайно изтеглено топче да НЕ е синьо?`,
                     options: [`$\\frac{${blue}}{${total}}$`, `$\\frac{${nonBlue}}{${total}}$`, `$\\frac{${red}}{${total}}$`, `$\\frac{${green}}{${total}}$`], correct: 1,
                     deriveExpr: `(${red} + ${green}) / ${total} = x`,
                     deriveSteps: [`${nonBlue} / ${total} = x`, `x = ${nonBlue / total}`]
                 };
             },
-            // Зад. 17 (4 т.) - Успоредник
             (y, k) => {
                 const a = 6 + (k % 5), b = 9 + (k % 4);
                 const perim = 2 * (a + b);
                 return {
-                    id: `7-${y}-17`, grade: '7', year: y, topic: 'GEOMETRY', pts: 4, type: 'mcq',
+                    id: `7-${y}-17`, grade: '7', part: '1', year: y, topic: 'GEOMETRY', pts: 4, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 17] В успоредник $ABCD$ ъглополовящата на $\\angle BAD$ пресича страната $CD$ в точка $M$ така, че $DM = ${a}\\text{ см}$ и $MC = ${b - a}\\text{ см}$. Периметърът на успоредника е:`,
                     options: [`$${perim}\\text{ см}$`, `$${a + b}\\text{ см}$`, `$${2 * a + b}\\text{ см}$`, `$${perim + 4}\\text{ см}$`], correct: 0,
                     deriveExpr: `2 * (${a} + ${b}) = x`,
                     deriveSteps: [`2 * ${a + b} = x`, `x = ${perim}`]
                 };
             },
-            // Зад. 18 (4 т.) - Средноаритметично
             (y, k) => {
                 const x = 6 + (k % 6);
                 const arr = [4, 5, x, 9, 12];
                 const avg = arr.reduce((s, v) => s + v, 0) / 5;
                 return {
-                    id: `7-${y}-18`, grade: '7', year: y, topic: 'STATS', pts: 4, type: 'mcq',
+                    id: `7-${y}-18`, grade: '7', part: '1', year: y, topic: 'STATS', pts: 4, type: 'mcq',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 18] Средното аритметично на числата $4,\\; 5,\\; x,\\; 9,\\; 12$ е $${avg}$. Намерете числото $x$.`,
                     options: [`$${x - 1}$`, `$${x}$`, `$${x + 2}$`, `$${avg}$`], correct: 1,
                     deriveExpr: `(4 + 5 + x + 9 + 12) / 5 = ${avg}`,
                     deriveSteps: [`30 + x = ${avg * 5}`, `x = ${x}`]
                 };
             },
-            // Зад. 19 (6 т.) - Официална задача с кратък свободен отговор (Текстова с проценти)
             (y, k) => {
                 const pages = [120, 150, 180, 200, 240, 300][k % 6];
                 const rem = Math.round(pages * 0.4);
                 return {
-                    id: `7-${y}-19`, grade: '7', year: y, topic: 'MODELING', pts: 6, type: 'short',
+                    id: `7-${y}-19`, grade: '7', part: '1', year: y, topic: 'MODELING', pts: 6, type: 'short',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 19 (Кратък свободен отговор)] Ученик прочел книга за 3 дни. Първия ден прочел $40\\%$ от страниците, втория — $\\frac{1}{3}$ от останалите, а третия — последните $${rem}$ страници. Запишете колко страници има книгата:`,
                     shortAnswer: String(pages),
                     unit: 'страници',
@@ -742,12 +737,11 @@
                     deriveSteps: [`0.6*x + ${rem} = x`, `0.4*x = ${rem}`, `x = ${pages}`]
                 };
             },
-            // Зад. 20 (6 т.) - Официална задача с кратък свободен отговор (Движение)
             (y, k) => {
                 const v1 = 60 + 5 * (k % 4), v2 = 40 + 5 * (k % 3), t = 2 + (k % 3);
                 const dist = (v1 + v2) * t;
                 return {
-                    id: `7-${y}-20`, grade: '7', year: y, topic: 'MODELING', pts: 6, type: 'short',
+                    id: `7-${y}-20`, grade: '7', part: '1', year: y, topic: 'MODELING', pts: 6, type: 'short',
                     text: `[НВО 7. кл. · ${y} г. · Зад. 20 (Кратък свободен отговор)] Два автомобила тръгват едновременно един срещу друг от градове $A$ и $B$, разстоянието между които е $${dist}\\text{ км}$, със скорости $${v1}\\text{ км/ч}$ и $${v2}\\text{ км/ч}$. Запишете след колко часа ще се срещнат:`,
                     shortAnswer: String(t),
                     unit: 'часа',
@@ -757,233 +751,308 @@
             }
         ];
 
-        // ================= 23 ЗАДАЧИ ЗА 10. КЛАС (МАКСИМУМ ЗА ЧАСТ 1 НА МОН: ЗАД. 1 ДО ЗАД. 23) =================
-        const BASE_TEMPLATES_10 = [
-            // Зад. 1 - Ирационален израз
+        // ================= 3 ЗАДАЧИ ЗА 7. КЛАС — ЧАСТ 2 / МОДУЛ 2 (ЗАД. 21–23 = 35 Т. ПО КРИТЕРИИ НА МОН) =================
+        const BASE_TEMPLATES_7_PART2 = [
+            // Зад. 21 (10 т.) - Модулно / параметрично уравнение с разписване
+            (y, k) => {
+                const a = 2 + (k % 3), b = 3 + (k % 4), rhs = 7 + 2 * (k % 3);
+                const x1 = (b + rhs) / a, x2 = (b - rhs) / a;
+                return {
+                    id: `7-${y}-21`, grade: '7', part: '2', year: y, topic: 'EQUATIONS', pts: 10, type: 'essay',
+                    text: `[НВО 7. кл. · ${y} г. · Зад. 21 (Част 2 · 10 точки)] Дадено е модулното уравнение $|${a}x - ${b}| - 4 = ${rhs - 4}$.\nа) Намерете корените на уравнението (6 т.).\nб) Проверете кой от корените е решение на неравенството $3x - 2 > 5$ (4 т.).`,
+                    rubric: [
+                        { label: 'Привеждане във вида |ax - b| = c (c > 0)', pts: 2 },
+                        { label: `Разглеждане на двата случая: ${a}x - ${b} = ${rhs} и ${a}x - ${b} = -${rhs}`, pts: 2 },
+                        { label: `Намиране на двата корена x₁ = ${x1} и x₂ = ${x2}`, pts: 2 },
+                        { label: 'Решаване на линейното неравенство 3x - 2 > 5 (x > 7/3)', pts: 2 },
+                        { label: `Обоснован извод кой корен удовлетворява неравенството (x₁ = ${x1})`, pts: 2 }
+                    ],
+                    fullSolution: [
+                        `1) Привеждаме уравнението в нормален вид: $|${a}x - ${b}| = ${rhs}$. Тъй като $${rhs} > 0$, уравнението има два корена.`,
+                        `2) Случай 1: $${a}x - ${b} = ${rhs} \\Rightarrow ${a}x = ${b + rhs} \\Rightarrow x_1 = ${x1}$.`,
+                        `3) Случай 2: $${a}x - ${b} = -${rhs} \\Rightarrow ${a}x = ${b - rhs} \\Rightarrow x_2 = ${x2}$.`,
+                        `4) Решаваме неравенството: $3x - 2 > 5 \\Rightarrow 3x > 7 \\Rightarrow x > \\frac{7}{3} \\approx 2,33$.`,
+                        `5) Сравняваме корените: $x_1 = ${x1} > 2,33$ (вярно), докато $x_2 = ${x2} < 2,33$. Единствено $x_1 = ${x1}$ е решение.`
+                    ],
+                    deriveExpr: `abs(${a}*x - ${b}) = ${rhs}`,
+                    deriveSteps: [`(${a}*x - ${b})^2 = ${rhs*rhs}`, `x = ${x1}; x = ${x2}`]
+                };
+            },
+            // Зад. 22 (10 т.) - Текстова задача за работа / движение с пълно моделиране
+            (y, k) => {
+                const cases = [
+                    { a: 6, b: 12, tog: 2, remA: 3 },
+                    { a: 8, b: 24, tog: 3, remA: 4 },
+                    { a: 10, b: 15, tog: 3, remA: 5 },
+                    { a: 12, b: 24, tog: 4, remA: 6 }
+                ];
+                const c = cases[k % cases.length];
+                return {
+                    id: `7-${y}-22`, grade: '7', part: '2', year: y, topic: 'MODELING', pts: 10, type: 'essay',
+                    text: `[НВО 7. кл. · ${y} г. · Зад. 22 (Част 2 · 10 точки)] Първи работник може да изпълни сам една поръчка за $${c.a}$ часа, а втори работник — за $${c.b}$ часа. Двамата работили заедно $${c.tog}$ часа, след което вторият напуснал и първият довършил сам останалата част от работата. За колко часа първият работник е довършил работата?`,
+                    rubric: [
+                        { label: `Определяне на производителностите за 1 час: 1/${c.a} и 1/${c.b}`, pts: 2 },
+                        { label: `Пресмятане на свършената работа заедно за ${c.tog} часа`, pts: 3 },
+                        { label: 'Съставяне на коректно уравнение спрямо неизвестното време x', pts: 3 },
+                        { label: `Решаване на уравнението и записване на отговор: ${c.remA} часа`, pts: 2 }
+                    ],
+                    fullSolution: [
+                        `1) За 1 час първият работник извършва $\\frac{1}{${c.a}}$ от цялата работа, а вторият — $\\frac{1}{${c.b}}$.`,
+                        `2) Заедно за $${c.tog}$ часа двамата са свършили: $${c.tog} \\cdot \\left(\\frac{1}{${c.a}} + \\frac{1}{${c.b}}\\right) = \\frac{${c.tog * (c.a + c.b)}}{${c.a * c.b}} = \\frac{1}{2}$ от работата.`,
+                        `3) Нека първият работник е довършвал сам още $x$ часа. Уравнението е: $\\frac{1}{2} + \\frac{x}{${c.a}} = 1$.`,
+                        `4) Решаваме: $\\frac{x}{${c.a}} = \\frac{1}{2} \\Rightarrow x = \\frac{${c.a}}{2} = ${c.remA}$ часа.`
+                    ],
+                    deriveExpr: `0.5 + x / ${c.a} = 1`,
+                    deriveSteps: [`x / ${c.a} = 0.5`, `x = ${c.remA}`]
+                };
+            },
+            // Зад. 23 (15 т.) - Геометрия за доказателство и пресмятане с чертеж
+            (y, k) => {
+                const topAngle = [36, 40, 44, 48, 52, 56][k % 6];
+                const baseAngle = (180 - topAngle) / 2;
+                const halfBase = baseAngle / 2;
+                const angleALC = 180 - topAngle - halfBase;
+                return {
+                    id: `7-${y}-23`, grade: '7', part: '2', year: y, topic: 'GEOMETRY', pts: 15, type: 'essay',
+                    text: `[НВО 7. кл. · ${y} г. · Зад. 23 (Част 2 · 15 точки)] В равнобедрен $\\triangle ABC$ ($AC = BC$) ъгълът при върха $C$ е $${topAngle}^\\circ$. Ъглополовящата $AL$ ($L \\in BC$) пресича бедрото $BC$, а симетралата на страната $AB$ пресича $AC$ в точка $M$.\nа) Намерете големината на $\\angle ALC$ (5 т.).\nб) Докажете, че $\\triangle ABM$ е равнобедрен и изразете $\\angle ABM$ (5 т.).\nв) Намерете големината на $\\angle LMB$ (5 т.).`,
+                    svg: `<svg viewBox="0 0 260 175" class="w-60 h-44 mx-auto text-indigo-500 dark:text-cyan-400">
+                        <polygon points="130,18 45,150 215,150" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <line x1="45" y1="150" x2="184" y2="98" stroke="#10b981" stroke-width="2"/>
+                        <line x1="130" y1="12" x2="130" y2="162" stroke="#f59e0b" stroke-width="1.6" stroke-dasharray="4"/>
+                        <line x1="215" y1="150" x2="96" y2="71" stroke="#ec4899" stroke-width="1.6" stroke-dasharray="3"/>
+                        <text x="122" y="13" fill="currentColor" font-size="11" font-weight="bold">C (${topAngle}°)</text>
+                        <text x="30" y="156" fill="currentColor" font-size="11" font-weight="bold">A</text>
+                        <text x="220" y="156" fill="currentColor" font-size="11" font-weight="bold">B</text>
+                        <text x="190" y="100" fill="#10b981" font-size="11" font-weight="bold">L</text>
+                        <text x="80" y="72" fill="#ec4899" font-size="11" font-weight="bold">M</text>
+                    </svg>`,
+                    rubric: [
+                        { label: `Намиране на ъглите при основата: ∠CAB = ∠CBA = ${baseAngle}°`, pts: 3 },
+                        { label: `Използване на ъглополовящата AL (∠CAL = ${halfBase}°) и намиране на ∠ALC = ${angleALC}°`, pts: 3 },
+                        { label: 'Прилагане свойството на симетралата (MA = MB) ⇒ △ABM е равнобедрен', pts: 4 },
+                        { label: `Доказване на еднаквост или пресмятане на търсените ъгли в чертежа`, pts: 5 }
+                    ],
+                    fullSolution: [
+                        `а) В равнобедрения $\\triangle ABC$ ($AC = BC$): $\\angle CAB = \\angle CBA = \\frac{180^\\circ - ${topAngle}^\\circ}{2} = ${baseAngle}^\\circ$.`,
+                        `Тъй като $AL$ е ъглополовяща на $\\angle CAB$, то $\\angle CAL = \\angle BAL = \\frac{${baseAngle}^\\circ}{2} = ${halfBase}^\\circ$.`,
+                        `От $\\triangle ALC$: $\\angle ALC = 180^\\circ - (${topAngle}^\\circ + ${halfBase}^\\circ) = ${angleALC}^\\circ$.`,
+                        `б) Точка $M$ лежи на симетралата на $AB \\Rightarrow MA = MB$ (всяка точка от симетралата е на равни разстояния от краищата на отсечката). Следователно $\\triangle ABM$ е равнобедрен с основа $AB$ и $\\angle ABM = \\angle BAM = ${baseAngle}^\\circ$.`,
+                        `в) В $\\triangle AMB$ външният ъгъл $\\angle CMB = \\angle MAB + \\angle MBA = 2 \\cdot ${baseAngle}^\\circ = ${2 * baseAngle}^\\circ$ (или при $\\angle C = 36^\\circ$ имаме $\\angle ABM = 72^\\circ = \\angle ALC$).`
+                    ],
+                    deriveExpr: `180 - ${topAngle} - (180 - ${topAngle})/4 = x`,
+                    deriveSteps: [`180 - ${topAngle} - ${halfBase} = x`, `x = ${angleALC}`]
+                };
+            }
+        ];
+
+        // ================= 23 ЗАДАЧИ ЗА 10. КЛАС — ЧАСТ 1 (65 Т.) =================
+        const BASE_TEMPLATES_10_PART1 = [
             (y, k) => {
                 const mult = 2 + (k % 3);
                 const a = 25 * mult, b = 9 * mult, c = 4 * mult;
                 const ansCoef = 5 - 3 + 2;
                 return {
-                    id: `10-${y}-1`, grade: '10', year: y, topic: 'ALGEBRA', pts: 2, type: 'mcq',
+                    id: `10-${y}-1`, grade: '10', part: '1', year: y, topic: 'ALGEBRA', pts: 2, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 1] Пресметнете стойността на ирационалния израз $\\sqrt{${a}} - \\sqrt{${b}} + \\sqrt{${c}}$:`,
                     options: [`$${ansCoef}\\sqrt{${mult}}$`, `$2\\sqrt{${mult}}$`, `$6\\sqrt{${mult}}$`, `$\\sqrt{${a - b + c}}$`], correct: 0,
                     deriveExpr: `sqrt(${a}) - sqrt(${b}) + sqrt(${c}) = x`,
                     deriveSteps: [`5*sqrt(${mult}) - 3*sqrt(${mult}) + 2*sqrt(${mult}) = x`, `x = ${ansCoef}*sqrt(${mult})`]
                 };
             },
-            // Зад. 2 - Степени с рационален показател
             (y, k) => {
                 const base = 2 + (k % 3);
                 const val = Math.pow(base, 3);
                 return {
-                    id: `10-${y}-2`, grade: '10', year: y, topic: 'ALGEBRA', pts: 2, type: 'mcq',
+                    id: `10-${y}-2`, grade: '10', part: '1', year: y, topic: 'ALGEBRA', pts: 2, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 2] Стойността на израза $\\sqrt[3]{${val}} + (${base}^2)^{\\frac{1}{2}}$ е:`,
                     options: [`$${2 * base}$`, `$${base * base}$`, `$${base + 2}$`, `$${3 * base}$`], correct: 0,
                     deriveExpr: `(${val})^(1/3) + (${base}^2)^(1/2) = x`,
                     deriveSteps: [`${base} + ${base} = x`, `x = ${2 * base}`]
                 };
             },
-            // Зад. 3 - Рационален израз
             (y, k) => {
                 const a = 2 + (k % 5);
                 return {
-                    id: `10-${y}-3`, grade: '10', year: y, topic: 'ALGEBRA', pts: 2, type: 'mcq',
+                    id: `10-${y}-3`, grade: '10', part: '1', year: y, topic: 'ALGEBRA', pts: 2, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 3] За $x \\neq \\pm ${a}$ изразът $\\frac{x^2 - ${a*a}}{x + ${a}}$ е тъждествено равен на:`,
                     options: [`$x - ${a}$`, `$x + ${a}$`, `$x^2 - ${a}$`, `$${a} - x$`], correct: 0,
                     deriveExpr: `(x^2 - ${a*a}) / (x + ${a}) = x - ${a}`,
                     deriveSteps: [`((x - ${a})*(x + ${a})) / (x + ${a}) = x - ${a}`]
                 };
             },
-            // Зад. 4 - Формули на Виет (сбор)
             (y, k) => {
                 const x1 = 1 + (k % 3), x2 = 3 + (k % 4);
                 const b = -(x1 + x2), c = x1 * x2;
                 return {
-                    id: `10-${y}-4`, grade: '10', year: y, topic: 'EQUATIONS', pts: 2, type: 'mcq',
+                    id: `10-${y}-4`, grade: '10', part: '1', year: y, topic: 'EQUATIONS', pts: 2, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 4] Сборът от корените на квадратното уравнение $x^2 ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x + ${c} = 0$ е:`,
                     options: [`$${b}$`, `$${c}$`, `$${x1 + x2}$`, `$${x1 * x2 + 1}$`], correct: 2,
                     deriveExpr: `x^2 ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}*x + ${c} = 0`,
                     deriveSteps: [`(x - ${x1})*(x - ${x2}) = 0`, `x = ${x1}; x = ${x2}`]
                 };
             },
-            // Зад. 5 - Дискриминанта
             (y, k) => {
                 const m = 4 + 2 * (k % 4);
                 const ans = (m * m) / 4;
                 return {
-                    id: `10-${y}-5`, grade: '10', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
+                    id: `10-${y}-5`, grade: '10', part: '1', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 5] За коя стойност на параметъра $c$ квадратното уравнение $x^2 - ${m}x + c = 0$ има два равни реални корена?`,
                     options: [`$${m}$`, `$${ans}$`, `$-${ans}$`, `$${m * m}$`], correct: 1,
                     deriveExpr: `${m}^2 - 4*x = 0`,
                     deriveSteps: [`${m*m} = 4*x`, `x = ${ans}`]
                 };
             },
-            // Зад. 6 - Биквадратно уравнение
             (y, k) => {
                 const r = 2 + (k % 3);
                 const sumRoots = r * r + 1;
                 const prodRoots = r * r;
                 return {
-                    id: `10-${y}-6`, grade: '10', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
+                    id: `10-${y}-6`, grade: '10', part: '1', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 6] Броят на реалните корени на биквадратното уравнение $x^4 - ${sumRoots}x^2 + ${prodRoots} = 0$ е:`,
                     options: [`$2$`, `$4$`, `$1$`, `$0$`], correct: 1,
                     deriveExpr: `(x^2 - 1)*(x^2 - ${r*r}) = 0`,
                     deriveSteps: [`x = 1; x = -1; x = ${r}; x = -${r}`]
                 };
             },
-            // Зад. 7 - Ирационално уравнение
             (y, k) => {
                 const xSol = 3 + (k % 5);
                 const rhs = 3 + (k % 3);
                 const b = rhs * rhs - 2 * xSol;
                 return {
-                    id: `10-${y}-7`, grade: '10', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
+                    id: `10-${y}-7`, grade: '10', part: '1', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 7] Решете ирационалното уравнение $\\sqrt{2x ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}} = ${rhs}$:`,
                     options: [`$x = ${xSol}$`, `$x = ${xSol + 2}$`, `$x = ${rhs}$`, `$x = ${xSol - 1}$`], correct: 0,
                     deriveExpr: `sqrt(2*x ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}) = ${rhs}`,
                     deriveSteps: [`2*x ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)} = ${rhs*rhs}`, `2*x = ${2*xSol}`, `x = ${xSol}`]
                 };
             },
-            // Зад. 8 - Дробно уравнение
             (y, k) => {
                 const a = 2 + (k % 4), xSol = 3 + (k % 4);
                 const num = a * (xSol - 1);
                 return {
-                    id: `10-${y}-8`, grade: '10', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
+                    id: `10-${y}-8`, grade: '10', part: '1', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 8] Коренът на дробното уравнение $\\frac{${num}}{x - 1} = ${a}$ е:`,
                     options: [`$x = 1$`, `$x = ${xSol}$`, `$x = ${xSol - 1}$`, `$x = ${num}$`], correct: 1,
                     deriveExpr: `${num} / (x - 1) = ${a}`,
                     deriveSteps: [`${num} = ${a}*(x - 1)`, `x - 1 = ${xSol - 1}`, `x = ${xSol}`]
                 };
             },
-            // Зад. 9 - Квадратно неравенство
             (y, k) => {
                 const r1 = 1 + (k % 3), r2 = r1 + 3;
                 const count = r2 - r1 - 1;
                 return {
-                    id: `10-${y}-9`, grade: '10', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
+                    id: `10-${y}-9`, grade: '10', part: '1', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 9] Колко цели числа са решения на квадратното неравенство $(x - ${r1})(x - ${r2}) < 0$?`,
                     options: [`$${count}$`, `$${count + 2}$`, `$${count + 1}$`, `$0$`], correct: 0,
                     deriveExpr: `(x - ${r1})*(x - ${r2}) = 0`,
                     deriveSteps: [`x = ${r1}; x = ${r2}`]
                 };
             },
-            // Зад. 10 - Система уравнения
             (y, k) => {
                 const x = 4 + (k % 4), yVal = 1 + (k % 3);
                 const sum = x + yVal, diff = x - yVal;
                 return {
-                    id: `10-${y}-10`, grade: '10', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
+                    id: `10-${y}-10`, grade: '10', part: '1', year: y, topic: 'EQUATIONS', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 10] Ако $(x;\\; y)$ е решение на системата $\\begin{cases} x + y = ${sum} \\\\ x - y = ${diff} \\end{cases}$, то произведението $x \\cdot y$ е:`,
                     options: [`$${x * yVal}$`, `$${sum * diff}$`, `$${x + yVal}$`, `$${x * yVal + 2}$`], correct: 0,
                     deriveExpr: `x + (${sum} - x) = ${sum}`,
                     deriveSteps: [`x = ${x}`]
                 };
             },
-            // Зад. 11 - Дефиниционно множество на функция
             (y, k) => {
                 const a = 3 + (k % 6);
                 return {
-                    id: `10-${y}-11`, grade: '10', year: y, topic: 'MODELING', pts: 2, type: 'mcq',
+                    id: `10-${y}-11`, grade: '10', part: '1', year: y, topic: 'MODELING', pts: 2, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 11] Дефиниционното множество на функцията $f(x) = \\sqrt{x - ${a}}$ е:`,
                     options: [`$x \\in [${a};\\; +\\infty)$`, `$x \\in (-\\infty;\\; ${a}]$`, `$x \\in (${a};\\; +\\infty)$`, `$x \\neq ${a}$`], correct: 0,
                     deriveExpr: `x - ${a} = 0`,
                     deriveSteps: [`x = ${a}`]
                 };
             },
-            // Зад. 12 - Връх на парабола
             (y, k) => {
                 const xv = 2 + (k % 4), yv = -(1 + (k % 5));
                 const b = -2 * xv, c = xv * xv + yv;
                 return {
-                    id: `10-${y}-12`, grade: '10', year: y, topic: 'MODELING', pts: 3, type: 'mcq',
+                    id: `10-${y}-12`, grade: '10', part: '1', year: y, topic: 'MODELING', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 12] Върхът на параболата $y = x^2 ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)}x ${c >= 0 ? '+ ' + c : '- ' + Math.abs(c)}$ има координати:`,
                     options: [`$(${xv};\\; ${yv})$`, `$(${-xv};\\; ${yv})$`, `$(${xv};\\; ${-yv})$`, `$(${b};\\; ${c})$`], correct: 0,
                     deriveExpr: `2*x ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)} = 0`,
                     deriveSteps: [`2*x = ${-b}`, `x = ${xv}`]
                 };
             },
-            // Зад. 13 - Аритметична прогресия
             (y, k) => {
                 const a1 = 3 + (k % 5), d = 4 + (k % 3), n = 6 + (k % 4);
                 const ans = a1 + (n - 1) * d;
                 return {
-                    id: `10-${y}-13`, grade: '10', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
+                    id: `10-${y}-13`, grade: '10', part: '1', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 13] В аритметична прогресия $a_1 = ${a1}$ и разликата $d = ${d}$. Намерете члена $a_${n}$:`,
                     options: [`$${ans - d}$`, `$${ans}$`, `$${ans + d}$`, `$${a1 * n}$`], correct: 1,
                     deriveExpr: `${a1} + (${n} - 1) * ${d} = x`,
                     deriveSteps: [`${a1} + ${(n-1)*d} = x`, `x = ${ans}`]
                 };
             },
-            // Зад. 14 - Геометрична прогресия
             (y, k) => {
                 const a1 = 2 + (k % 4), q = 2 + (k % 2), n = 4 + (k % 2);
                 const ans = a1 * Math.pow(q, n - 1);
                 return {
-                    id: `10-${y}-14`, grade: '10', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
+                    id: `10-${y}-14`, grade: '10', part: '1', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 14] В геометрична прогресия $a_1 = ${a1}$ и частното $q = ${q}$. Намерете члена $a_${n}$:`,
                     options: [`$${ans / 2}$`, `$${ans + q}$`, `$${ans}$`, `$${ans * q}$`], correct: 2,
                     deriveExpr: `${a1} * ${q}^(${n} - 1) = x`,
                     deriveSteps: [`${a1} * ${q}^${n - 1} = x`, `${a1} * ${Math.pow(q, n - 1)} = x`, `x = ${ans}`]
                 };
             },
-            // Зад. 15 - Логаритми
             (y, k) => {
                 const p2 = 3 + (k % 4), p3 = 2 + (k % 2);
                 const val2 = Math.pow(2, p2), val3 = Math.pow(3, p3);
                 const ans = p2 - p3;
                 return {
-                    id: `10-${y}-15`, grade: '10', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
+                    id: `10-${y}-15`, grade: '10', part: '1', year: y, topic: 'ALGEBRA', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 15] Стойността на израза $\\log_2 ${val2} - \\log_3 ${val3}$ е:`,
                     options: [`$${ans}$`, `$${p2 + p3}$`, `$${p2}$`, `$${ans + 2}$`], correct: 0,
                     deriveExpr: `${p2} - ${p3} = x`,
                     deriveSteps: [`x = ${ans}`]
                 };
             },
-            // Зад. 16 - Експоненциално моделиране
             (y, k) => {
                 const start = [200, 300, 400, 500, 600, 800][k % 6];
                 const cycles = 3 + (k % 2);
                 const ans = start * Math.pow(2, cycles);
                 return {
-                    id: `10-${y}-16`, grade: '10', year: y, topic: 'MODELING', pts: 3, type: 'mcq',
+                    id: `10-${y}-16`, grade: '10', part: '1', year: y, topic: 'MODELING', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 16] Броят на бактериите в култура се удвоява на всеки $2$ часа. Ако в началото са $${start}$, след $${cycles * 2}$ часа ще бъдат:`,
                     options: [`$${ans / 2}$`, `$${ans - start}$`, `$${ans}$`, `$${ans * 2}$`], correct: 2,
                     deriveExpr: `${start} * 2^(${cycles * 2}/2) = x`,
                     deriveSteps: [`${start} * 2^${cycles} = x`, `${start} * ${Math.pow(2, cycles)} = x`, `x = ${ans}`]
                 };
             },
-            // Зад. 17 - Комбинации
             (y, k) => {
                 const n = 5 + (k % 4);
                 const ans = (n * (n - 1)) / 2;
                 return {
-                    id: `10-${y}-17`, grade: '10', year: y, topic: 'STATS', pts: 3, type: 'mcq',
+                    id: `10-${y}-17`, grade: '10', part: '1', year: y, topic: 'STATS', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 17] По колко начина могат да се изберат $2$ дежурни ученици от група с $${n}$ кандидати (комбинации $C_${n}^2$)?`,
                     options: [`$${n * 2}$`, `$${ans}$`, `$${n * (n - 1)}$`, `$${ans + n}$`], correct: 1,
                     deriveExpr: `(${n} * ${n - 1}) / 2 = x`,
                     deriveSteps: [`${n * (n - 1)} / 2 = x`, `x = ${ans}`]
                 };
             },
-            // Зад. 18 - Тригонометрия
             (y, k) => {
                 const pairs = [['\\frac{3}{5}', '\\frac{4}{5}', 0.8], ['\\frac{5}{13}', '\\frac{12}{13}', 12/13], ['\\frac{8}{17}', '\\frac{15}{17}', 15/17], ['\\frac{7}{25}', '\\frac{24}{25}', 24/25]];
                 const [sinTex, cosTex, cosNum] = pairs[k % pairs.length];
                 return {
-                    id: `10-${y}-18`, grade: '10', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `10-${y}-18`, grade: '10', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 18] Ако $\\alpha$ е остър ъгъл и $\\sin\\alpha = ${sinTex}$, то $\\cos\\alpha$ е равно на:`,
                     options: [`$${cosTex}$`, `$${sinTex}$`, `$1 - ${sinTex}$`, `$\\frac{1}{2}$`], correct: 0,
                     deriveExpr: `sqrt(1 - (${k % 4 === 0 ? '3/5' : k % 4 === 1 ? '5/13' : k % 4 === 2 ? '8/17' : '7/25'})^2) = x`,
                     deriveSteps: [`x = ${Number(cosNum.toFixed(4))}`]
                 };
             },
-            // Зад. 19 - Описана окръжност около правоъгълен триъгълник
             (y, k) => {
                 const triples = [[6, 8, 5], [5, 12, 6.5], [8, 15, 8.5], [9, 12, 7.5], [12, 16, 10], [10, 24, 13]];
                 const [c1, c2, R] = triples[k % triples.length];
                 return {
-                    id: `10-${y}-19`, grade: '10', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `10-${y}-19`, grade: '10', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 19] В правоъгълен $\\triangle ABC$ ($\\angle C = 90^\\circ$) катетите са $AC = ${c1}\\text{ см}$ и $BC = ${c2}\\text{ см}$. Радиусът $R$ на описаната окръжност е:`,
                     svg: `<svg viewBox="0 0 220 140" class="w-48 h-32 mx-auto text-indigo-500 dark:text-cyan-400"><circle cx="110" cy="70" r="55" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3"/><polygon points="55,70 165,70 88,20" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="110" cy="70" r="3" fill="#f59e0b"/><text x="42" y="74" fill="currentColor" font-size="11" font-weight="bold">A</text><text x="169" y="74" fill="currentColor" font-size="11" font-weight="bold">B</text><text x="82" y="14" fill="currentColor" font-size="11" font-weight="bold">C (90°)</text><text x="106" y="84" fill="#f59e0b" font-size="10" font-weight="bold">O (R)</text></svg>`,
                     options: [`$${2 * R}\\text{ см}$`, `$${R}\\text{ см}$`, `$${R - 1}\\text{ см}$`, `$${c1}\\text{ см}$`], correct: 1,
@@ -991,51 +1060,47 @@
                     deriveSteps: [`sqrt(${c1*c1 + c2*c2}) / 2 = x`, `${2*R} / 2 = x`, `x = ${R}`]
                 };
             },
-            // Зад. 20 - Лице на триъгълник
             (y, k) => {
                 const a = 6 + 2 * (k % 3), b = 5 + (k % 4);
                 const area = 0.5 * a * b * 0.5;
                 return {
-                    id: `10-${y}-20`, grade: '10', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `10-${y}-20`, grade: '10', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 20] Лицето на триъгълник със страни $a = ${a}\\text{ см}$, $b = ${b}\\text{ см}$ и ъгъл между тях $\\gamma = 30^\\circ$ е:`,
                     options: [`$${2 * area}\\text{ см}^2$`, `$${area}\\text{ см}^2$`, `$${a * b}\\text{ см}^2$`, `$${area * 3}\\text{ см}^2$`], correct: 1,
                     deriveExpr: `0.5 * ${a} * ${b} * 0.5 = x`,
                     deriveSteps: [`${0.5 * a * b} * 0.5 = x`, `x = ${area}`]
                 };
             },
-            // Зад. 21 - Косинусова теорема
             (y, k) => {
                 const cases = [[3, 8, 7], [5, 8, 7], [3, 5, 7], [7, 8, 13], [5, 7, 8]];
                 const [a, b, c] = cases[k % cases.length];
                 const is120 = (a === 3 && b === 5 && c === 7) || (a === 7 && b === 8 && c === 13);
                 const ang = is120 ? 120 : 60;
                 return {
-                    id: `10-${y}-21`, grade: '10', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `10-${y}-21`, grade: '10', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 21] Намерете третата страна $c$ на триъгълник със страни $a = ${a}\\text{ см}$, $b = ${b}\\text{ см}$ и ъгъл между тях $\\gamma = ${ang}^\\circ$:`,
                     options: [`$${c - 1}\\text{ см}$`, `$${c}\\text{ см}$`, `$${c + 1}\\text{ см}$`, `$${a + b}\\text{ см}$`], correct: 1,
                     deriveExpr: `sqrt(${a}^2 + ${b}^2 - 2*${a}*${b}*(${is120 ? -0.5 : 0.5})) = x`,
                     deriveSteps: [`sqrt(${c*c}) = x`, `x = ${c}`]
                 };
             },
-            // Зад. 22 - Подобни триъгълници
             (y, k) => {
                 const coef = 2 + (k % 4);
                 const s1 = 5 + (k % 5);
                 const s2 = s1 * coef * coef;
                 return {
-                    id: `10-${y}-22`, grade: '10', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
+                    id: `10-${y}-22`, grade: '10', part: '1', year: y, topic: 'GEOMETRY', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 22] Два триъгълника са подобни с коефициент на подобие $k = ${coef}$. Ако лицето на по-малкия е $${s1}\\text{ см}^2$, лицето на по-големия е:`,
                     options: [`$${s1 * coef}\\text{ см}^2$`, `$${s2}\\text{ см}^2$`, `$${s1 + coef}\\text{ см}^2$`, `$${s2 * 2}\\text{ см}^2$`], correct: 1,
                     deriveExpr: `${s1} * ${coef}^2 = x`,
                     deriveSteps: [`${s1} * ${coef*coef} = x`, `x = ${s2}`]
                 };
             },
-            // Зад. 23 - Вероятност и статистика
             (y, k) => {
                 const n = 20 + 5 * (k % 4);
                 const fav = 4 + (k % 4);
                 return {
-                    id: `10-${y}-23`, grade: '10', year: y, topic: 'STATS', pts: 3, type: 'mcq',
+                    id: `10-${y}-23`, grade: '10', part: '1', year: y, topic: 'STATS', pts: 3, type: 'mcq',
                     text: `[НВО 10. кл. · ${y} г. · Зад. 23] В клас от $${n}$ ученици отличниците по математика са $${fav}$. Каква е вероятността случайно избран ученик от класа да е отличник по математика?`,
                     options: [`$\\frac{${fav}}{${n}}$`, `$\\frac{${n - fav}}{${n}}$`, `$\\frac{1}{${fav}}$`, `$\\frac{1}{${n}}$`], correct: 0,
                     deriveExpr: `${fav} / ${n} = x`,
@@ -1044,12 +1109,110 @@
             }
         ];
 
-        // Генерираме пълна банка от 258 задачи (20/год. за 7. клас + 23/год. за 10. клас за 2021–2026)
+        // ================= 3 ЗАДАЧИ ЗА 10. КЛАС — ЧАСТ 2 / МОДУЛ 2 (ЗАД. 24–26 = 35 Т. ПО КРИТЕРИИ НА МОН) =================
+        const BASE_TEMPLATES_10_PART2 = [
+            // Зад. 24 (10 т.) - Ирационално уравнение с ДМ
+            (y, k) => {
+                const shifts = [
+                    { shift: 5, sub: 1, xValid: 4, xBad: -1, bCoef: -3, cCoef: -4 },
+                    { shift: 13, sub: 1, xValid: 6, xBad: -2, bCoef: -4, cCoef: -12 },
+                    { shift: 7, sub: 1, xValid: 3, xBad: -2, bCoef: -1, cCoef: -6 }
+                ];
+                const s = shifts[k % shifts.length];
+                return {
+                    id: `10-${y}-24`, grade: '10', part: '2', year: y, topic: 'EQUATIONS', pts: 10, type: 'essay',
+                    text: `[НВО 10. кл. · ${y} г. · Зад. 24 (Част 2 · 10 точки)] Решете ирационалното уравнение:\n$$\\sqrt{x + ${s.shift}} = x - ${s.sub}$$`,
+                    rubric: [
+                        { label: `Определяне на дефиниционното множество (ДМ): x - ${s.sub} ≥ 0 ⇒ x ≥ ${s.sub}`, pts: 3 },
+                        { label: 'Повдигане на двете страни на квадрат и привеждане в нормален вид', pts: 2 },
+                        { label: `Намиране на корените на квадратното уравнение: x₁ = ${s.xValid}, x₂ = ${s.xBad}`, pts: 3 },
+                        { label: `Проверка спрямо ДМ и отхвърляне на чуждия корен x₂ = ${s.xBad} (окончателен отговор x = ${s.xValid})`, pts: 2 }
+                    ],
+                    fullSolution: [
+                        `1) Дефиниционно множество (условие за неотрицателност на дясната страна): $x - ${s.sub} \\ge 0 \\Rightarrow x \\ge ${s.sub}$.`,
+                        `2) Повдигаме двете страни на квадрат: $x + ${s.shift} = (x - ${s.sub})^2 \\Rightarrow x + ${s.shift} = x^2 - ${2 * s.sub}x + ${s.sub * s.sub}$.`,
+                        `3) Привеждаме в нормален вид: $x^2 ${s.bCoef >= 0 ? '+ ' + s.bCoef : '- ' + Math.abs(s.bCoef)}x ${s.cCoef >= 0 ? '+ ' + s.cCoef : '- ' + Math.abs(s.cCoef)} = 0$.`,
+                        `4) Корените на квадратното уравнение са $x_1 = ${s.xValid}$ и $x_2 = ${s.xBad}$.`,
+                        `5) Проверка в ДМ ($x \\ge ${s.sub}$): $x_1 = ${s.xValid} \\ge ${s.sub}$ (е решение), а $x_2 = ${s.xBad} < ${s.sub}$ (не е решение). Отговор: $x = ${s.xValid}$.`
+                    ],
+                    deriveExpr: `sqrt(x + ${s.shift}) = x - ${s.sub}`,
+                    deriveSteps: [`x + ${s.shift} = (x - ${s.sub})^2`, `x^2 ${s.bCoef >= 0 ? '+ ' + s.bCoef : '- ' + Math.abs(s.bCoef)}*x ${s.cCoef >= 0 ? '+ ' + s.cCoef : '- ' + Math.abs(s.cCoef)} = 0`, `x = ${s.xValid}`]
+                };
+            },
+            // Зад. 25 (10 т.) - Прогресии / система уравнения
+            (y, k) => {
+                const a1 = 2 + (k % 4), d = 3 + (k % 3);
+                const a3 = a1 + 2 * d;
+                const a7 = a1 + 6 * d;
+                const sum10 = (10 * (2 * a1 + 9 * d)) / 2;
+                return {
+                    id: `10-${y}-25`, grade: '10', part: '2', year: y, topic: 'ALGEBRA', pts: 10, type: 'essay',
+                    text: `[НВО 10. кл. · ${y} г. · Зад. 25 (Част 2 · 10 точки)] В аритметична прогресия $(a_n)$ третият член е $a_3 = ${a3}$, а седмият член е $a_7 = ${a7}$.\nа) Намерете първия член $a_1$ и разликата $d$ на прогресията (6 т.).\nб) Изчислете сбора $S_{10}$ на първите $10$ члена на прогресията (4 т.).`,
+                    rubric: [
+                        { label: `Изразяване на a₃ = a₁ + 2d = ${a3} и a₇ = a₁ + 6d = ${a7}`, pts: 2 },
+                        { label: `Съставяне и решаване на системата за намиране на d = ${d}`, pts: 2 },
+                        { label: `Намиране на първия член a₁ = ${a1}`, pts: 2 },
+                        { label: 'Прилагане на формулата Sₙ = (2a₁ + (n - 1)d)·n / 2', pts: 2 },
+                        { label: `Изчисляване на точния сбор S₁₀ = ${sum10}`, pts: 2 }
+                    ],
+                    fullSolution: [
+                        `а) Използваме формулата за общия член $a_n = a_1 + (n - 1)d$:`,
+                        `$\\begin{cases} a_1 + 2d = ${a3} \\\\ a_1 + 6d = ${a7} \\end{cases}$`,
+                        `Изваждаме почленно първото уравнение от второто: $4d = ${a7 - a3} \\Rightarrow d = ${d}$.`,
+                        `Заместваме в първото уравнение: $a_1 + 2 \\cdot ${d} = ${a3} \\Rightarrow a_1 = ${a3 - 2 * d} = ${a1}$.`,
+                        `б) Намираме сбора на първите $10$ члена: $S_{10} = \\frac{2a_1 + 9d}{2} \\cdot 10 = (2 \\cdot ${a1} + 9 \\cdot ${d}) \\cdot 5 = ${2 * a1 + 9 * d} \\cdot 5 = ${sum10}$.`
+                    ],
+                    deriveExpr: `((2 * ${a1} + 9 * ${d}) / 2) * 10 = x`,
+                    deriveSteps: [`(${2 * a1 + 9 * d}) * 5 = x`, `x = ${sum10}`]
+                };
+            },
+            // Зад. 26 (15 т.) - Комбинирана задача по геометрия и тригонометрия
+            (y, k) => {
+                const cases = [
+                    { a: 3, b: 8, c: 7, ang: 60, sinTex: '\\frac{\\sqrt{3}}{2}', areaTex: '6\\sqrt{3}', rTex: '\\frac{7\\sqrt{3}}{3}' },
+                    { a: 5, b: 8, c: 7, ang: 60, sinTex: '\\frac{\\sqrt{3}}{2}', areaTex: '10\\sqrt{3}', rTex: '\\frac{7\\sqrt{3}}{3}' },
+                    { a: 3, b: 5, c: 7, ang: 120, sinTex: '\\frac{\\sqrt{3}}{2}', areaTex: '\\frac{15\\sqrt{3}}{4}', rTex: '\\frac{7\\sqrt{3}}{3}' }
+                ];
+                const g = cases[k % cases.length];
+                return {
+                    id: `10-${y}-26`, grade: '10', part: '2', year: y, topic: 'GEOMETRY', pts: 15, type: 'essay',
+                    text: `[НВО 10. кл. · ${y} г. · Зад. 26 (Част 2 · 15 точки)] В $\\triangle ABC$ страните $BC = ${g.a}\\text{ см}$, $AC = ${g.b}\\text{ см}$ и $\\angle ACB = ${g.ang}^\\circ$.\nа) Намерете дължината на страната $AB$ (5 т.).\nб) Изчислете лицето $S$ на $\\triangle ABC$ и радиуса $R$ на описаната около триъгълника окръжност (6 т.).\nв) Намерете височината $CH$ към страната $AB$ (4 т.).`,
+                    svg: `<svg viewBox="0 0 260 170" class="w-60 h-44 mx-auto text-indigo-500 dark:text-cyan-400">
+                        <circle cx="130" cy="85" r="70" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3"/>
+                        <polygon points="62,105 198,105 102,22" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <line x1="102" y1="22" x2="102" y2="105" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="4"/>
+                        <text x="48" y="110" fill="currentColor" font-size="11" font-weight="bold">A</text>
+                        <text x="202" y="110" fill="currentColor" font-size="11" font-weight="bold">B</text>
+                        <text x="95" y="16" fill="currentColor" font-size="11" font-weight="bold">C (${g.ang}°)</text>
+                        <text x="98" y="118" fill="#f59e0b" font-size="11" font-weight="bold">H</text>
+                    </svg>`,
+                    rubric: [
+                        { label: `Прилагане на косинусовата теорема за △ABC и намиране на AB = ${g.c} см`, pts: 5 },
+                        { label: `Изчисляване на лицето S = ½·a·b·sin(${g.ang}°) = ${g.areaTex} см²`, pts: 3 },
+                        { label: `Прилагане на синусовата теорема AB / sin(${g.ang}°) = 2R ⇒ R = ${g.rTex} см`, pts: 3 },
+                        { label: 'Намиране на височината CH = 2S / AB', pts: 4 }
+                    ],
+                    fullSolution: [
+                        `а) По косинусовата теорема за $\\triangle ABC$: $AB^2 = BC^2 + AC^2 - 2 \\cdot BC \\cdot AC \\cdot \\cos ${g.ang}^\\circ$.`,
+                        `$AB^2 = ${g.a}^2 + ${g.b}^2 - 2 \\cdot ${g.a} \\cdot ${g.b} \\cdot \\left(${g.ang === 120 ? '-\\frac{1}{2}' : '\\frac{1}{2}'}\\right) = ${g.c * g.c} \\Rightarrow AB = ${g.c}\\text{ см}$.`,
+                        `б) Лицето на триъгълника е: $S = \\frac{1}{2} \\cdot ${g.a} \\cdot ${g.b} \\cdot \\sin ${g.ang}^\\circ = \\frac{1}{2} \\cdot ${g.a * g.b} \\cdot ${g.sinTex} = ${g.areaTex}\\text{ см}^2$.`,
+                        `По синусовата теорема: $2R = \\frac{AB}{\\sin ${g.ang}^\\circ} = \\frac{${g.c}}{${g.sinTex}} \\Rightarrow R = ${g.rTex}\\text{ см}$.`,
+                        `в) От формулата за лице $S = \\frac{AB \\cdot CH}{2} \\Rightarrow CH = \\frac{2S}{AB} = \\frac{2 \\cdot ${g.areaTex}}{${g.c}}\\text{ см}$.`
+                    ],
+                    deriveExpr: `sqrt(${g.a}^2 + ${g.b}^2 - 2*${g.a}*${g.b}*(${g.ang === 120 ? -0.5 : 0.5})) = x`,
+                    deriveSteps: [`sqrt(${g.c * g.c}) = x`, `x = ${g.c}`]
+                };
+            }
+        ];
+
+        // Генерираме пълна банка от 294 задачи (20+3=23/год. за 7. клас и 23+3=26/год. за 10. клас за 2021–2026)
         const NVO_BANK = [];
         const YEARS_LIST = ['2026', '2025', '2024', '2023', '2022', '2021'];
         YEARS_LIST.forEach((yr, yIdx) => {
-            BASE_TEMPLATES_7.forEach((tpl, tIdx) => NVO_BANK.push(tpl(yr, yIdx * 3 + tIdx)));
-            BASE_TEMPLATES_10.forEach((tpl, tIdx) => NVO_BANK.push(tpl(yr, yIdx * 3 + tIdx)));
+            BASE_TEMPLATES_7_PART1.forEach((tpl, tIdx) => NVO_BANK.push(tpl(yr, yIdx * 3 + tIdx)));
+            BASE_TEMPLATES_7_PART2.forEach((tpl, tIdx) => NVO_BANK.push(tpl(yr, yIdx * 3 + tIdx)));
+            BASE_TEMPLATES_10_PART1.forEach((tpl, tIdx) => NVO_BANK.push(tpl(yr, yIdx * 3 + tIdx)));
+            BASE_TEMPLATES_10_PART2.forEach((tpl, tIdx) => NVO_BANK.push(tpl(yr, yIdx * 3 + tIdx)));
         });
 
         // ================= INITIALIZATION & PERSISTENCE =================
@@ -1157,6 +1320,7 @@
                 showToast('Режим: Учител (отключени са ключът и вариантите)');
             }
             applyRolePermissions();
+            if (state.masterMode === 'nvo') renderNvoQuestion();
             drawRadarChart();
         }
 
@@ -1474,7 +1638,7 @@
             const fn2 = compileEquationSystem(eq2);
             if (!fn1 || !fn2) return false;
 
-            const probePoints = [-4.2, -2, -1.5, -1, 0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 7, 8, 12, 20, 24, 48, 150];
+            const probePoints = [-4.2, -3, -2, -1.5, -1, 0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 7, 8, 12, 20, 24, 48, 150];
             for (let i = 0; i < 8; i++) probePoints.push(Number((Math.random() * 20 - 10).toFixed(3)));
 
             let hasIdenticalZeros = true;
@@ -1799,21 +1963,33 @@
             reader.readAsText(file);
         }
 
-        // ================= NVO ARENA ENGINE (20 ЗАД. ЗА 7. КЛ. И 23 ЗАД. ЗА 10. КЛ. ПО ГОДИНИ) =================
+        // ================= NVO ARENA ENGINE (ЧАСТ 1 + ЧАСТ 2 С КРИТЕРИИ НА МОН) =================
         function setNvoGrade(grade) {
             state.nvo.grade = grade;
             const b7 = document.getElementById('nvo-grade-7-btn');
             const b10 = document.getElementById('nvo-grade-10-btn');
-            const genLabel = document.getElementById('nvo-gen-variant-label');
             if (grade === '7') {
                 b7.className = 'py-2 px-2 rounded-lg text-xs font-extrabold transition bg-amber-600 text-white shadow-sm';
                 b10.className = 'py-2 px-2 rounded-lg text-xs font-extrabold transition text-slate-600 dark:text-slate-300';
-                genLabel.textContent = 'Нов вариант с други числа (20 зад.)';
             } else {
                 b10.className = 'py-2 px-2 rounded-lg text-xs font-extrabold transition bg-amber-600 text-white shadow-sm';
                 b7.className = 'py-2 px-2 rounded-lg text-xs font-extrabold transition text-slate-600 dark:text-slate-300';
-                genLabel.textContent = 'Нов вариант с други числа (23 зад.)';
             }
+            buildNvoSession();
+        }
+
+        function setNvoPart(part) {
+            state.nvo.part = part;
+            const p1 = document.getElementById('nvo-part-1-btn');
+            const p2 = document.getElementById('nvo-part-2-btn');
+            const pAll = document.getElementById('nvo-part-all-btn');
+            const activeCls = 'py-1.5 px-1 rounded-lg bg-indigo-600 text-white shadow-sm transition';
+            const activePart2Cls = 'py-1.5 px-1 rounded-lg bg-emerald-600 text-white shadow-sm transition';
+            const inactiveCls = 'py-1.5 px-1 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition';
+
+            p1.className = part === '1' ? activeCls : inactiveCls;
+            p2.className = part === '2' ? activePart2Cls : inactiveCls;
+            pAll.className = part === 'ALL' ? activeCls : inactiveCls;
             buildNvoSession();
         }
 
@@ -1822,11 +1998,11 @@
             const pBtn = document.getElementById('nvo-mode-practice-btn');
             const eBtn = document.getElementById('nvo-mode-exam-btn');
             if (mode === 'practice') {
-                pBtn.className = 'p-2.5 rounded-xl border-2 border-cyan-500 bg-cyan-500/10 text-left transition';
-                eBtn.className = 'p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-lab-850 text-left transition';
+                pBtn.className = 'p-2 rounded-xl border-2 border-cyan-500 bg-cyan-500/10 text-left transition';
+                eBtn.className = 'p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-lab-850 text-left transition';
             } else {
-                eBtn.className = 'p-2.5 rounded-xl border-2 border-amber-500 bg-amber-500/10 text-left transition';
-                pBtn.className = 'p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-lab-850 text-left transition';
+                eBtn.className = 'p-2 rounded-xl border-2 border-amber-500 bg-amber-500/10 text-left transition';
+                pBtn.className = 'p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-lab-850 text-left transition';
             }
             buildNvoSession();
         }
@@ -1844,43 +2020,32 @@
         function generateFullExamVariantForYear() {
             const yearSel = document.getElementById('nvo-year-filter').value;
             const yearLabel = yearSel === 'ALL' ? '2026' : yearSel;
-            const templates = state.nvo.grade === '7' ? BASE_TEMPLATES_7 : BASE_TEMPLATES_10;
-            const totalCount = templates.length; // 20 за 7. клас, 23 за 10. клас
-            const generated = [];
+            const tPart1 = state.nvo.grade === '7' ? BASE_TEMPLATES_7_PART1 : BASE_TEMPLATES_10_PART1;
+            const tPart2 = state.nvo.grade === '7' ? BASE_TEMPLATES_7_PART2 : BASE_TEMPLATES_10_PART2;
 
-            for (let i = 0; i < totalCount; i++) {
-                const tpl = templates[i];
+            let selectedTemplates = [];
+            if (state.nvo.part === '1') selectedTemplates = tPart1;
+            else if (state.nvo.part === '2') selectedTemplates = tPart2;
+            else selectedTemplates = [...tPart1, ...tPart2];
+
+            const generated = selectedTemplates.map((tpl, i) => {
                 const seedOffset = randInt(1, 50) + i;
                 const q = tpl(yearLabel, seedOffset);
                 q.id = `GEN-${state.nvo.grade}-${yearLabel}-${i + 1}`;
                 q.text = q.text.replace(`[НВО ${state.nvo.grade}. кл. · ${yearLabel} г.`, `[Вариант · ${yearLabel} г.`);
-                generated.push(q);
-            }
+                return q;
+            });
 
             state.nvo.questions = generated;
             state.nvo.currentIdx = 0;
             state.nvo.answers = {};
             state.nvo.finished = false;
 
-            clearInterval(state.nvo.timerInterval);
-            state.nvo.timerSeconds = state.nvo.mode === 'exam' ? (state.nvo.grade === '7' ? 4500 : 5400) : 0;
-            updateTimerUi();
-
-            if (state.nvo.mode === 'exam') {
-                state.nvo.timerInterval = setInterval(() => {
-                    if (state.nvo.timerSeconds > 0 && !state.nvo.finished) {
-                        state.nvo.timerSeconds--;
-                        updateTimerUi();
-                    } else if (state.nvo.timerSeconds === 0) {
-                        finishNvoExam();
-                    }
-                }, 1000);
-            }
-
+            setupExamTimer();
             renderNvoQuestion();
             renderNvoMap();
             updateNvoScore();
-            showToast(`Генериран е пълен Модул 1 от ${totalCount} задачи (${state.nvo.grade}. клас, ${yearLabel} г.)!`, 'fa-wand-magic-sparkles');
+            showToast(`Генериран е нов вариант (${generated.length} задачи, ${state.nvo.grade}. клас)!`, 'fa-wand-magic-sparkles');
         }
 
         function buildNvoSession() {
@@ -1888,33 +2053,45 @@
             const topic = document.getElementById('nvo-topic-filter').value;
 
             let filtered = NVO_BANK.filter(q => q.grade === state.nvo.grade);
+            if (state.nvo.part !== 'ALL') filtered = filtered.filter(q => q.part === state.nvo.part);
             if (year !== 'ALL') filtered = filtered.filter(q => q.year === year);
             if (topic !== 'ALL') filtered = filtered.filter(q => q.topic === topic);
-            if (filtered.length === 0) filtered = NVO_BANK.filter(q => q.grade === state.nvo.grade);
+
+            if (filtered.length === 0) {
+                filtered = NVO_BANK.filter(q => q.grade === state.nvo.grade && (state.nvo.part === 'ALL' || q.part === state.nvo.part));
+            }
 
             state.nvo.questions = filtered;
             state.nvo.currentIdx = 0;
             state.nvo.answers = {};
             state.nvo.finished = false;
 
-            clearInterval(state.nvo.timerInterval);
-            state.nvo.timerSeconds = state.nvo.mode === 'exam' ? (state.nvo.grade === '7' ? 4500 : 5400) : 0;
-            updateTimerUi();
-
-            if (state.nvo.mode === 'exam') {
-                state.nvo.timerInterval = setInterval(() => {
-                    if (state.nvo.timerSeconds > 0 && !state.nvo.finished) {
-                        state.nvo.timerSeconds--;
-                        updateTimerUi();
-                    } else if (state.nvo.timerSeconds === 0) {
-                        finishNvoExam();
-                    }
-                }, 1000);
-            }
-
+            setupExamTimer();
             renderNvoQuestion();
             renderNvoMap();
             updateNvoScore();
+        }
+
+        function setupExamTimer() {
+            clearInterval(state.nvo.timerInterval);
+            if (state.nvo.mode !== 'exam') {
+                state.nvo.timerSeconds = 0;
+                updateTimerUi();
+                return;
+            }
+            if (state.nvo.part === '1') state.nvo.timerSeconds = state.nvo.grade === '7' ? 4500 : 5400;
+            else if (state.nvo.part === '2') state.nvo.timerSeconds = 5400;
+            else state.nvo.timerSeconds = state.nvo.grade === '7' ? 9900 : 10800;
+
+            updateTimerUi();
+            state.nvo.timerInterval = setInterval(() => {
+                if (state.nvo.timerSeconds > 0 && !state.nvo.finished) {
+                    state.nvo.timerSeconds--;
+                    updateTimerUi();
+                } else if (state.nvo.timerSeconds === 0) {
+                    finishNvoExam();
+                }
+            }, 1000);
         }
 
         function updateTimerUi() {
@@ -1928,29 +2105,115 @@
             el.textContent = `${m}:${s}`;
         }
 
-        function isNvoQuestionCorrect(q, ans) {
-            if (ans === undefined || ans === null || ans === '') return false;
+        function getQuestionEarnedPoints(q) {
+            const ans = state.nvo.answers[q.id];
+            if (ans === undefined || ans === null || ans === '') return 0;
             if (q.type === 'short') {
                 const normUser = String(ans).trim().replace(',', '.');
                 const normCorrect = String(q.shortAnswer).trim().replace(',', '.');
-                return Math.abs(Number(normUser) - Number(normCorrect)) < 1e-4;
+                return Math.abs(Number(normUser) - Number(normCorrect)) < 1e-4 ? q.pts : 0;
             }
-            return ans === q.correct;
+            if (q.type === 'essay') {
+                if (!ans.checked || !Array.isArray(ans.checked)) return 0;
+                let sum = 0;
+                q.rubric.forEach((r, idx) => {
+                    if (ans.checked[idx]) sum += r.pts;
+                });
+                return sum;
+            }
+            return ans === q.correct ? q.pts : 0;
+        }
+
+        function isQuestionAnswered(q) {
+            const ans = state.nvo.answers[q.id];
+            if (ans === undefined || ans === null || ans === '') return false;
+            if (q.type === 'essay') {
+                return (ans.text && ans.text.trim().length > 0) || (ans.checked && ans.checked.some(Boolean)) || ans.revealed;
+            }
+            return true;
         }
 
         function renderNvoQuestion() {
             const q = state.nvo.questions[state.nvo.currentIdx];
             if (!q) return;
 
+            const partBadge = q.part === '2' ? 'ЧАСТ 2 · МОДУЛ 2' : 'ЧАСТ 1 · МОДУЛ 1';
             document.getElementById('nvo-question-counter').textContent = `ЗАДАЧА ${state.nvo.currentIdx + 1} / ${state.nvo.questions.length} · ${q.year} г. (${q.pts} т.)`;
             const userAns = state.nvo.answers[q.id];
-            const hasAns = userAns !== undefined && userAns !== '';
+            const hasAns = isQuestionAnswered(q);
             const reveal = state.nvo.mode === 'practice' ? hasAns : state.nvo.finished;
             const letters = ['А', 'Б', 'В', 'Г'];
 
             let answerAreaHtml = '';
-            if (q.type === 'short') {
-                const isRight = isNvoQuestionCorrect(q, userAns);
+
+            if (q.type === 'essay') {
+                const essayState = userAns || { text: '', checked: q.rubric.map(() => false), revealed: false };
+                const earnedPts = getQuestionEarnedPoints(q);
+                const canShowSolution = state.nvo.mode === 'practice' || state.nvo.finished || state.role === 'teacher';
+
+                const rubricHtml = q.rubric.map((item, rIdx) => {
+                    const checked = essayState.checked[rIdx] ? 'checked' : '';
+                    return `
+                        <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-lab-850 border border-slate-200 dark:border-slate-800 cursor-pointer hover:border-emerald-500 transition">
+                            <input type="checkbox" ${checked} onchange="toggleEssayRubricItem(${rIdx}, this.checked)" class="mt-0.5 w-4 h-4 accent-emerald-600 rounded">
+                            <div class="flex-1 text-xs">
+                                <span class="font-semibold text-slate-800 dark:text-slate-200">${item.label}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 font-mono text-[11px] font-extrabold shrink-0">+${item.pts} т.</span>
+                        </label>
+                    `;
+                }).join('');
+
+                const solutionHtml = essayState.revealed ? `
+                    <div class="p-4 rounded-2xl bg-slate-900 text-slate-100 border border-emerald-500/50 space-y-2.5 animate-fade-in">
+                        <div class="flex items-center justify-between text-xs font-mono font-bold text-emerald-400">
+                            <span><i class="fa-solid fa-award mr-1"></i> ЕТАЛОННО РАЗПИСАНО РЕШЕНИЕ (МОН)</span>
+                            <span>Макс. ${q.pts} т.</span>
+                        </div>
+                        <div class="space-y-2 text-xs sm:text-sm leading-relaxed text-slate-200">
+                            ${q.fullSolution.map(step => `<p class="pl-2 border-l-2 border-emerald-500/60">${step}</p>`).join('')}
+                        </div>
+                    </div>
+                ` : '';
+
+                answerAreaHtml = `
+                    <div class="space-y-4 pt-2">
+                        <div class="space-y-1.5">
+                            <div class="flex flex-wrap items-center justify-between gap-1">
+                                <label class="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400">РАБОТНА ТЕТРАДКА (РАЗПИШИ ОБОСНОВКАТА И СТЪПКИТЕ):</label>
+                                <div class="flex items-center gap-1">
+                                    ${['√', '²', '°', '∠', '△', '⊥', '∥', '⇒', '∈', '≥', '≤', '≠'].map(sym =>
+                                        `<button type="button" onclick="insertMathSymbol('${sym}')" class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-lab-800 hover:bg-indigo-600 hover:text-white font-mono text-xs font-bold transition">${sym}</button>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            <textarea id="nvo-essay-textarea" rows="5" oninput="updateEssayText(this.value)"
+                                placeholder="Дадено: ...&#10;Търси се: ...&#10;Решение:&#10;1) ...&#10;2) ..."
+                                class="w-full rounded-xl bg-slate-50 dark:bg-lab-950 border-2 border-slate-300 dark:border-slate-700 p-3 font-mono text-xs sm:text-sm leading-relaxed focus:outline-none focus:border-emerald-500">${escapeHtml(essayState.text || '')}</textarea>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-mono font-bold uppercase text-amber-600 dark:text-amber-400"><i class="fa-solid fa-list-check mr-1"></i> Критерии за оценяване на МОН (Самооценка):</span>
+                                <span class="font-mono text-xs font-extrabold text-emerald-600 dark:text-emerald-400">${earnedPts} / ${q.pts} т.</span>
+                            </div>
+                            <div class="space-y-1.5">${rubricHtml}</div>
+                        </div>
+
+                        ${canShowSolution ? `
+                            <div class="flex items-center justify-between pt-1">
+                                <button onclick="toggleEssaySolution()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-sm transition flex items-center gap-1.5">
+                                    <i class="fa-solid ${essayState.revealed ? 'fa-eye-slash' : 'fa-book-open'}"></i>
+                                    <span>${essayState.revealed ? 'Скрий еталонното решение' : 'Покажи пълното решение по критериите на МОН'}</span>
+                                </button>
+                            </div>
+                        ` : `<p class="text-[11px] font-mono text-slate-400">В режим „Изпит“ еталонното решение се отключва след приключване.</p>`}
+
+                        ${solutionHtml}
+                    </div>
+                `;
+            } else if (q.type === 'short') {
+                const isRight = getQuestionEarnedPoints(q) > 0;
                 let statusBanner = '';
                 if (reveal) {
                     statusBanner = isRight
@@ -1990,18 +2253,66 @@
             const container = document.getElementById('nvo-question-container');
             container.innerHTML = `
                 <div class="rounded-2xl bg-white dark:bg-lab-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-300 font-mono text-[10px] font-bold">НВО ${q.grade}. КЛАС · ${q.topic}</span>
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <span class="px-2 py-0.5 rounded ${q.part === '2' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'bg-amber-500/15 text-amber-600 dark:text-amber-300'} font-mono text-[10px] font-bold">${partBadge}</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-lab-800 text-slate-600 dark:text-slate-300 font-mono text-[10px] font-bold">НВО ${q.grade}. КЛАС · ${q.topic}</span>
+                        </div>
                         <button onclick="sendNvoToConstructor()" class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold transition flex items-center gap-1.5">
                             <i class="fa-solid fa-diagram-project"></i> Реши в Конструктора
                         </button>
                     </div>
-                    <p class="text-sm sm:text-base font-bold leading-relaxed">${q.text}</p>
+                    <p class="text-sm sm:text-base font-bold leading-relaxed whitespace-pre-line">${q.text}</p>
                     ${q.svg ? `<div class="p-3 rounded-xl bg-slate-50 dark:bg-lab-850 border border-slate-200 dark:border-slate-800">${q.svg}</div>` : ''}
                     ${answerAreaHtml}
                 </div>
             `;
             renderMathInNode(container);
+        }
+
+        function ensureEssayState(q) {
+            if (!state.nvo.answers[q.id] || typeof state.nvo.answers[q.id] !== 'object') {
+                state.nvo.answers[q.id] = { text: '', checked: q.rubric.map(() => false), revealed: false };
+            }
+            return state.nvo.answers[q.id];
+        }
+
+        function updateEssayText(val) {
+            const q = state.nvo.questions[state.nvo.currentIdx];
+            if (!q || q.type !== 'essay') return;
+            const st = ensureEssayState(q);
+            st.text = val;
+            renderNvoMap();
+        }
+
+        function insertMathSymbol(sym) {
+            const ta = document.getElementById('nvo-essay-textarea');
+            if (!ta) return;
+            const start = ta.selectionStart;
+            const end = ta.selectionEnd;
+            ta.value = ta.value.substring(0, start) + sym + ta.value.substring(end);
+            ta.focus();
+            ta.selectionStart = ta.selectionEnd = start + sym.length;
+            updateEssayText(ta.value);
+        }
+
+        function toggleEssayRubricItem(rIdx, isChecked) {
+            const q = state.nvo.questions[state.nvo.currentIdx];
+            if (!q || q.type !== 'essay') return;
+            const st = ensureEssayState(q);
+            st.checked[rIdx] = isChecked;
+            renderNvoQuestion();
+            renderNvoMap();
+            updateNvoScore();
+        }
+
+        function toggleEssaySolution() {
+            const q = state.nvo.questions[state.nvo.currentIdx];
+            if (!q || q.type !== 'essay') return;
+            const st = ensureEssayState(q);
+            st.revealed = !st.revealed;
+            renderNvoQuestion();
+            renderNvoMap();
         }
 
         function selectNvoOption(optIdx) {
@@ -2047,22 +2358,27 @@
 
         function renderNvoMap() {
             const grid = document.getElementById('nvo-map-grid');
-            const answeredCount = state.nvo.questions.filter(q => state.nvo.answers[q.id] !== undefined && state.nvo.answers[q.id] !== '').length;
+            const answeredCount = state.nvo.questions.filter(q => isQuestionAnswered(q)).length;
             document.getElementById('nvo-answered-count').textContent = `${answeredCount} / ${state.nvo.questions.length} решени`;
 
             grid.innerHTML = state.nvo.questions.map((q, idx) => {
-                const ans = state.nvo.answers[q.id];
-                const hasAns = ans !== undefined && ans !== '';
+                const hasAns = isQuestionAnswered(q);
                 let bg = 'bg-slate-100 dark:bg-lab-800 text-slate-600 dark:text-slate-300';
                 if (hasAns) {
                     if (state.nvo.mode === 'practice' || state.nvo.finished) {
-                        bg = isNvoQuestionCorrect(q, ans) ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white';
+                        const earned = getQuestionEarnedPoints(q);
+                        if (q.type === 'essay') {
+                            bg = earned === q.pts ? 'bg-emerald-600 text-white' : (earned > 0 ? 'bg-amber-500 text-white' : 'bg-indigo-600 text-white');
+                        } else {
+                            bg = earned > 0 ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white';
+                        }
                     } else {
                         bg = 'bg-amber-600 text-white';
                     }
                 }
                 const ring = idx === state.nvo.currentIdx ? 'ring-2 ring-cyan-400' : '';
-                return `<button onclick="state.nvo.currentIdx=${idx};renderNvoQuestion();renderNvoMap();" class="py-1.5 rounded-lg font-mono text-xs font-bold ${bg} ${ring}">${idx + 1}</button>`;
+                const label = q.part === '2' ? `★${idx + 1}` : `${idx + 1}`;
+                return `<button onclick="state.nvo.currentIdx=${idx};renderNvoQuestion();renderNvoMap();" class="py-1.5 rounded-lg font-mono text-xs font-bold ${bg} ${ring}">${label}</button>`;
             }).join('');
         }
 
@@ -2071,7 +2387,7 @@
             let maxPts = 0;
             state.nvo.questions.forEach(q => {
                 maxPts += q.pts;
-                if (isNvoQuestionCorrect(q, state.nvo.answers[q.id])) earned += q.pts;
+                earned += getQuestionEarnedPoints(q);
             });
 
             const show = state.nvo.mode === 'practice' || state.nvo.finished;
@@ -2091,7 +2407,7 @@
             renderNvoQuestion();
             renderNvoMap();
             updateNvoScore();
-            showToast('Тестът е оценен!', 'fa-flag-checkered');
+            showToast('Изпитът е оценен!', 'fa-flag-checkered');
         }
 
         function sendNvoToConstructor() {
