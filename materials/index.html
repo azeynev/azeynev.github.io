@@ -941,19 +941,21 @@
         ];
         
 
-        // =========================================================================
+        
+       // =========================================================================
         // DYNAMIC CATEGORY COUNTERS UPDATE
         // =========================================================================
         function updateCategoryCounts() {
-            const counts = {
-                all: MATERIALS_DATA.length,
-                math: 0,
-                informatics: 0,
-                exams: 0,
-                physics: 0,
-                biology: 0,
-                tools: 0
-            };
+            const totalEl = document.getElementById('stat-total-count');
+            if (totalEl) totalEl.textContent = MATERIALS_DATA.length;
+
+            document.querySelectorAll('.cat-count').forEach(span => {
+                const cat = span.getAttribute('data-cat');
+                span.textContent = (cat === 'all')
+                    ? MATERIALS_DATA.length
+                    : MATERIALS_DATA.filter(item => item.cat === cat).length;
+            });
+        }
             MATERIALS_DATA.forEach(item => {
                 if (counts[item.cat] !== undefined) counts[item.cat]++;
             });
