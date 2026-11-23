@@ -244,6 +244,15 @@
     .badge-amber { background: #fef3c7; color: #92400e; }
     .badge-slate { background: #e2e8f0; color: #334155; }
 
+    .badge-rec {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .badge-rec:hover { background: #d1fae5; }
+
     .level-selector {
       display: flex;
       flex-wrap: wrap;
@@ -252,6 +261,7 @@
     }
 
     .level-btn {
+      position: relative;
       flex: 1 1 130px;
       padding: 0.5rem 0.6rem;
       border: 1px solid var(--border);
@@ -265,10 +275,26 @@
     .level-btn strong { display: block; font-size: 0.82rem; color: #0f172a; }
     .level-btn span { font-size: 0.73rem; color: var(--muted); }
 
+    .level-btn.recommended {
+      border-color: #10b981;
+      background: #f0fdf4;
+    }
+
     .level-btn.selected {
       background: #eff6ff;
       border-color: var(--primary);
       box-shadow: inset 0 0 0 1px var(--primary);
+    }
+
+    .rec-tag {
+      display: inline-block;
+      margin-top: 0.22rem;
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: #047857;
+      background: #d1fae5;
+      padding: 0.05rem 0.35rem;
+      border-radius: 4px;
     }
 
     .comp-evidences-box {
@@ -483,10 +509,13 @@
     <div class="card">
       <h2>
         <span>Матрица на професионалните компетентности</span>
-        <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 0 / 40</span>
+        <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="applyAllRecommended()">✨ Приложи препоръчителните нива</button>
+          <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 0 / 40</span>
+        </div>
       </h2>
       <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1rem;">
-        Изберете ниво на владеене (от 1 до 5) за всяка област. Под всяка компетентност се визуализират прикачените към нея доказателства.
+        Системата изчислява препоръчително ниво (1–5) според броя и тежестта на прикачените доказателства и аргументацията. Винаги можете да зададете своя финален избор.
       </p>
       <div id="competenciesContainer"></div>
     </div>
@@ -694,10 +723,41 @@
       bio: ""
     },
     ratings: { c1: 4, c2: 4, c3: 4, c4: 5, c5: 4, c6: 4, c7: 4, c8: 5 },
+    manualRatings: {},
     notes: {},
     evidences: [],
     goals: []
   };
+
+  // Изчислява препоръчително ниво (1–5) на база доказателства и аргументация
+  function computeRecommendedLevel(compId) {
+    const evs = state.evidences.filter(e => e.compId === compId);
+    const noteText = (state.notes[compId] || "").trim();
+    const hasRichNote = noteText.length >= 20;
+
+    if (evs.length === 0) {
+      return hasRichNote ? 2 : 1;
+    }
+
+    // Тегло според вида на артефакта
+    let weightPoints = 0;
+    evs.forEach(ev => {
+      const t = (ev.type || "").toLowerCase();
+      if (t.includes("софтуер") || t.includes("публикац") || t.includes("олимпиад")) {
+        weightPoints += 2;
+      } else {
+        weightPoints += 1;
+      }
+      if (ev.link) weightPoints += 0.5;
+    });
+
+    if (hasRichNote) weightPoints += 1;
+
+    if (weightPoints >= 6) return 5;
+    if (weightPoints >= 4) return 4;
+    if (weightPoints >= 2) return 3;
+    return 2;
+  }
 
   function showToast(msg) {
     const el = document.getElementById("toast");
@@ -714,6 +774,7 @@
         state = {
           profile: { ...state.profile, ...(parsed.profile || {}) },
           ratings: { ...state.ratings, ...(parsed.ratings || {}) },
+          manualRatings: parsed.manualRatings || {},
           notes: parsed.notes || {},
           evidences: Array.isArray(parsed.evidences) ? parsed.evidences : [],
           goals: Array.isArray(parsed.goals) ? parsed.goals : []
@@ -766,16 +827,31 @@
     renderReport();
   }
 
-  function setRating(compId, val) {
+  function setRating(compId, val, isManual = true) {
     state.ratings[compId] = val;
+    if (isManual) state.manualRatings[compId] = true;
     saveState();
     renderAll();
-    showToast("Оценката е обновена.");
+    showToast(`Избрано е Ниво ${val}.`);
+  }
+
+  function applyAllRecommended() {
+    COMPETENCIES.forEach(c => {
+      state.ratings[c.id] = computeRecommendedLevel(c.id);
+      state.manualRatings[c.id] = false;
+    });
+    saveState();
+    renderAll();
+    showToast("Приложени са препоръчителните нива за всички области.");
   }
 
   function saveCompNote(compId, text) {
     state.notes[compId] = text;
+    if (!state.manualRatings[compId] && state.evidences.length > 0) {
+      state.ratings[compId] = computeRecommendedLevel(compId);
+    }
     saveState();
+    renderOverview();
   }
 
   function escapeHtml(str) {
@@ -792,15 +868,29 @@
 
     container.innerHTML = COMPETENCIES.map(c => {
       const current = Number(state.ratings[c.id]) || 0;
+      const recLevel = computeRecommendedLevel(c.id);
       total += current;
       const compEvidences = state.evidences.filter(e => e.compId === c.id);
 
-      const levelButtons = LEVELS.map(l => `
-        <button type="button" class="level-btn ${current === l.val ? "selected" : ""}" onclick="setRating('${c.id}', ${l.val})">
-          <strong>${l.label}</strong>
-          <span>${l.sub}</span>
-        </button>
-      `).join("");
+      const levelButtons = LEVELS.map(l => {
+        const isSelected = current === l.val;
+        const isRec = recLevel === l.val && state.evidences.length > 0;
+        return `
+          <button type="button"
+            class="level-btn ${isSelected ? "selected" : ""} ${isRec && !isSelected ? "recommended" : ""}"
+            onclick="setRating('${c.id}', ${l.val}, true)">
+            <strong>${l.label}</strong>
+            <span>${l.sub}</span>
+            ${isRec ? `<div class="rec-tag">Препоръчано</div>` : ""}
+          </button>
+        `;
+      }).join("");
+
+      const recBadge = (state.evidences.length > 0 && recLevel !== current)
+        ? `<button type="button" class="badge badge-rec" onclick="setRating('${c.id}', ${recLevel}, false)" title="Кликнете, за да приложите препоръчителното ниво">
+            Препоръчително: Ниво ${recLevel} (Приложи)
+          </button>`
+        : "";
 
       const evidencesHtml = compEvidences.length > 0
         ? `<div class="evidence-chips">
@@ -830,7 +920,8 @@
               <div class="comp-title">${c.title}</div>
               <div class="comp-desc">${c.desc}</div>
             </div>
-            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
+              ${recBadge}
               <span class="badge ${compEvidences.length > 0 ? "badge-green" : "badge-slate"}">${compEvidences.length} доказателства</span>
               <span class="badge badge-blue">Оценка: ${current} / 5</span>
             </div>
@@ -920,6 +1011,11 @@
       title, compId, type, date, link, desc
     });
 
+    // Ако оценката за тази област не е заключена ръчно, обнови я автоматично
+    if (!state.manualRatings[compId]) {
+      state.ratings[compId] = computeRecommendedLevel(compId);
+    }
+
     document.getElementById("evTitle").value = "";
     document.getElementById("evDate").value = "";
     document.getElementById("evLink").value = "";
@@ -927,11 +1023,15 @@
 
     saveState();
     renderAll();
-    showToast("Доказателството е добавено.");
+    showToast("Доказателството е добавено и нивото е преизчислено.");
   }
 
   function deleteEvidence(id) {
+    const target = state.evidences.find(e => e.id === id);
     state.evidences = state.evidences.filter(e => e.id !== id);
+    if (target && !state.manualRatings[target.compId]) {
+      state.ratings[target.compId] = computeRecommendedLevel(target.compId);
+    }
     saveState();
     renderAll();
     showToast("Доказателството е премахнато.");
@@ -1193,12 +1293,19 @@
         added++;
       });
 
+      // Автоматично светване на препоръчителните нива за областите без ръчна корекция
+      COMPETENCIES.forEach(c => {
+        if (!state.manualRatings[c.id]) {
+          state.ratings[c.id] = computeRecommendedLevel(c.id);
+        }
+      });
+
       saveState();
       renderAll();
       if (added > 0) {
-        showToast(`Синхронизирани са ${added} нови доказателства от index.html!`);
+        showToast(`Синхронизирани са ${added} доказателства и нивата в матрицата са обновени!`);
       } else {
-        showToast("Портфолиото е проверено — всички елементи вече са заредени.");
+        showToast("Портфолиото е проверено — нивата в матрицата са актуални.");
       }
     } catch (err) {
       showToast("Неуспешно четене на index.html: " + err.message);
@@ -1226,6 +1333,7 @@
         state = {
           profile: { ...state.profile, ...(imported.profile || {}) },
           ratings: { ...state.ratings, ...(imported.ratings || {}) },
+          manualRatings: imported.manualRatings || {},
           notes: imported.notes || {},
           evidences: Array.isArray(imported.evidences) ? imported.evidences : [],
           goals: Array.isArray(imported.goals) ? imported.goals : []
