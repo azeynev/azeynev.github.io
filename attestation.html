@@ -1712,3 +1712,42 @@ const ADMIN_PASS_HASH = "c8d650857bb65da7ee2989e2b71da06852e28fab74b3860721e1ddc
 </script>
 </body>
 </html>
+
+<!-- === НАДСТРОЙКА: Auto-Lock (10 мин.) + Публичен JSON Sync === -->
+<script>
+  (function () {
+    const AUTO_LOCK_MS = 10 * 60 * 1000;
+    let lockTimer = null;
+
+    function resetAutoLock() {
+      if (sessionStorage.getItem("adem_zeynev_att_unlocked") !== "true") return;
+      clearTimeout(lockTimer);
+      lockTimer = setTimeout(() => {
+        sessionStorage.removeItem("adem_zeynev_att_unlocked");
+        location.reload();
+      }, AUTO_LOCK_MS);
+    }
+
+    ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach((evt) => {
+      document.addEventListener(evt, resetAutoLock, { passive: true });
+    });
+    resetAutoLock();
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const res = await fetch("attestation-data.json?v=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) return;
+        const remoteData = await res.json();
+        const storageKey = Object.keys(localStorage).find((k) => k.startsWith("adem_zeynev_att"));
+        if (storageKey && remoteData && typeof remoteData === "object") {
+          const currentRaw = localStorage.getItem(storageKey);
+          const remoteRaw = JSON.stringify(remoteData);
+          if (currentRaw !== remoteRaw) {
+            localStorage.setItem(storageKey, remoteRaw);
+            location.reload();
+          }
+        }
+      } catch (e) {}
+    });
+  })();
+</script>
