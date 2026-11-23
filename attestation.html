@@ -1,1022 +1,1291 @@
 <!DOCTYPE html>
-<html lang="bg" class="scroll-smooth">
+<html lang="bg">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0f172a">
-<title>Атестация по Наредба № 15 | Професионално портфолио • д-р Адем Зейнев</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script>
-  tailwind.config = {
-    darkMode: 'class',
-    theme: {
-      extend: {
-        colors: {
-          brand: {
-            50: '#eff6ff',
-            100: '#dbeafe',
-            500: '#3b82f6',
-            600: '#2563eb',
-            700: '#1d4ed8',
-            800: '#1e40af',
-            900: '#0f172a',
-          }
-        }
-      }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Атестация по Наредба № 15 | Професионално портфолио</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-light: #334155;
+      --card: #ffffff;
+      --page-bg: #f1f5f9;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
+      --primary: #1d4ed8;
+      --primary-hover: #1e40af;
+      --accent: #059669;
+      --accent-hover: #047857;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
     }
-  }
-</script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-  .panel { display: none; animation: fadeIn 0.2s ease-out; }
-  .panel.active { display: block; }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @media print {
-    body { background: #fff !important; color: #000 !important; }
-    .no-print, header, footer, .toolbar-area, .tabs-area, .stats-area, .notice-area { display: none !important; }
-    .panel { display: none !important; }
-    #report { display: block !important; }
-    #reportCard { box-shadow: none !important; border: none !important; padding: 0 !important; background: #fff !important; color: #000 !important; }
-    #reportBody, #reportBody * { color: #000 !important; background: transparent !important; }
-  }
-</style>
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--page-bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #fff;
+      padding: 1.5rem 1.25rem 1.25rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .brand h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .brand p {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin-top: 0.2rem;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 0.95rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-accent:hover { background: var(--accent-hover); }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.22); }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-outline:hover { background: #f8fafc; border-color: #94a3b8; }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+    .btn-danger:hover { background: #fecaca; }
+
+    .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.8rem; }
+
+    nav.tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 0.9rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: #cbd5e1;
+      border: none;
+      padding: 0.55rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .tab-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .tab-btn.active { background: #fff; color: #0f172a; }
+
+    main { padding: 1.5rem 1.25rem 3rem; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius);
+      padding: 1.35rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.25rem;
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      margin-bottom: 0.75rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .stat-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
+    .stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+    .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--primary); margin: 0.25rem 0; }
+    .stat-sub { font-size: 0.82rem; color: var(--muted); }
+
+    label { display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 0.3rem; }
+
+    input[type="text"], input[type="date"], input[type="url"], select, textarea {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+    }
+
+    .form-group { margin-bottom: 0.85rem; }
+
+    /* Competence Matrix Cards */
+    .comp-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 1.1rem;
+      margin-bottom: 1rem;
+      background: #fcfdff;
+    }
+
+    .comp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    .comp-title { font-weight: 700; font-size: 1rem; color: #0f172a; }
+    .comp-desc { font-size: 0.85rem; color: var(--muted); margin-top: 0.15rem; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-green { background: #d1fae5; color: #065f46; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-slate { background: #e2e8f0; color: #334155; }
+
+    .level-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 0.75rem 0;
+    }
+
+    .level-btn {
+      flex: 1 1 130px;
+      padding: 0.5rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.15s;
+    }
+
+    .level-btn strong { display: block; font-size: 0.82rem; color: #0f172a; }
+    .level-btn span { font-size: 0.73rem; color: var(--muted); }
+
+    .level-btn.selected {
+      background: #eff6ff;
+      border-color: var(--primary);
+      box-shadow: inset 0 0 0 1px var(--primary);
+    }
+
+    /* Evidence Chips inside Matrix */
+    .comp-evidences-box {
+      margin: 0.75rem 0;
+      padding: 0.65rem 0.8rem;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+    }
+
+    .comp-evidences-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .evidence-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .evidence-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.65rem;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #1e293b;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .evidence-chip:hover {
+      border-color: var(--primary);
+      background: #eff6ff;
+      color: var(--primary);
+    }
+
+    .evidence-chip .chip-type {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #1d4ed8;
+      background: #dbeafe;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+    }
+
+    .no-evidence-hint {
+      font-size: 0.8rem;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .no-evidence-hint a {
+      color: var(--primary);
+      text-decoration: underline;
+      cursor: pointer;
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
+    th { background: #f8fafc; font-weight: 700; color: #334155; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 1.25rem;
+      right: 1.25rem;
+      background: #0f172a;
+      color: #fff;
+      padding: 0.75rem 1.15rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: 0.25s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Print / Report styling */
+    .report-sheet {
+      background: #fff;
+      padding: 2rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+    }
+    .report-sheet h1 { font-size: 1.35rem; text-align: center; margin-bottom: 0.25rem; }
+    .report-sheet .subtitle { text-align: center; color: #475569; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .report-sheet h3 { font-size: 1.05rem; margin: 1.25rem 0 0.5rem; border-bottom: 2px solid #1e3a8a; padding-bottom: 0.25rem; color: #1e3a8a; }
+
+    @media print {
+      header, .no-print { display: none !important; }
+      body { background: #fff; }
+      main { padding: 0; }
+      .card { box-shadow: none; border: none; padding: 0; }
+      .report-sheet { border: none; padding: 0; }
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+<body>
 
-<!-- Top Header -->
-<header class="sticky top-0 z-30 bg-slate-900/95 dark:bg-slate-950/95 backdrop-blur-md text-white border-b border-slate-800 shadow-lg no-print">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-    <div class="flex items-center gap-3">
-      <a href="index.html" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-blue-600/30 border border-slate-700 hover:border-blue-400 text-slate-200 hover:text-white text-xs font-bold transition shadow-sm" title="Върни се в основния сайт">
-        <i class="fa-solid fa-arrow-left"></i>
-        <span class="hidden sm:inline">Към сайта</span>
-      </a>
-      <div class="h-6 w-px bg-slate-700 hidden sm:block"></div>
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
-        <i class="fa-solid fa-award text-lg"></i>
+<header>
+  <div class="container">
+    <div class="header-top">
+      <div class="brand">
+        <h1>Атестация по Наредба № 15</h1>
+        <p>Интерактивна карта на професионалните компетентности, доказателства и кариерен план</p>
       </div>
-      <div>
-        <div class="flex items-center gap-2">
-          <h1 class="font-extrabold text-base sm:text-lg tracking-tight leading-tight">Атестация по Наредба № 15</h1>
-          <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">v3.1 Sync</span>
-        </div>
-        <p class="text-xs text-slate-400 hidden sm:block">Работна среда за професионално портфолио, самооценка и план за развитие</p>
+      <div class="header-actions">
+        <a href="index.html" class="btn btn-ghost">← Към портфолиото</a>
+        <button class="btn btn-accent" onclick="syncFromPortfolio()">🔄 Зареди от сайта (index.html)</button>
+        <button class="btn btn-ghost" onclick="exportJSON()">⬇ Експорт JSON</button>
+        <label class="btn btn-ghost" style="margin:0; cursor:pointer;">
+          ⬆ Импорт JSON
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)" />
+        </label>
       </div>
     </div>
 
-    <div class="flex items-center gap-2.5">
-      <span id="saveIndicator" class="text-[11px] text-emerald-400 font-medium hidden lg:inline-flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-1 rounded-lg">
-        <i class="fa-solid fa-cloud-check"></i> Автозапис: готов
-      </span>
-      <button onclick="syncFromSite()" id="syncBtn" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 border border-emerald-400/30 text-xs font-bold text-white shadow-md transition inline-flex items-center gap-1.5" title="Автоматично извличане на профила, проектите, публикациите и наградите от index.html">
-        <i class="fa-solid fa-rotate"></i>
-        <span>Зареди от сайта (index.html)</span>
-      </button>
-      <button onclick="toggleDarkMode()" id="themeToggle" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 transition" title="Смени светла / тъмна тема">
-        <i class="fa-solid fa-moon"></i>
-      </button>
-    </div>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">1. Профил и обобщение</button>
+      <button class="tab-btn" data-tab="matrix" onclick="switchTab('matrix')">2. Матрица на компетентностите</button>
+      <button class="tab-btn" data-tab="evidences" onclick="switchTab('evidences')">3. Доказателства и артефакти</button>
+      <button class="tab-btn" data-tab="goals" onclick="switchTab('goals')">4. Насоки и цели за развитие</button>
+      <button class="tab-btn" data-tab="report" onclick="switchTab('report')">5. Официален отчет (PDF / Word)</button>
+    </nav>
   </div>
 </header>
 
-<main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 flex-1">
+<main class="container">
 
-  <!-- Action Toolbar -->
-  <div class="toolbar-area flex flex-wrap items-center justify-between gap-3 mb-6 no-print">
-    <div class="flex flex-wrap gap-2">
-      <button onclick="saveAll(true)" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-sm transition inline-flex items-center gap-2">
-        <i class="fa-solid fa-floppy-disk"></i> Запази
-      </button>
-      <button onclick="exportWord()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition inline-flex items-center gap-2">
-        <i class="fa-solid fa-file-word"></i> Експорт в Word (.doc)
-      </button>
-      <button onclick="printReport()" class="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs sm:text-sm font-bold transition inline-flex items-center gap-2">
-        <i class="fa-solid fa-print"></i> Печат / PDF
-      </button>
-    </div>
-
-    <div class="flex flex-wrap gap-2">
-      <button onclick="exportJSON()" class="px-3.5 py-2 rounded-xl bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition inline-flex items-center gap-1.5">
-        <i class="fa-solid fa-download"></i> Архив (.json)
-      </button>
-      <label for="importFile" class="cursor-pointer px-3.5 py-2 rounded-xl bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition inline-flex items-center gap-1.5">
-        <i class="fa-solid fa-upload"></i> Импорт
-      </label>
-      <input id="importFile" class="hidden" type="file" accept=".json,application/json" onchange="importJSON(event)">
-      <button onclick="resetData()" class="px-3.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 text-xs font-bold transition inline-flex items-center gap-1.5">
-        <i class="fa-solid fa-trash-can"></i> Изчисти
-      </button>
-    </div>
-  </div>
-
-  <!-- Stats Dashboard -->
-  <div class="stats-area grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 no-print">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
-      <div class="flex items-center justify-between mb-1">
-        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Доказателства</span>
-        <span class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs"><i class="fa-solid fa-folder-open"></i></span>
+  <!-- TAB 1: OVERVIEW -->
+  <section id="tab-overview" class="tab-panel active">
+    <div class="grid-3" style="margin-bottom: 1.25rem;">
+      <div class="stat-box">
+        <div class="stat-label">Средна самооценка</div>
+        <div class="stat-value" id="statAvgScore">0.00 / 5.00</div>
+        <div class="stat-sub" id="statRatingText">Попълнете матрицата по Наредба № 15</div>
       </div>
-      <strong id="statEvidence" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">0</strong>
-      <span class="block text-[11px] text-slate-400 mt-0.5">прикачени в портфолиото</span>
-    </div>
-
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
-      <div class="flex items-center justify-between mb-1">
-        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Покритие</span>
-        <span class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs"><i class="fa-solid fa-layer-group"></i></span>
+      <div class="stat-box">
+        <div class="stat-label">Прикачени доказателства</div>
+        <div class="stat-value" id="statEvidenceCount">0</div>
+        <div class="stat-sub">Свързани проекти, публикации и сертификати</div>
       </div>
-      <strong id="statCoverage" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">0 / 8</strong>
-      <span class="block text-[11px] text-slate-400 mt-0.5">области с доказателства</span>
-    </div>
-
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
-      <div class="flex items-center justify-between mb-1">
-        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Цели за развитие</span>
-        <span class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs"><i class="fa-solid fa-bullseye"></i></span>
-      </div>
-      <strong id="statGoals" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">0</strong>
-      <span id="statGoalsDone" class="block text-[11px] text-slate-400 mt-0.5">0 изпълнени</span>
-    </div>
-
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
-      <div class="flex items-center justify-between mb-1">
-        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Средна самооценка</span>
-        <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs"><i class="fa-solid fa-chart-line"></i></span>
-      </div>
-      <strong id="statAverage" class="text-2xl sm:text-3xl font-black text-blue-600 dark:text-blue-400">—</strong>
-      <span class="block text-[11px] text-slate-400 mt-0.5">по скала от 1.00 до 5.00</span>
-    </div>
-  </div>
-
-  <!-- Navigation Tabs -->
-  <nav class="tabs-area flex gap-1.5 overflow-x-auto p-1.5 mb-6 bg-slate-200/70 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl no-print">
-    <button class="tab active flex-1 min-w-[120px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2" data-tab="profile">
-      <i class="fa-solid fa-user-tie"></i> Профил
-    </button>
-    <button class="tab flex-1 min-w-[120px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2" data-tab="matrix">
-      <i class="fa-solid fa-sliders"></i> Матрица
-    </button>
-    <button class="tab flex-1 min-w-[135px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2" data-tab="evidence">
-      <i class="fa-solid fa-file-circle-check"></i> Доказателства
-    </button>
-    <button class="tab flex-1 min-w-[125px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2" data-tab="goals">
-      <i class="fa-solid fa-road"></i> Развитие
-    </button>
-    <button class="tab flex-1 min-w-[120px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2" data-tab="report">
-      <i class="fa-solid fa-file-lines"></i> Отчет
-    </button>
-  </nav>
-
-  <!-- TAB 1: PROFILE -->
-  <section id="profile" class="panel active">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-7 shadow-sm">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
-        <div>
-          <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Професионален профил</h2>
-          <p class="text-sm text-slate-500 dark:text-slate-400">Въведете данните за Вашата педагогическа позиция или ги извлечете автоматично от основния сайт.</p>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="name" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Име, презиме и фамилия</label>
-          <input id="name" oninput="autoSave()" placeholder="Напр. Иван Петров Георгиев" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label for="position" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Длъжност</label>
-          <input id="position" oninput="autoSave()" placeholder="Напр. Старши учител / Главен учител" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label for="school" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Образователна институция</label>
-          <input id="school" oninput="autoSave()" placeholder="Наименование на училището / детската градина" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label for="subjects" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Направления / учебни предмети</label>
-          <input id="subjects" oninput="autoSave()" placeholder="Напр. Математика, информатика и ИТ" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label for="qualification" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Образование и ПКС / научна степен</label>
-          <input id="qualification" oninput="autoSave()" placeholder="Напр. Магистър, III ПКС / ОНС „Доктор“" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label for="experience" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Педагогически стаж и атестационен период</label>
-          <input id="experience" oninput="autoSave()" placeholder="Напр. 18 години (период 2022–2026 г.)" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div class="md:col-span-2">
-          <label for="profileNotes" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Професионална мисия, философия и ключови постижения</label>
-          <textarea id="profileNotes" rows="4" oninput="autoSave()" placeholder="Опишете накратко педагогическата си философия, иновациите, които прилагате, и приноса си към институцията." class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-        </div>
+      <div class="stat-box">
+        <div class="stat-label">Цели за следващ период</div>
+        <div class="stat-value" id="statGoalsCount">0</div>
+        <div class="stat-sub">Планирани дейности за професионално израстване</div>
       </div>
     </div>
-  </section>
 
-  <!-- TAB 2: COMPETENCY MATRIX -->
-  <section id="matrix" class="panel">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-7 shadow-sm">
-      <div class="mb-5">
-        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Матрица на професионалните компетентности</h2>
-        <p class="text-sm text-slate-500 dark:text-slate-400">Оценете собственото си равнище от 1 до 5 по областите от професионалния профил на учителя (Наредба № 15). Системата показва автоматично броя прикачени доказателства към всяка област.</p>
+    <div class="card">
+      <h2>Данни за атестирания педагогически специалист</h2>
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="profName">Трите имена</label>
+          <input type="text" id="profName" placeholder="напр. д-р Айдън Зейнев" oninput="saveProfile()" />
+        </div>
+        <div class="form-group">
+          <label for="profPosition">Длъжност и ПКС</label>
+          <input type="text" id="profPosition" placeholder="напр. Главен учител по математика и информатика, I ПКС" oninput="saveProfile()" />
+        </div>
+        <div class="form-group">
+          <label for="profInstitution">Образователна институция</label>
+          <input type="text" id="profInstitution" placeholder="Име на училището / институцията" oninput="saveProfile()" />
+        </div>
+        <div class="form-group">
+          <label for="profPeriod">Атестационен период</label>
+          <input type="text" id="profPeriod" placeholder="напр. 2022 – 2026 г." oninput="saveProfile()" />
+        </div>
       </div>
-      <div id="competencyList" class="space-y-4"></div>
-    </div>
-  </section>
-
-  <!-- TAB 3: EVIDENCE -->
-  <section id="evidence" class="panel">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-7 shadow-sm mb-6">
-      <div class="mb-5">
-        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Добавяне на доказателство в портфолиото</h2>
-        <p class="text-sm text-slate-500 dark:text-slate-400">Регистрирайте сертификати, публикации, дигитални уроци, проекти, протоколи или постижения на ученици.</p>
+      <div class="form-group" style="margin-bottom:0;">
+        <label for="profBio">Кратко професионално резюме / педагогическа философия</label>
+        <textarea id="profBio" rows="3" placeholder="Опишете основните акценти в своята преподавателска, научна и дигитална дейност..." oninput="saveProfile()"></textarea>
       </div>
-      <form id="evidenceForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="evTitle" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Наименование на доказателството *</label>
-          <input id="evTitle" required placeholder="Напр. Интерактивен образователен ресурс / Сертификат за обучение" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label for="evCategory" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Компетентностна област</label>
-          <select id="evCategory" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
-        </div>
-        <div>
-          <label for="evType" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Вид доказателство</label>
-          <select id="evType" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>Квалификация / удостоверение / сертификат</option>
-            <option>Научна или методическа публикация</option>
-            <option>Авторски учебен ресурс / дигитална разработка</option>
-            <option>Открит урок / споделяне на добри практики</option>
-            <option>Постижения на ученици (олимпиади, състезания)</option>
-            <option>Работа по проекти / екипни дейности</option>
-            <option>Друг документ от портфолиото</option>
-          </select>
-        </div>
-        <div>
-          <label for="evDate" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Дата / учебна година</label>
-          <input id="evDate" type="date" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div class="md:col-span-2">
-          <label for="evUrl" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Връзка към електронно доказателство (Drive, сайт, публикация)</label>
-          <input id="evUrl" type="url" placeholder="https://..." class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div class="md:col-span-2">
-          <label for="evDesc" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Описание и педагогическа приложимост</label>
-          <textarea id="evDesc" rows="2" placeholder="Какво доказва този материал и какъв е ефектът от прилагането му?" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-        </div>
-        <div class="md:col-span-2">
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-sm transition inline-flex items-center gap-2">
-            <i class="fa-solid fa-plus"></i> Добави в регистъра
-          </button>
-        </div>
-      </form>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-7 shadow-sm">
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Регистър на доказателствата</h3>
-        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-          <select id="evFilterCat" onchange="renderEvidence()" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-xs font-medium">
-            <option value="">Всички компетентности</option>
-          </select>
-          <input id="evSearch" oninput="renderEvidence()" placeholder="Търсене по ключова дума..." class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-xs min-w-[200px]">
-        </div>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse min-w-[680px]">
+    <div class="card">
+      <h2>Бърз преглед на покритието по области</h2>
+      <div class="table-wrap">
+        <table>
           <thead>
-            <tr class="border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/60">
-              <th class="py-3 px-3 rounded-tl-xl">Наименование и описание</th>
-              <th class="py-3 px-3">Компетентност</th>
-              <th class="py-3 px-3">Вид</th>
-              <th class="py-3 px-3">Дата</th>
-              <th class="py-3 px-3 rounded-tr-xl text-right">Действие</th>
+            <tr>
+              <th>Компетентностна област (Наредба № 15)</th>
+              <th>Ниво</th>
+              <th>Брой доказателства</th>
+              <th>Статус</th>
             </tr>
           </thead>
-          <tbody id="evidenceRows" class="divide-y divide-slate-200 dark:divide-slate-800 text-sm"></tbody>
+          <tbody id="overviewMatrixBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: MATRIX -->
+  <section id="tab-matrix" class="tab-panel">
+    <div class="card">
+      <h2>
+        <span>Карта на професионалните компетентности (Наредба № 15)</span>
+        <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 0 / 40</span>
+      </h2>
+      <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1rem;">
+        Изберете ниво на владеене (от 1 до 5) за всяка област. Под всяка компетентност автоматично се визуализират прикачените към нея доказателства от портфолиото.
+      </p>
+      <div id="competenciesContainer"></div>
+    </div>
+  </section>
+
+  <!-- TAB 3: EVIDENCES -->
+  <section id="tab-evidences" class="tab-panel">
+    <div class="card">
+      <h2>Добавяне на ново доказателство / артефакт</h2>
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="evTitle">Наименование на доказателството *</label>
+          <input type="text" id="evTitle" placeholder="напр. Интерактивна платформа CyberMath OPS" />
+        </div>
+        <div class="form-group">
+          <label for="evComp">Компетентностна област *</label>
+          <select id="evComp"></select>
+        </div>
+        <div class="form-group">
+          <label for="evType">Вид на артефакта</label>
+          <select id="evType">
+            <option value="Дигитален ресурс / Софтуер">Дигитален ресурс / Софтуер</option>
+            <option value="Научна публикация / Доклад">Научна публикация / Доклад</option>
+            <option value="Открит урок / Иновативна практика">Открит урок / Иновативна практика</option>
+            <option value="Удостоверение / Сертификат (квалификация)">Удостоверение / Сертификат (квалификация)</option>
+            <option value="Постижения на ученици (олимпиади / проекти)">Постижения на ученици (олимпиади / проекти)</option>
+            <option value="Участие в комисии / Проектна дейност">Участие в комисии / Проектна дейност</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="evDate">Година / Дата</label>
+          <input type="text" id="evDate" placeholder="напр. 2025" />
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="evLink">Линк към ресурса (ако е наличен онлайн)</label>
+          <input type="url" id="evLink" placeholder="https://..." />
+        </div>
+        <div class="form-group">
+          <label for="evDesc">Кратко описание и измерим резултат</label>
+          <input type="text" id="evDesc" placeholder="Какъв педагогически или научен ефект постига?" />
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addEvidence()">+ Добави доказателство</button>
+    </div>
+
+    <div class="card">
+      <h2>
+        <span>Списък с прикачени доказателства</span>
+        <button class="btn btn-outline btn-sm" onclick="syncFromPortfolio()">🔄 Синхронизирай с index.html</button>
+      </h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Доказателство</th>
+              <th>Вид</th>
+              <th>Компетентност</th>
+              <th>Година</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody id="evidencesTableBody"></tbody>
         </table>
       </div>
     </div>
   </section>
 
   <!-- TAB 4: GOALS -->
-  <section id="goals" class="panel">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-7 shadow-sm mb-6">
-      <div class="mb-5">
-        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">План за професионално развитие</h2>
-        <p class="text-sm text-slate-500 dark:text-slate-400">Определете конкретни цели за следващия атестационен период, срокове и измерими резултати.</p>
+  <section id="tab-goals" class="tab-panel">
+    <div class="card">
+      <h2>Планиране на насоки и цели за следващия атестационен период</h2>
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="goalTitle">Конкретна цел / направление за развитие *</label>
+          <input type="text" id="goalTitle" placeholder="напр. Разширяване на STEM и киберсигурност модулите в обучението" />
+        </div>
+        <div class="form-group">
+          <label for="goalComp">Свързана компетентност</label>
+          <select id="goalComp"></select>
+        </div>
+        <div class="form-group">
+          <label for="goalIndicator">Индикатор за постигане (очакван резултат)</label>
+          <input type="text" id="goalIndicator" placeholder="напр. Разработени 3 нови интерактивни сценария и обучени 60 ученици" />
+        </div>
+        <div class="form-group">
+          <label for="goalDeadline">Срок за изпълнение</label>
+          <input type="text" id="goalDeadline" placeholder="напр. Учебна 2026/2027 г." />
+        </div>
       </div>
-      <form id="goalForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="md:col-span-2">
-          <label for="goalTitle" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Професионална цел *</label>
-          <input id="goalTitle" required placeholder="Напр. Интегриране на интерактивни симулации и AI инструменти в обучението" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label for="goalDate" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Целеви срок</label>
-          <input id="goalDate" type="date" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label for="goalStatus" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Текущ статус</label>
-          <select id="goalStatus" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>Планирана</option>
-            <option>В процес</option>
-            <option>Изпълнена</option>
-          </select>
-        </div>
-        <div class="md:col-span-2">
-          <label for="goalResult" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Очакван резултат и индикатори за успех</label>
-          <textarea id="goalResult" rows="2" placeholder="Как ще измерите постигането на целта?" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-        </div>
-        <div class="md:col-span-2">
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-sm transition inline-flex items-center gap-2">
-            <i class="fa-solid fa-plus"></i> Добави цел
-          </button>
-        </div>
-      </form>
+      <button class="btn btn-primary" onclick="addGoal()">+ Добави цел</button>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-7 shadow-sm">
-      <h3 class="text-lg font-extrabold text-slate-900 dark:text-white mb-4">Формулирани цели за развитие</h3>
-      <div id="goalList" class="space-y-3"></div>
+    <div class="card">
+      <h2>Индивидуален план за професионално развитие</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Цел за развитие</th>
+              <th>Компетентност</th>
+              <th>Индикатор за успех</th>
+              <th>Срок</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody id="goalsTableBody"></tbody>
+        </table>
+      </div>
     </div>
   </section>
 
   <!-- TAB 5: REPORT -->
-  <section id="report" class="panel">
-    <div id="reportCard" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-10 shadow-sm">
-      <div class="flex flex-wrap items-center justify-between gap-3 pb-5 mb-6 border-b border-slate-200 dark:border-slate-800 no-print">
+  <section id="tab-report" class="tab-panel">
+    <div class="card no-print">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
         <div>
-          <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Обобщен отчет на професионалното портфолио</h2>
-          <p class="text-sm text-slate-500 dark:text-slate-400">Готов документ за печат, запис в PDF или директен експорт в Microsoft Word.</p>
+          <h2 style="margin-bottom:0.2rem;">Генериране на официален атестационен отчет</h2>
+          <p style="font-size:0.85rem; color:var(--muted);">Готов формат за атестационна комисия — експортирайте в Word (.doc) или отпечатайте като PDF.</p>
         </div>
-        <div class="flex gap-2">
-          <button onclick="exportWord()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">
-            <i class="fa-solid fa-file-word mr-1"></i> Изтегли Word (.doc)
-          </button>
-          <button onclick="printReport()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition">
-            <i class="fa-solid fa-print mr-1"></i> Печат / PDF
-          </button>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="exportWord()">📄 Изтегли Word (.doc)</button>
+          <button class="btn btn-outline" onclick="window.print()">🖨 Печат / Запази като PDF</button>
+          <button class="btn btn-danger" onclick="resetAllData()">Изчисти данните</button>
         </div>
       </div>
-      <div id="reportBody" class="prose prose-slate dark:prose-invert max-w-none leading-relaxed"></div>
     </div>
-  </section>
 
-  <!-- GDPR & Regulatory Notice -->
-  <div class="notice-area mt-6 p-4 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-amber-900 dark:text-amber-200 text-xs leading-relaxed flex items-start gap-3 no-print">
-    <i class="fa-solid fa-shield-halved text-base text-amber-600 dark:text-amber-400 mt-0.5"></i>
-    <div>
-      <strong>Поверителност и нормативна бележка:</strong> Всички данни се обработват и съхраняват локално във Вашия браузър (без изпращане към външен сървър). Не въвеждайте ЕГН или лични данни на ученици. Инструментът подпомага структурирането на професионално портфолио и самооценка по Наредба № 15 и не замества официалната атестационна карта на комисията.
-    </div>
-  </div>
+    <div id="reportContainer" class="report-sheet"></div>
+  </section>
 
 </main>
 
-<footer class="text-center text-xs text-slate-500 dark:text-slate-400 py-6 border-t border-slate-200 dark:border-slate-800/80 no-print">
-  Авторска разработка: <a href="index.html" class="font-bold text-blue-600 dark:text-blue-400 hover:underline">д-р Адем Зейнев</a> • Модул за професионално портфолио и самооценка (v3.1 Sync)
-</footer>
-
-<!-- Toast Notification -->
-<div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-  <div class="bg-slate-900 dark:bg-slate-800 text-white border border-slate-700 px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2.5">
-    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
-    <span id="toastMsg">Запазено!</span>
-  </div>
-</div>
+<div id="toast" class="toast"></div>
 
 <script>
-const STORAGE_KEY = "azeynev_attestation_v2"; // 100% съвместимост със старите архиви
-
-const competencies = [
-  { id: "c1", name: "Професионална подготовка", desc: "Педагогическа, психологическа, методическа и предметна подготовка.", group: "Педагогически компетентности" },
-  { id: "c2", name: "Планиране на урока / педагогическата ситуация", desc: "Планиране на учебното съдържание, целите, дейностите и ресурсите.", group: "Педагогически компетентности" },
-  { id: "c3", name: "Организиране и управление на образователния процес", desc: "Подбор на методи, технологии и организация на учебната работа.", group: "Педагогически компетентности" },
-  { id: "c4", name: "Оценяване напредъка на учениците", desc: "Използване на подходящи методи за оценяване и обратна връзка.", group: "Педагогически компетентности" },
-  { id: "c5", name: "Управление на процесите в групата / класа", desc: "Подкрепяща среда, правила, взаимодействие и управление на класа.", group: "Педагогически компетентности" },
-  { id: "c6", name: "Работа в екип и професионално взаимодействие", desc: "Сътрудничество с колеги и участие в дейностите на институцията.", group: "Професионално взаимодействие" },
-  { id: "c7", name: "Взаимодействие с родители и заинтересовани страни", desc: "Комуникация и партньорство в подкрепа на образователния процес.", group: "Професионално взаимодействие" },
-  { id: "c8", name: "Продължаваща квалификация и професионално развитие", desc: "Самооценка, квалификация, иновации и усъвършенстване на практиката.", group: "Професионално развитие" }
-];
-
-const blankState = () => ({ evidence: [], goals: [], ratings: {}, reflection: "", profile: {} });
-let state = blankState();
-let autoSaveTimer = null;
-const $ = id => document.getElementById(id);
-
-function showToast(msg, type = "success") {
-  const toast = $("toast");
-  const icon = $("toastIcon");
-  $("toastMsg").textContent = msg;
-  icon.className = type === "warn"
-    ? "fa-solid fa-triangle-exclamation text-amber-400 text-sm"
-    : type === "error"
-      ? "fa-solid fa-circle-xmark text-rose-400 text-sm"
-      : "fa-solid fa-circle-check text-emerald-400 text-sm";
-  toast.classList.remove("translate-y-20", "opacity-0");
-  clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(() => {
-    toast.classList.add("translate-y-20", "opacity-0");
-  }, 3200);
-}
-
-function toggleDarkMode() {
-  const isDark = document.documentElement.classList.toggle("dark");
-  localStorage.setItem("azeynev_attestation_theme", isDark ? "dark" : "light");
-  $("themeToggle").innerHTML = isDark ? '<i class="fa-solid fa-sun text-amber-300"></i>' : '<i class="fa-solid fa-moon"></i>';
-}
-
-function initTheme() {
-  const savedTheme = localStorage.getItem("azeynev_attestation_theme");
-  if (savedTheme === "dark") {
-    document.documentElement.classList.add("dark");
-    $("themeToggle").innerHTML = '<i class="fa-solid fa-sun text-amber-300"></i>';
-  }
-}
-
-function load() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) state = { ...blankState(), ...JSON.parse(saved) };
-  } catch (e) {
-    console.warn("Неуспешно зареждане", e);
-  }
-}
-
-function getProfileFromInputs() {
-  return Object.fromEntries(["name", "position", "school", "subjects", "qualification", "experience", "profileNotes"].map(id => [id, $(id).value]));
-}
-
-function restoreProfile() {
-  if (!state.profile) return;
-  Object.entries(state.profile).forEach(([k, v]) => {
-    if ($(k)) $(k).value = v || "";
-  });
-}
-
-function saveSilently() {
-  state.profile = getProfileFromInputs();
-  if ($("reflection")) state.reflection = $("reflection").value;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  const ind = $("saveIndicator");
-  if (ind) {
-    const now = new Date().toLocaleTimeString("bg-BG", { hour: "2-digit", minute: "2-digit" });
-    ind.innerHTML = `<i class="fa-solid fa-cloud-check"></i> Запазено в ${now}`;
-  }
-}
-
-function autoSave() {
-  clearTimeout(autoSaveTimer);
-  autoSaveTimer = setTimeout(() => {
-    saveSilently();
-  }, 400);
-}
-
-function saveAll(notify = false) {
-  saveSilently();
-  refresh();
-  if (notify) showToast("Всички данни са запазени локално!");
-}
-
-// Интелигентно категоризиране на извлечените материали от сайта
-function classifyItem(title, desc, typeHint) {
-  const txt = (title + " " + desc + " " + typeHint).toLowerCase();
-  if (txt.includes("cybermath") || txt.includes("полигон") || txt.includes("симулац") || txt.includes("урок") || txt.includes("интерактив") || txt.includes("платформ") || txt.includes("уеб система")) {
-    return { category: "c3", type: "Авторски учебен ресурс / дигитална разработка" };
-  }
-  if (txt.includes("публикац") || txt.includes("статия") || txt.includes("доклад") || txt.includes("конференц") || txt.includes("сборник") || txt.includes("issn") || txt.includes("isbn") || txt.includes("науч")) {
-    return { category: "c8", type: "Научна или методическа публикация" };
-  }
-  if (txt.includes("награда") || txt.includes("грамота") || txt.includes("отличие") || txt.includes("неделчо") || txt.includes("сертификат") || txt.includes("квалификац") || txt.includes("пкс") || txt.includes("доктор")) {
-    return { category: "c8", type: "Квалификация / удостоверение / сертификат" };
-  }
-  if (txt.includes("олимпиад") || txt.includes("състезан") || txt.includes("учениц") || txt.includes("класиране") || txt.includes("оценяв")) {
-    return { category: "c4", type: "Постижения на ученици (олимпиади, състезания)" };
-  }
-  if (txt.includes("проект") || txt.includes("екип") || txt.includes("комисия") || txt.includes("методическ") || txt.includes("училищ")) {
-    return { category: "c6", type: "Работа по проекти / екипни дейности" };
-  }
-  if (txt.includes("родител") || txt.includes("общност")) {
-    return { category: "c7", type: "Взаимодействие с родители и заинтересовани страни" };
-  }
-  return { category: "c1", type: "Друг документ от портфолиото" };
-}
-
-function extractYearDate(text) {
-  const m = text.match(/(20[12]\d)/);
-  return m ? `${m[1]}-06-15` : new Date().toISOString().slice(0, 10);
-}
-
-// Директно четене и парсване на index.html
-async function syncFromSite() {
-  const btn = $("syncBtn");
-  const origHTML = btn.innerHTML;
-  btn.disabled = true;
-  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Извличане...</span>`;
-
-  try {
-    const res = await fetch("index.html?t=" + Date.now());
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const html = await res.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-
-    // 1. Извличане на профилни данни от JSON-LD и метаданни в index.html
-    let personData = null;
-    const ldScripts = doc.querySelectorAll('script[type="application/ld+json"]');
-    ldScripts.forEach(s => {
-      try {
-        const json = JSON.parse(s.textContent);
-        const graph = json["@graph"] || [json];
-        graph.forEach(node => {
-          if (node["@type"] === "Person") personData = node;
-        });
-      } catch (_) {}
-    });
-
-    const metaDesc = doc.querySelector('meta[name="description"]')?.getAttribute("content") || "";
-    const pageTitle = doc.querySelector("title")?.textContent || "";
-
-    state.profile = {
-      name: personData?.name || "д-р Адем Ибушев Зейнев",
-      position: personData?.jobTitle || "Старши учител",
-      school: personData?.worksFor?.name || "СУ „Св. Паисий Хилендарски“ – с. Абланица",
-      subjects: "Математика, информатика, ИТ и специални предмети",
-      qualification: "ОНС „Доктор“",
-      experience: "25+ години педагогически стаж (атестационен период 2022–2026 г.)",
-      profileNotes: metaDesc || "Преподавател по математика, информатика и ИТ, разработчик на интерактивни образователни среди и дигитални инструменти за училищно управление."
-    };
-
-    // 2. Извличане на реални елементи от секциите на index.html (проекти, публикации, награди, хронология)
-    const extracted = [];
-    const seenTitles = new Set(state.evidence.map(e => e.title.toLowerCase().trim()));
-
-    const pushItem = (rawTitle, rawDesc, rawUrl, hint = "") => {
-      const title = rawTitle.replace(/\s+/g, " ").trim();
-      const desc = rawDesc.replace(/\s+/g, " ").trim();
-      if (!title || title.length < 5 || title.length > 220) return;
-      const key = title.toLowerCase();
-      if (seenTitles.has(key)) return;
-      seenTitles.add(key);
-
-      const { category, type } = classifyItem(title, desc, hint);
-      let finalUrl = rawUrl || "";
-      if (finalUrl && !finalUrl.startsWith("http")) {
-        finalUrl = "https://azeynev.github.io/" + finalUrl.replace(/^\.?\//, "");
-      }
-
-      extracted.push({
-        id: "sync_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
-        title,
-        category,
-        type,
-        date: extractYearDate(title + " " + desc),
-        url: finalUrl,
-        desc: desc.slice(0, 320)
-      });
-    };
-
-    // Парсване на карти (проекти, публикации, постижения)
-    doc.querySelectorAll("article, .card, [class*='rounded-2xl']").forEach(card => {
-      const h = card.querySelector("h3, h4");
-      if (!h) return;
-      // Взимаме само българския текст, ако има двуезични span-ове
-      const bgSpan = h.querySelector(".lang-inline-bg");
-      const title = bgSpan ? bgSpan.textContent : h.textContent;
-
-      const p = card.querySelector("p");
-      const pBg = p?.querySelector(".lang-inline-bg");
-      const desc = pBg ? pBg.textContent : (p?.textContent || "");
-
-      const link = card.querySelector("a[href]");
-      const href = link ? link.getAttribute("href") : "";
-
-      if (title && (desc.length > 15 || href)) {
-        pushItem(title, desc, href);
-      }
-    });
-
-    // Парсване на списъци с публикации / награди (<li> в основното съдържание)
-    doc.querySelectorAll("main li").forEach(li => {
-      if (li.closest("nav") || li.closest("header")) return;
-      const bgSpan = li.querySelector(".lang-inline-bg");
-      const text = (bgSpan ? bgSpan.textContent : li.textContent).replace(/\s+/g, " ").trim();
-      if (text.length < 25 || text.length > 450) return;
-      // Пропускаме технически мета-етикети като "• Хостинг:"
-      if (text.startsWith("•") || text.startsWith("Хостинг:") || text.startsWith("Технологии:")) return;
-
-      const link = li.querySelector("a[href]");
-      const href = link ? link.getAttribute("href") : "";
-      const shortTitle = text.length > 110 ? text.slice(0, 107) + "..." : text;
-      pushItem(shortTitle, text, href, "публикация награда");
-    });
-
-    // Добавяме новите доказателства най-отгоре
-    if (extracted.length > 0) {
-      state.evidence = [...extracted, ...state.evidence];
+  const COMPETENCIES = [
+    {
+      id: "c1",
+      code: "1. Педагогическа",
+      title: "1. Планиране и организиране на образователния процес",
+      desc: "Планиране на уроци, диференциран подход, ясно формулирани образователни цели и ефективно управление на учебното време."
+    },
+    {
+      id: "c2",
+      code: "2. Методическа",
+      title: "2. Прилагане на ефективни методи и подходи на преподаване",
+      desc: "Използване на интерактивни методи, проектно-базирано обучение, STEM интеграция и насърчаване на критическото мислене."
+    },
+    {
+      id: "c3",
+      code: "3. Оценяване",
+      title: "3. Оценяване на напредъка и постиженията на учениците",
+      desc: "Обективни критерии за оценяване, формиращо оценяване, конструктивна обратна връзка и проследяване на индивидуалния напредък."
+    },
+    {
+      id: "c4",
+      code: "4. Дигитална",
+      title: "4. Дигитални компетентности и иновации в обучението",
+      desc: "Създаване и внедряване на дигитални образователни ресурси, платформи, симулации и дигитална безопасност."
+    },
+    {
+      id: "c5",
+      code: "5. Социална и гражданска",
+      title: "5. Работа в приобщаваща среда и подкрепа за личностно развитие",
+      desc: "Създаване на позитивен климат в класната стая, работа с ученици със СОП или изявени дарби, превенция на агресията."
+    },
+    {
+      id: "c6",
+      code: "6. Партньорство",
+      title: "6. Взаимодействие с родители и заинтересовани страни",
+      desc: "Ефективна комуникация със семействата, партньорство с университети, институции, НПО и местната общност."
+    },
+    {
+      id: "c7",
+      code: "7. Екипна и организационна",
+      title: "7. Работа в екип и принос към развитието на институцията",
+      desc: "Участие в методически обединения, училищни комисии, проекти, наставничество и споделяне на добри практики."
+    },
+    {
+      id: "c8",
+      code: "8. Професионално развитие",
+      title: "8. Продължаваща квалификация и научна / методическа дейност",
+      desc: "Участие в обучения, конференции, научни публикации, авторски разработки и рефлексия върху собствената практика."
     }
+  ];
 
-    // Попълваме базови самооценки, ако все още няма зададени
-    if (Object.keys(state.ratings).length === 0) {
-      state.ratings = { c1: 5, c2: 5, c3: 5, c4: 5, c5: 5, c6: 5, c7: 4, c8: 5 };
-    }
-    if (!state.reflection) {
-      state.reflection = "Систематично прилагане на иновативни дигитални образователни технологии, авторски интерактивни платформи и научни изследвания в обучението по математика, информатика и киберсигурност.";
-    }
+  const LEVELS = [
+    { val: 1, label: "Ниво 1", sub: "Базово / Начално" },
+    { val: 2, label: "Ниво 2", sub: "Развиващо се" },
+    { val: 3, label: "Ниво 3", sub: "Утвърдено" },
+    { val: 4, label: "Ниво 4", sub: "Високо / Експертно" },
+    { val: 5, label: "Ниво 5", sub: "Образцово / Новаторско" }
+  ];
 
-    restoreProfile();
-    renderCompetencies();
-    refresh();
-    saveSilently();
+  const STORAGE_KEY = "azeynev_attestation_naredba15_v3";
 
-    if (extracted.length > 0) {
-      showToast(`Синхронизирано! Добавени са ${extracted.length} нови доказателства от сайта.`);
-    } else {
-      showToast("Профилът е обновен от index.html (всички доказателства вече са налични).");
-    }
-  } catch (err) {
-    console.warn("Fetch от index.html неуспешен (вероятно файлът е отворен локално през file://):", err);
-    showToast("Отворете през GitHub Pages (https://azeynev.github.io/attestation.html), за да чете автоматично index.html!", "warn");
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = origHTML;
-  }
-}
-
-function renderCompetencies() {
-  $("competencyList").innerHTML = competencies.map(c => {
-    const evCount = state.evidence.filter(e => e.category === c.id).length;
-    const val = Number(state.ratings[c.id]) || 0;
-    return `
-      <div class="p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/40">
-        <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
-          <div>
-            <div class="flex flex-wrap items-center gap-2 mb-1">
-              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">${c.group}</span>
-              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${evCount > 0 ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}">
-                <i class="fa-solid fa-paperclip mr-1"></i>${evCount} доказателства
-              </span>
-            </div>
-            <h3 class="font-bold text-base text-slate-900 dark:text-white">${c.name}</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${c.desc}</p>
-          </div>
-          <div class="text-right">
-            <span id="ratingVal_${c.id}" class="inline-block px-3 py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-black text-sm text-blue-600 dark:text-blue-400">${val || "—"}/5</span>
-          </div>
-        </div>
-        <div class="flex flex-wrap gap-2 my-3">
-          ${[1, 2, 3, 4, 5].map(n => `
-            <label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border text-xs font-bold transition ${val === n ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:border-blue-400'}">
-              <input type="radio" class="hidden" name="${c.id}" value="${n}" ${val === n ? "checked" : ""} onchange="setRating('${c.id}', ${n})">
-              <span>Ниво ${n}</span>
-            </label>
-          `).join("")}
-        </div>
-        <div class="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-          <div id="bar_${c.id}" class="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-300" style="width:${val * 20}%"></div>
-        </div>
-      </div>
-    `;
-  }).join("") + `
-    <div class="pt-3">
-      <label for="reflection" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">Обобщена саморефлексия – силни страни, постижения и области за усъвършенстване</label>
-      <textarea id="reflection" rows="4" oninput="state.reflection=this.value; autoSave()" placeholder="Опишете Вашите изводи от самооценката..." class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">${esc(state.reflection || "")}</textarea>
-    </div>
-  `;
-}
-
-function setRating(id, n) {
-  state.ratings[id] = n;
-  renderCompetencies();
-  refreshStats();
-  saveSilently();
-}
-
-function fillCategorySelects() {
-  const options = competencies.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
-  $("evCategory").innerHTML = options;
-  $("evFilterCat").innerHTML = `<option value="">Всички компетентности</option>` + options;
-}
-
-$("evidenceForm").addEventListener("submit", e => {
-  e.preventDefault();
-  state.evidence.unshift({
-    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-    title: $("evTitle").value.trim(),
-    category: $("evCategory").value,
-    type: $("evType").value,
-    date: $("evDate").value,
-    url: $("evUrl").value.trim(),
-    desc: $("evDesc").value.trim()
-  });
-  e.target.reset();
-  renderCompetencies();
-  refresh();
-  saveSilently();
-  showToast("Доказателството е добавено в портфолиото!");
-});
-
-function renderEvidence() {
-  const q = ($("evSearch")?.value || "").toLowerCase();
-  const catFilter = $("evFilterCat")?.value || "";
-  const rows = state.evidence.filter(e => {
-    const matchText = (e.title + " " + e.type + " " + e.desc).toLowerCase().includes(q);
-    const matchCat = !catFilter || e.category === catFilter;
-    return matchText && matchCat;
-  });
-
-  $("evidenceRows").innerHTML = rows.length ? rows.map(e => {
-    const compName = (competencies.find(c => c.id === e.category) || {}).name || "—";
-    return `
-      <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
-        <td class="py-3.5 px-3">
-          <div class="font-bold text-slate-900 dark:text-white">${esc(e.title)}</div>
-          ${e.desc ? `<div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${esc(e.desc)}</div>` : ""}
-          ${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline mt-1"><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Преглед на ресурса</a>` : ""}
-        </td>
-        <td class="py-3.5 px-3 text-xs font-medium text-slate-700 dark:text-slate-300">${esc(compName)}</td>
-        <td class="py-3.5 px-3"><span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-medium">${esc(e.type)}</span></td>
-        <td class="py-3.5 px-3 text-xs text-slate-500 whitespace-nowrap">${esc(e.date || "—")}</td>
-        <td class="py-3.5 px-3 text-right">
-          <button onclick="deleteEvidence('${e.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-600 dark:text-rose-400 text-xs font-bold transition" title="Изтрий">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  }).join("") : `<tr><td colspan="5" class="py-8 text-center text-sm text-slate-400">Няма намерени доказателства по зададените критерии.</td></tr>`;
-}
-
-function deleteEvidence(id) {
-  if (confirm("Да премахна ли това доказателство от регистъра?")) {
-    state.evidence = state.evidence.filter(e => e.id !== id);
-    renderCompetencies();
-    refresh();
-    saveSilently();
-    showToast("Доказателството е премахнато.", "warn");
-  }
-}
-
-$("goalForm").addEventListener("submit", e => {
-  e.preventDefault();
-  state.goals.unshift({
-    id: Date.now().toString(),
-    title: $("goalTitle").value.trim(),
-    date: $("goalDate").value,
-    status: $("goalStatus").value,
-    result: $("goalResult").value.trim()
-  });
-  e.target.reset();
-  refresh();
-  saveSilently();
-  showToast("Целта е добавена към плана за развитие!");
-});
-
-function cycleGoalStatus(id) {
-  const order = ["Планирана", "В процес", "Изпълнена"];
-  const g = state.goals.find(x => x.id === id);
-  if (!g) return;
-  g.status = order[(order.indexOf(g.status) + 1) % order.length];
-  refresh();
-  saveSilently();
-}
-
-function renderGoals() {
-  $("goalList").innerHTML = state.goals.length ? state.goals.map(g => {
-    const badgeClass = g.status === "Изпълнена"
-      ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300"
-      : g.status === "В процес"
-        ? "bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300"
-        : "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300";
-    return `
-      <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/40 flex flex-wrap items-start justify-between gap-3">
-        <div class="flex-1 min-w-[240px]">
-          <div class="flex flex-wrap items-center gap-2 mb-1">
-            <button onclick="cycleGoalStatus('${g.id}')" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass} hover:opacity-80 transition" title="Кликнете за смяна на статуса">
-              ${esc(g.status)} ↻
-            </button>
-            <span class="text-xs text-slate-400"><i class="fa-regular fa-calendar mr-1"></i>Срок: ${esc(g.date || "не е посочен")}</span>
-          </div>
-          <h4 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white">${esc(g.title)}</h4>
-          ${g.result ? `<p class="text-xs text-slate-600 dark:text-slate-400 mt-1">${esc(g.result)}</p>` : ""}
-        </div>
-        <button onclick="deleteGoal('${g.id}')" class="px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-600 dark:text-rose-400 text-xs font-bold transition">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </div>
-    `;
-  }).join("") : `<div class="py-8 text-center text-sm text-slate-400">Все още няма формулирани цели за професионално развитие.</div>`;
-}
-
-function deleteGoal(id) {
-  state.goals = state.goals.filter(g => g.id !== id);
-  refresh();
-  saveSilently();
-  showToast("Целта е изтрита.", "warn");
-}
-
-function refreshStats() {
-  $("statEvidence").textContent = state.evidence.length;
-  const coveredAreas = new Set(state.evidence.map(e => e.category)).size;
-  $("statCoverage").textContent = `${coveredAreas} / ${competencies.length}`;
-  $("statGoals").textContent = state.goals.length;
-  const doneGoals = state.goals.filter(g => g.status === "Изпълнена").length;
-  $("statGoalsDone").textContent = `${doneGoals} изпълнени`;
-  const vals = Object.values(state.ratings).map(Number).filter(n => n >= 1 && n <= 5);
-  $("statAverage").textContent = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : "—";
-}
-
-function buildReportHTML() {
-  const p = getProfileFromInputs();
-  const avg = Object.values(state.ratings).map(Number).filter(n => n >= 1 && n <= 5);
-  const avgStr = avg.length ? (avg.reduce((a, b) => a + b, 0) / avg.length).toFixed(2) + " / 5.00" : "няма въведени оценки";
-
-  return `
-    <div style="text-align:center; margin-bottom:20px;">
-      <h1 style="font-size:20px; margin:0 0 4px;">ПРОФЕСИОНАЛНО ПОРТФОЛИО И КАРТА ЗА САМООЦЕНКА</h1>
-      <p style="font-size:13px; color:#555; margin:0;">по Наредба № 15 от 22.07.2019 г. за статута и професионалното развитие на учителите, директорите и другите педагогически специалисти</p>
-    </div>
-
-    <h3 style="border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-top:18px;">1. Идентификационни данни на педагогическия специалист</h3>
-    <table style="width:100%; border-collapse:collapse; margin-bottom:14px; font-size:13px;">
-      <tr><td style="padding:5px; border:1px solid #cbd5e1; width:35%;"><strong>Име, презиме и фамилия:</strong></td><td style="padding:5px; border:1px solid #cbd5e1;">${esc(p.name || "—")}</td></tr>
-      <tr><td style="padding:5px; border:1px solid #cbd5e1;"><strong>Заемана длъжност:</strong></td><td style="padding:5px; border:1px solid #cbd5e1;">${esc(p.position || "—")}</td></tr>
-      <tr><td style="padding:5px; border:1px solid #cbd5e1;"><strong>Образователна институция:</strong></td><td style="padding:5px; border:1px solid #cbd5e1;">${esc(p.school || "—")}</td></tr>
-      <tr><td style="padding:5px; border:1px solid #cbd5e1;"><strong>Учебни предмети / направления:</strong></td><td style="padding:5px; border:1px solid #cbd5e1;">${esc(p.subjects || "—")}</td></tr>
-      <tr><td style="padding:5px; border:1px solid #cbd5e1;"><strong>Образование, ПКС / научна степен:</strong></td><td style="padding:5px; border:1px solid #cbd5e1;">${esc(p.qualification || "—")}</td></tr>
-      <tr><td style="padding:5px; border:1px solid #cbd5e1;"><strong>Педагогически стаж и период:</strong></td><td style="padding:5px; border:1px solid #cbd5e1;">${esc(p.experience || "—")}</td></tr>
-    </table>
-    ${p.profileNotes ? `<p style="font-size:13px;"><strong>Професионална мисия и постижения:</strong> ${esc(p.profileNotes)}</p>` : ""}
-
-    <h3 style="border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-top:20px;">2. Матрица за самооценка на компетентностите</h3>
-    <table style="width:100%; border-collapse:collapse; margin-bottom:10px; font-size:13px;">
-      <thead>
-        <tr style="background:#f1f5f9;">
-          <th style="padding:6px; border:1px solid #cbd5e1; text-align:left;">Компетентностна област</th>
-          <th style="padding:6px; border:1px solid #cbd5e1; text-align:center; width:110px;">Самооценка</th>
-          <th style="padding:6px; border:1px solid #cbd5e1; text-align:center; width:120px;">Доказателства</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${competencies.map(c => {
-          const cnt = state.evidence.filter(e => e.category === c.id).length;
-          return `<tr>
-            <td style="padding:6px; border:1px solid #cbd5e1;">${esc(c.name)}</td>
-            <td style="padding:6px; border:1px solid #cbd5e1; text-align:center;"><strong>${state.ratings[c.id] || "—"}</strong> / 5</td>
-            <td style="padding:6px; border:1px solid #cbd5e1; text-align:center;">${cnt} бр.</td>
-          </tr>`;
-        }).join("")}
-      </tbody>
-    </table>
-    <p style="font-size:13px;"><strong>Средна стойност от самооценката:</strong> ${avgStr}</p>
-    <p style="font-size:13px;"><strong>Обобщена рефлексия:</strong> ${esc(state.reflection || "Не е попълнена.")}</p>
-
-    <h3 style="border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-top:20px;">3. Опис на доказателствата в портфолиото (${state.evidence.length} бр.)</h3>
-    ${state.evidence.length ? `
-      <ol style="font-size:13px; padding-left:20px;">
-        ${state.evidence.map(e => `
-          <li style="margin-bottom:6px;">
-            <strong>${esc(e.title)}</strong> (${esc(e.type)}, ${esc(e.date || "без дата")}) — <em>${esc((competencies.find(c => c.id === e.category) || {}).name || "")}</em>.
-            ${e.desc ? esc(e.desc) : ""}
-            ${e.url ? `<br><span style="color:#1d4ed8;">Връзка: ${esc(e.url)}</span>` : ""}
-          </li>
-        `).join("")}
-      </ol>
-    ` : `<p style="font-size:13px;">Няма въведени доказателства.</p>`}
-
-    <h3 style="border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-top:20px;">4. План за професионално развитие (${state.goals.length} цели)</h3>
-    ${state.goals.length ? `
-      <ol style="font-size:13px; padding-left:20px;">
-        ${state.goals.map(g => `
-          <li style="margin-bottom:6px;">
-            <strong>${esc(g.title)}</strong> — Статус: <em>${esc(g.status)}</em>, Срок: ${esc(g.date || "непосочен")}.
-            ${g.result ? `<br>Очакван резултат: ${esc(g.result)}` : ""}
-          </li>
-        `).join("")}
-      </ol>
-    ` : `<p style="font-size:13px;">Няма въведени цели.</p>`}
-
-    <p style="font-size:11px; color:#64748b; margin-top:24px; border-top:1px solid #e2e8f0; padding-top:8px;">
-      Дата на генериране: ${new Date().toLocaleDateString("bg-BG")} г. • Документът е изготвен чрез интерактивния модул за професионално портфолио (azeynev.github.io).
-    </p>
-  `;
-}
-
-function buildReport() {
-  $("reportBody").innerHTML = buildReportHTML();
-}
-
-function refresh() {
-  renderEvidence();
-  renderGoals();
-  refreshStats();
-  buildReport();
-}
-
-function printReport() {
-  saveSilently();
-  buildReport();
-  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-  $("report").classList.add("active");
-  window.print();
-  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === "report"));
-}
-
-function exportWord() {
-  saveSilently();
-  const content = buildReportHTML();
-  const wordDoc = `
-    <html xmlns:o='urn:schemas-microsoft-com:office:office'
-          xmlns:w='urn:schemas-microsoft-com:office:word'
-          xmlns='http://www.w3.org/TR/REC-html40'>
-    <head><meta charset='utf-8'><title>Професионално портфолио</title>
-    <style>body{font-family:Calibri,Arial,sans-serif;line-height:1.5;color:#111}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:6px}</style>
-    </head><body>${content}</body></html>
-  `;
-  const blob = new Blob(['﻿', wordDoc], { type: 'application/msword' });
-  const a = document.createElement("a");
-  const pName = ($("name").value.trim() || "portfolio").replace(/\s+/g, "_");
-  a.href = URL.createObjectURL(blob);
-  a.download = `Portfolio_Naredba15_${pName}.doc`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-  showToast("Word документът е изтеглен!");
-}
-
-function exportJSON() {
-  saveSilently();
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "attestation-portfolio-backup.json";
-  a.click();
-  URL.revokeObjectURL(a.href);
-  showToast("Архивът (.json) е изтеглен!");
-}
-
-function importJSON(ev) {
-  const file = ev.target.files[0];
-  if (!file) return;
-  const r = new FileReader();
-  r.onload = () => {
-    try {
-      const x = JSON.parse(r.result);
-      if (!x || !Array.isArray(x.evidence) || !Array.isArray(x.goals)) throw Error();
-      state = { ...blankState(), ...x };
-      restoreProfile();
-      renderCompetencies();
-      refresh();
-      saveSilently();
-      showToast("Архивът е зареден успешно!");
-    } catch (e) {
-      alert("Избраният файл не е валиден архив на този модул.");
-    }
+  let state = {
+    profile: {
+      name: "д-р Айдън Зейнев",
+      position: "Учител по математика и информатика",
+      institution: "",
+      period: "2022 – 2026 г.",
+      bio: ""
+    },
+    ratings: { c1: 4, c2: 4, c3: 4, c4: 5, c5: 4, c6: 4, c7: 4, c8: 5 },
+    notes: {},
+    evidences: [],
+    goals: []
   };
-  r.readAsText(file);
-  ev.target.value = "";
-}
 
-function resetData() {
-  if (confirm("Сигурни ли сте? Това ще изтрие всички локално запазени данни в браузъра.")) {
-    localStorage.removeItem(STORAGE_KEY);
-    state = blankState();
-    document.querySelectorAll("#profile input, #profile textarea").forEach(x => x.value = "");
-    renderCompetencies();
-    refresh();
-    showToast("Данните са изчистени.", "warn");
+  function showToast(msg) {
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    setTimeout(() => el.classList.remove("show"), 3200);
   }
-}
 
-function esc(s) {
-  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
-
-function updateTabStyles() {
-  document.querySelectorAll(".tab").forEach(t => {
-    if (t.classList.contains("active")) {
-      t.classList.add("bg-white", "dark:bg-slate-800", "text-blue-600", "dark:text-blue-400", "shadow-sm");
-      t.classList.remove("text-slate-600", "dark:text-slate-400");
-    } else {
-      t.classList.remove("bg-white", "dark:bg-slate-800", "text-blue-600", "dark:text-blue-400", "shadow-sm");
-      t.classList.add("text-slate-600", "dark:text-slate-400");
+  function loadState() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        state = {
+          profile: { ...state.profile, ...(parsed.profile || {}) },
+          ratings: { ...state.ratings, ...(parsed.ratings || {}) },
+          notes: parsed.notes || {},
+          evidences: Array.isArray(parsed.evidences) ? parsed.evidences : [],
+          goals: Array.isArray(parsed.goals) ? parsed.goals : []
+        };
+      }
+    } catch (e) {
+      console.warn("Грешка при зареждане от localStorage:", e);
     }
-  });
-}
+  }
 
-document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
-  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === t));
-  document.querySelectorAll(".panel").forEach(x => x.classList.toggle("active", x.id === t.dataset.tab));
-  updateTabStyles();
-  if (t.dataset.tab === "report") buildReport();
-}));
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.warn("Грешка при запис в localStorage:", e);
+    }
+  }
 
-initTheme();
-load();
-restoreProfile();
-fillCategorySelects();
-renderCompetencies();
-updateTabStyles();
-refresh();
+  function switchTab(tabId) {
+    document.querySelectorAll(".tab-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.tab === tabId);
+    });
+    document.querySelectorAll(".tab-panel").forEach(p => {
+      p.classList.toggle("active", p.id === "tab-" + tabId);
+    });
+    if (tabId === "report") renderReport();
+  }
+
+  function populateSelects() {
+    const options = COMPETENCIES.map(c => `<option value="${c.id}">${c.title}</option>`).join("");
+    document.getElementById("evComp").innerHTML = options;
+    document.getElementById("goalComp").innerHTML = options;
+  }
+
+  function renderProfileInputs() {
+    document.getElementById("profName").value = state.profile.name || "";
+    document.getElementById("profPosition").value = state.profile.position || "";
+    document.getElementById("profInstitution").value = state.profile.institution || "";
+    document.getElementById("profPeriod").value = state.profile.period || "";
+    document.getElementById("profBio").value = state.profile.bio || "";
+  }
+
+  function saveProfile() {
+    state.profile.name = document.getElementById("profName").value.trim();
+    state.profile.position = document.getElementById("profPosition").value.trim();
+    state.profile.institution = document.getElementById("profInstitution").value.trim();
+    state.profile.period = document.getElementById("profPeriod").value.trim();
+    state.profile.bio = document.getElementById("profBio").value.trim();
+    saveState();
+    renderReport();
+  }
+
+  function setRating(compId, val) {
+    state.ratings[compId] = val;
+    saveState();
+    renderAll();
+    showToast("Оценката е обновена.");
+  }
+
+  function saveCompNote(compId, text) {
+    state.notes[compId] = text;
+    saveState();
+  }
+
+  function escapeHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderMatrix() {
+    const container = document.getElementById("competenciesContainer");
+    let total = 0;
+
+    container.innerHTML = COMPETENCIES.map(c => {
+      const current = Number(state.ratings[c.id]) || 0;
+      total += current;
+      const compEvidences = state.evidences.filter(e => e.compId === c.id);
+
+      const levelButtons = LEVELS.map(l => `
+        <button type="button" class="level-btn ${current === l.val ? "selected" : ""}" onclick="setRating('${c.id}', ${l.val})">
+          <strong>${l.label}</strong>
+          <span>${l.sub}</span>
+        </button>
+      `).join("");
+
+      const evidencesHtml = compEvidences.length > 0
+        ? `<div class="evidence-chips">
+            ${compEvidences.map(ev => {
+              const titleSafe = escapeHtml(ev.title);
+              const typeSafe = escapeHtml(ev.type || "Артефакт");
+              if (ev.link) {
+                return `<a href="${escapeHtml(ev.link)}" target="_blank" rel="noopener" class="evidence-chip" title="${escapeHtml(ev.desc || ev.title)}">
+                  <span class="chip-type">${typeSafe}</span>
+                  <span>${titleSafe} ↗</span>
+                </a>`;
+              }
+              return `<button type="button" class="evidence-chip" onclick="switchTab('evidences')" title="${escapeHtml(ev.desc || ev.title)}">
+                <span class="chip-type">${typeSafe}</span>
+                <span>${titleSafe}</span>
+              </button>`;
+            }).join("")}
+          </div>`
+        : `<div class="no-evidence-hint">
+            Няма прикачени доказателства към тази област — <a onclick="preselectEvidenceComp('${c.id}')">+ добави доказателство</a>.
+          </div>`;
+
+      return `
+        <div class="comp-item">
+          <div class="comp-header">
+            <div>
+              <div class="comp-title">${c.title}</div>
+              <div class="comp-desc">${c.desc}</div>
+            </div>
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+              <span class="badge ${compEvidences.length > 0 ? "badge-green" : "badge-slate"}">${compEvidences.length} доказателства</span>
+              <span class="badge badge-blue">Оценка: ${current} / 5</span>
+            </div>
+          </div>
+
+          <div class="level-selector">${levelButtons}</div>
+
+          <div class="comp-evidences-box">
+            <div class="comp-evidences-label">
+              <span>Прикачени доказателства по тази компетентност:</span>
+              <a style="color:var(--primary); cursor:pointer; font-weight:600;" onclick="preselectEvidenceComp('${c.id}')">+ Добави</a>
+            </div>
+            ${evidencesHtml}
+          </div>
+
+          <div class="form-group" style="margin-bottom:0; margin-top:0.5rem;">
+            <label for="note-${c.id}" style="font-size:0.8rem;">Самооценка и аргументация за постигнатото ниво:</label>
+            <input type="text" id="note-${c.id}" value="${escapeHtml(state.notes[c.id] || "")}"
+              placeholder="Опишете накратко конкретния си принос в тази област..."
+              oninput="saveCompNote('${c.id}', this.value)" />
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    document.getElementById("matrixTotalBadge").textContent = `Общ бал: ${total} / 40`;
+  }
+
+  function preselectEvidenceComp(compId) {
+    switchTab("evidences");
+    const sel = document.getElementById("evComp");
+    if (sel) sel.value = compId;
+    const titleInput = document.getElementById("evTitle");
+    if (titleInput) titleInput.focus();
+  }
+
+  function renderOverview() {
+    const scores = COMPETENCIES.map(c => Number(state.ratings[c.id]) || 0);
+    const sum = scores.reduce((a, b) => a + b, 0);
+    const avg = (sum / COMPETENCIES.length).toFixed(2);
+
+    document.getElementById("statAvgScore").textContent = `${avg} / 5.00`;
+    let ratingLabel = "Недостатъчно данни";
+    if (avg >= 4.5) ratingLabel = "Образцово изпълнение (Висока оценка)";
+    else if (avg >= 3.75) ratingLabel = "Надвишава изискванията";
+    else if (avg >= 2.75) ratingLabel = "Отговаря на изискванията";
+    else if (avg > 0) ratingLabel = "Отговаря частично на изискванията";
+    document.getElementById("statRatingText").textContent = ratingLabel;
+
+    document.getElementById("statEvidenceCount").textContent = state.evidences.length;
+    document.getElementById("statGoalsCount").textContent = state.goals.length;
+
+    const tbody = document.getElementById("overviewMatrixBody");
+    tbody.innerHTML = COMPETENCIES.map(c => {
+      const val = Number(state.ratings[c.id]) || 0;
+      const evCount = state.evidences.filter(e => e.compId === c.id).length;
+      const statusBadge = evCount > 0
+        ? `<span class="badge badge-green">Подкрепена с доказателства</span>`
+        : `<span class="badge badge-amber">Без прикачени доказателства</span>`;
+
+      return `
+        <tr>
+          <td><strong>${c.title}</strong></td>
+          <td><span class="badge badge-blue">${val} / 5</span></td>
+          <td>${evCount}</td>
+          <td>${statusBadge}</td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function addEvidence() {
+    const title = document.getElementById("evTitle").value.trim();
+    const compId = document.getElementById("evComp").value;
+    const type = document.getElementById("evType").value;
+    const date = document.getElementById("evDate").value.trim();
+    const link = document.getElementById("evLink").value.trim();
+    const desc = document.getElementById("evDesc").value.trim();
+
+    if (!title) {
+      showToast("Въведете наименование на доказателството.");
+      return;
+    }
+
+    state.evidences.push({
+      id: "ev_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+      title, compId, type, date, link, desc
+    });
+
+    document.getElementById("evTitle").value = "";
+    document.getElementById("evDate").value = "";
+    document.getElementById("evLink").value = "";
+    document.getElementById("evDesc").value = "";
+
+    saveState();
+    renderAll();
+    showToast("Доказателството е добавено.");
+  }
+
+  function deleteEvidence(id) {
+    state.evidences = state.evidences.filter(e => e.id !== id);
+    saveState();
+    renderAll();
+    showToast("Доказателството е премахнато.");
+  }
+
+  function renderEvidences() {
+    const tbody = document.getElementById("evidencesTableBody");
+    if (state.evidences.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--muted); padding:1.5rem;">
+        Все още няма добавени доказателства. Натиснете „Зареди от сайта (index.html)“ или добавете ръчно по-горе.
+      </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = state.evidences.map(ev => {
+      const comp = COMPETENCIES.find(c => c.id === ev.compId);
+      const linkHtml = ev.link ? ` <a href="${escapeHtml(ev.link)}" target="_blank" rel="noopener" style="color:var(--primary); font-weight:600;">[Отвори ↗]</a>` : "";
+      const descHtml = ev.desc ? `<div style="font-size:0.8rem; color:var(--muted); margin-top:0.2rem;">${escapeHtml(ev.desc)}</div>` : "";
+      return `
+        <tr>
+          <td><strong>${escapeHtml(ev.title)}</strong>${linkHtml}${descHtml}</td>
+          <td>${escapeHtml(ev.type)}</td>
+          <td><span class="badge badge-slate">${comp ? comp.code : ev.compId}</span></td>
+          <td>${escapeHtml(ev.date || "—")}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteEvidence('${ev.id}')">Изтрий</button></td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function addGoal() {
+    const title = document.getElementById("goalTitle").value.trim();
+    const compId = document.getElementById("goalComp").value;
+    const indicator = document.getElementById("goalIndicator").value.trim();
+    const deadline = document.getElementById("goalDeadline").value.trim();
+
+    if (!title) {
+      showToast("Въведете цел за развитие.");
+      return;
+    }
+
+    state.goals.push({
+      id: "g_" + Date.now(),
+      title, compId, indicator, deadline
+    });
+
+    document.getElementById("goalTitle").value = "";
+    document.getElementById("goalIndicator").value = "";
+    document.getElementById("goalDeadline").value = "";
+
+    saveState();
+    renderAll();
+    showToast("Целта е добавена в плана.");
+  }
+
+  function deleteGoal(id) {
+    state.goals = state.goals.filter(g => g.id !== id);
+    saveState();
+    renderAll();
+  }
+
+  function renderGoals() {
+    const tbody = document.getElementById("goalsTableBody");
+    if (state.goals.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--muted); padding:1.5rem;">
+        Няма въведени цели за следващ атестационен период.
+      </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = state.goals.map(g => {
+      const comp = COMPETENCIES.find(c => c.id === g.compId);
+      return `
+        <tr>
+          <td><strong>${escapeHtml(g.title)}</strong></td>
+          <td><span class="badge badge-slate">${comp ? comp.code : g.compId}</span></td>
+          <td>${escapeHtml(g.indicator || "—")}</td>
+          <td>${escapeHtml(g.deadline || "—")}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteGoal('${g.id}')">Изтрий</button></td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function renderReport() {
+    const container = document.getElementById("reportContainer");
+    const scores = COMPETENCIES.map(c => Number(state.ratings[c.id]) || 0);
+    const sum = scores.reduce((a, b) => a + b, 0);
+    const avg = (sum / COMPETENCIES.length).toFixed(2);
+
+    const matrixRows = COMPETENCIES.map(c => {
+      const val = Number(state.ratings[c.id]) || 0;
+      const compEvs = state.evidences.filter(e => e.compId === c.id);
+      const evNames = compEvs.length > 0
+        ? compEvs.map(e => `• ${escapeHtml(e.title)}`).join("<br>")
+        : "<em>—</em>";
+      return `
+        <tr>
+          <td><strong>${c.title}</strong></td>
+          <td style="text-align:center;"><strong>${val} / 5</strong></td>
+          <td>${evNames}</td>
+          <td>${escapeHtml(state.notes[c.id] || "—")}</td>
+        </tr>
+      `;
+    }).join("");
+
+    const evRows = state.evidences.length
+      ? state.evidences.map((ev, idx) => {
+          const comp = COMPETENCIES.find(c => c.id === ev.compId);
+          return `
+            <tr>
+              <td>${idx + 1}</td>
+              <td><strong>${escapeHtml(ev.title)}</strong>${ev.desc ? `<br><small>${escapeHtml(ev.desc)}</small>` : ""}</td>
+              <td>${escapeHtml(ev.type)}</td>
+              <td>${comp ? comp.code : ""}</td>
+              <td>${escapeHtml(ev.date || "—")}</td>
+            </tr>
+          `;
+        }).join("")
+      : `<tr><td colspan="5">Няма въведени доказателства.</td></tr>`;
+
+    const goalRows = state.goals.length
+      ? state.goals.map((g, idx) => {
+          const comp = COMPETENCIES.find(c => c.id === g.compId);
+          return `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${escapeHtml(g.title)}</td>
+              <td>${comp ? comp.code : ""}</td>
+              <td>${escapeHtml(g.indicator || "—")}</td>
+              <td>${escapeHtml(g.deadline || "—")}</td>
+            </tr>
+          `;
+        }).join("")
+      : `<tr><td colspan="5">Няма планирани цели.</td></tr>`;
+
+    container.innerHTML = `
+      <h1>КАРТА ЗА САМООЦЕНКА И АТЕСТИРАНЕ НА ПЕДАГОГИЧЕСКИ СПЕЦИАЛИСТ</h1>
+      <div class="subtitle">Съгласно Наредба № 15 от 22.07.2019 г. за статута и професионалното развитие на учителите, директорите и другите педагогически специалисти</div>
+
+      <h3>1. Общи данни за педагогическия специалист</h3>
+      <table>
+        <tr><th style="width:30%;">Трите имена:</th><td>${escapeHtml(state.profile.name || "—")}</td></tr>
+        <tr><th>Длъжност / ПКС:</th><td>${escapeHtml(state.profile.position || "—")}</td></tr>
+        <tr><th>Образователна институция:</th><td>${escapeHtml(state.profile.institution || "—")}</td></tr>
+        <tr><th>Атестационен период:</th><td>${escapeHtml(state.profile.period || "—")}</td></tr>
+        <tr><th>Общ резултат (самооценка):</th><td><strong>${sum} / 40 точки (Среден бал: ${avg} / 5.00)</strong></td></tr>
+      </table>
+      ${state.profile.bio ? `<p style="margin-top:0.75rem; font-size:0.9rem;"><strong>Професионално резюме:</strong> ${escapeHtml(state.profile.bio)}</p>` : ""}
+
+      <h3>2. Оценка по професионални компетентности и прилежащи доказателства</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:28%;">Компетентностна област</th>
+            <th style="width:10%; text-align:center;">Ниво</th>
+            <th style="width:32%;">Прикачени доказателства</th>
+            <th style="width:30%;">Аргументация / Самооценка</th>
+          </tr>
+        </thead>
+        <tbody>${matrixRows}</tbody>
+      </table>
+
+      <h3>3. Опис на доказателствата и професионалните постижения</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:5%;">№</th>
+            <th style="width:40%;">Наименование и описание</th>
+            <th style="width:25%;">Вид артефакт</th>
+            <th style="width:20%;">Компетентност</th>
+            <th style="width:10%;">Година</th>
+          </tr>
+        </thead>
+        <tbody>${evRows}</tbody>
+      </table>
+
+      <h3>4. Насоки и цели за професионално развитие през следващия период</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:5%;">№</th>
+            <th style="width:35%;">Цел за развитие</th>
+            <th style="width:20%;">Компетентност</th>
+            <th style="width:28%;">Индикатор за успех</th>
+            <th style="width:12%;">Срок</th>
+          </tr>
+        </thead>
+        <tbody>${goalRows}</tbody>
+      </table>
+
+      <div style="margin-top:2rem; display:flex; justify-content:space-between; font-size:0.9rem;">
+        <div>Дата: ${new Date().toLocaleDateString("bg-BG")} г.</div>
+        <div>Подпис: _______________________</div>
+      </div>
+    `;
+  }
+
+  function classifyEvidence(title, text) {
+    const t = (title + " " + text).toLowerCase();
+    if (t.includes("cybermath") || t.includes("платформа") || t.includes("софтуер") || t.includes("уеб") || t.includes("дигитал") || t.includes("ии") || t.includes("ai")) {
+      return { compId: "c4", type: "Дигитален ресурс / Софтуер" };
+    }
+    if (t.includes("публикац") || t.includes("статия") || t.includes("конференц") || t.includes("доклад") || t.includes("науч") || t.includes("монограф")) {
+      return { compId: "c8", type: "Научна публикация / Доклад" };
+    }
+    if (t.includes("олимпиад") || t.includes("състезан") || t.includes("учениц") || t.includes("наград")) {
+      return { compId: "c5", type: "Постижения на ученици (олимпиади / проекти)" };
+    }
+    if (t.includes("проект") || t.includes("еразъм") || t.includes("комиси") || t.includes("екип")) {
+      return { compId: "c7", type: "Участие в комисии / Проектна дейност" };
+    }
+    if (t.includes("сертификат") || t.includes("квалификац") || t.includes("обучен") || t.includes("пкс")) {
+      return { compId: "c8", type: "Удостоверение / Сертификат (квалификация)" };
+    }
+    return { compId: "c2", type: "Открит урок / Иновативна практика" };
+  }
+
+  async function syncFromPortfolio() {
+    try {
+      const resp = await fetch("index.html?nocache=" + Date.now());
+      if (!resp.ok) throw new Error("Файлът index.html не беше открит.");
+      const html = await resp.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+
+      const h1 = doc.querySelector("h1");
+      if (h1 && h1.textContent.trim().length > 3 && h1.textContent.trim().length < 60) {
+        state.profile.name = h1.textContent.trim();
+      }
+
+      const existingTitles = new Set(state.evidences.map(e => e.title.toLowerCase()));
+      let added = 0;
+
+      const candidates = doc.querySelectorAll("article, .project-card, .card, .publication-item, section li");
+      candidates.forEach(el => {
+        const heading = el.querySelector("h2, h3, h4, strong");
+        const title = heading ? heading.textContent.trim() : el.textContent.trim().split("\n")[0].trim();
+        if (!title || title.length < 6 || title.length > 140) return;
+        if (title.toLowerCase().includes("атестация") || title.toLowerCase().includes("навигация")) return;
+        if (existingTitles.has(title.toLowerCase())) return;
+
+        const fullText = el.textContent.trim();
+        const yearMatch = fullText.match(/20[12]\d/);
+        const linkEl = el.querySelector("a[href]");
+        const href = linkEl ? linkEl.getAttribute("href") : "";
+        const resolvedLink = href && !href.startsWith("#") ? href : "";
+
+        const classified = classifyEvidence(title, fullText);
+        state.evidences.push({
+          id: "sync_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+          title,
+          compId: classified.compId,
+          type: classified.type,
+          date: yearMatch ? yearMatch[0] : "",
+          link: resolvedLink,
+          desc: fullText.replace(title, "").trim().slice(0, 140)
+        });
+        existingTitles.add(title.toLowerCase());
+        added++;
+      });
+
+      saveState();
+      renderAll();
+      if (added > 0) {
+        showToast(`Синхронизирани са ${added} нови доказателства от index.html!`);
+      } else {
+        showToast("Портфолиото е проверено — всички елементи вече са заредени.");
+      }
+    } catch (err) {
+      showToast("Неуспешно четене на index.html: " + err.message);
+    }
+  }
+
+  function exportJSON() {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "azeynev-attestation.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("JSON архивът е изтеглен.");
+  }
+
+  function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        state = {
+          profile: { ...state.profile, ...(imported.profile || {}) },
+          ratings: { ...state.ratings, ...(imported.ratings || {}) },
+          notes: imported.notes || {},
+          evidences: Array.isArray(imported.evidences) ? imported.evidences : [],
+          goals: Array.isArray(imported.goals) ? imported.goals : []
+        };
+        saveState();
+        renderAll();
+        showToast("Данните са заредени успешно от JSON файла.");
+      } catch {
+        showToast("Невалиден JSON файл.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function exportWord() {
+    renderReport();
+    const content = document.getElementById("reportContainer").innerHTML;
+    const docHtml = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset='utf-8'><title>Атестационен отчет</title>
+      <style>
+        body { font-family: "Times New Roman", serif; font-size: 12pt; }
+        h1 { font-size: 15pt; text-align: center; }
+        .subtitle { text-align: center; font-size: 10pt; margin-bottom: 16pt; color: #333; }
+        h3 { font-size: 13pt; margin-top: 14pt; color: #1e3a8a; border-bottom: 1px solid #1e3a8a; }
+        table { width: 100%; border-collapse: collapse; margin-top: 6pt; }
+        th, td { border: 1px solid #444; padding: 5pt; text-align: left; vertical-align: top; font-size: 10.5pt; }
+        th { background-color: #f0f4f8; }
+      </style>
+      </head><body>${content}</body></html>
+    `;
+    const blob = new Blob(['\ufeff', docHtml], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Atestacia-Naredba-15.doc';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("Word документът (.doc) е изтеглен.");
+  }
+
+  function resetAllData() {
+    if (!confirm("Сигурни ли сте, че искате да изчистите всички въведени данни в браузъра?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+
+  function renderAll() {
+    renderProfileInputs();
+    renderMatrix();
+    renderOverview();
+    renderEvidences();
+    renderGoals();
+    renderReport();
+  }
+
+  // Init
+  loadState();
+  populateSelects();
+  renderAll();
 </script>
 </body>
 </html>
