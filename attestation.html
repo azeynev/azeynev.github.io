@@ -542,7 +542,7 @@
         </div>
         <div class="form-group">
           <label for="profInstitution">Образователна институция</label>
-          <input type="text" id="profInstitution" placeholder="Име на училището / институцията" oninput="saveProfile()" />
+          <input type="text" id="profInstitution" placeholder="напр. СУ „Св. Паисий Хилендарски“, с. Абланица" oninput="saveProfile()" />
         </div>
         <div class="form-group">
           <label for="profPeriod">Атестационен период</label>
@@ -804,7 +804,7 @@
     { val: 5, label: "Ниво 5", sub: "Образцово / Новаторско" }
   ];
 
-  const STORAGE_KEY = "adem_zeynev_attestation_naredba15_v6";
+  const STORAGE_KEY = "adem_zeynev_attestation_naredba15_v7";
 
   const DEFAULT_EVIDENCES = [
     {
@@ -885,7 +885,7 @@
     profile: {
       name: "д-р Адем Зейнев",
       position: "д-р, Учител по математика и информатика",
-      institution: "",
+      institution: "СУ „Св. Паисий Хилендарски“, с. Абланица",
       period: "2022 – 2026 г.",
       bio: "Доктор (PhD) с фокус върху съвременното обучение по математика, информатика, киберсигурност и внедряване на авторски дигитални образователни платформи."
     },
@@ -986,11 +986,15 @@
 
   function loadState() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("adem_zeynev_attestation_naredba15_v6");
       if (saved) {
         const parsed = JSON.parse(saved);
+        const loadedProfile = { ...state.profile, ...(parsed.profile || {}) };
+        if (!loadedProfile.institution) {
+          loadedProfile.institution = "СУ „Св. Паисий Хилендарски“, с. Абланица";
+        }
         state = {
-          profile: { ...state.profile, ...(parsed.profile || {}) },
+          profile: loadedProfile,
           ratings: { ...state.ratings, ...(parsed.ratings || {}) },
           manualRatings: parsed.manualRatings || {},
           notes: { ...state.notes, ...(parsed.notes || {}) },
@@ -1623,6 +1627,7 @@
     if (!isUnlocked) return;
     if (!confirm("Сигурни ли сте, че искате да възстановите началния експертен профил с 8-те доказателства?")) return;
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("adem_zeynev_attestation_naredba15_v6");
     location.reload();
   }
 
