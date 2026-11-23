@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Атестация по Наредба № 15 | Професионално портфолио</title>
+  <title>Атестация по Наредба № 15 | Професионално портфолио — д-р Айдън Зейнев</title>
   <style>
     :root {
       --bg: #0f172a;
       --surface: #1e293b;
-      --surface-light: #334155;
       --card: #ffffff;
       --page-bg: #f1f5f9;
       --text: #0f172a;
@@ -18,7 +17,6 @@
       --primary-hover: #1e40af;
       --accent: #059669;
       --accent-hover: #047857;
-      --warning: #d97706;
       --danger: #dc2626;
       --radius: 12px;
       --shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
@@ -36,14 +34,11 @@
     header {
       background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
       color: #fff;
-      padding: 1.5rem 1.25rem 1.25rem;
+      padding: 1.35rem 1.25rem 1.1rem;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     }
 
-    .container {
-      max-width: 1120px;
-      margin: 0 auto;
-    }
+    .container { max-width: 1120px; margin: 0 auto; }
 
     .header-top {
       display: flex;
@@ -51,19 +46,28 @@
       justify-content: space-between;
       align-items: center;
       gap: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .brand .eyebrow {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #93c5fd;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
     }
 
     .brand h1 {
-      font-size: 1.45rem;
+      font-size: 1.35rem;
       font-weight: 700;
       letter-spacing: -0.01em;
     }
 
     .brand p {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: #cbd5e1;
-      margin-top: 0.2rem;
+      margin-top: 0.15rem;
     }
 
     .header-actions {
@@ -76,10 +80,10 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.55rem 0.95rem;
+      padding: 0.5rem 0.9rem;
       border-radius: 8px;
       border: 1px solid transparent;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -120,16 +124,16 @@
       flex-wrap: wrap;
       gap: 0.4rem;
       border-top: 1px solid rgba(255, 255, 255, 0.15);
-      padding-top: 0.9rem;
+      padding-top: 0.85rem;
     }
 
     .tab-btn {
       background: transparent;
       color: #cbd5e1;
       border: none;
-      padding: 0.55rem 1rem;
+      padding: 0.5rem 0.95rem;
       border-radius: 8px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
       transition: 0.15s;
@@ -153,7 +157,7 @@
     }
 
     .card h2 {
-      font-size: 1.15rem;
+      font-size: 1.12rem;
       margin-bottom: 0.75rem;
       color: #0f172a;
       display: flex;
@@ -182,8 +186,8 @@
       padding: 1rem;
     }
 
-    .stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
-    .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--primary); margin: 0.25rem 0; }
+    .stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+    .stat-value { font-size: 1.7rem; font-weight: 800; color: var(--primary); margin: 0.25rem 0; }
     .stat-sub { font-size: 0.82rem; color: var(--muted); }
 
     label { display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 0.3rem; }
@@ -207,7 +211,6 @@
 
     .form-group { margin-bottom: 0.85rem; }
 
-    /* Competence Matrix Cards */
     .comp-item {
       border: 1px solid #e2e8f0;
       border-radius: 10px;
@@ -268,10 +271,9 @@
       box-shadow: inset 0 0 0 1px var(--primary);
     }
 
-    /* Evidence Chips inside Matrix */
     .comp-evidences-box {
-      margin: 0.75rem 0;
-      padding: 0.65rem 0.8rem;
+      margin: 0.7rem 0;
+      padding: 0.6rem 0.8rem;
       background: #f8fafc;
       border: 1px dashed #cbd5e1;
       border-radius: 8px;
@@ -297,7 +299,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      padding: 0.3rem 0.65rem;
+      padding: 0.28rem 0.6rem;
       background: #ffffff;
       border: 1px solid #cbd5e1;
       border-radius: 6px;
@@ -319,7 +321,7 @@
       font-weight: 700;
       color: #1d4ed8;
       background: #dbeafe;
-      padding: 0.1rem 0.35rem;
+      padding: 0.08rem 0.35rem;
       border-radius: 4px;
     }
 
@@ -337,13 +339,11 @@
       font-weight: 600;
     }
 
-    /* Tables */
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
     th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
     th { background: #f8fafc; font-weight: 700; color: #334155; }
 
-    /* Toast */
     .toast {
       position: fixed;
       bottom: 1.25rem;
@@ -362,7 +362,6 @@
     }
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    /* Print / Report styling */
     .report-sheet {
       background: #fff;
       padding: 2rem;
@@ -388,8 +387,9 @@
   <div class="container">
     <div class="header-top">
       <div class="brand">
-        <h1>Атестация по Наредба № 15</h1>
-        <p>Интерактивна карта на професионалните компетентности, доказателства и кариерен план</p>
+        <div class="eyebrow">Дигитално портфолио • Наредба № 15 (МОН)</div>
+        <h1>Модул за атестиране на педагогически специалисти</h1>
+        <p>Матрица на компетентностите, доказателствен материал и кариерен план</p>
       </div>
       <div class="header-actions">
         <a href="index.html" class="btn btn-ghost">← Към портфолиото</a>
@@ -403,11 +403,11 @@
     </div>
 
     <nav class="tabs">
-      <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">1. Профил и обобщение</button>
+      <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">1. Обобщение</button>
       <button class="tab-btn" data-tab="matrix" onclick="switchTab('matrix')">2. Матрица на компетентностите</button>
-      <button class="tab-btn" data-tab="evidences" onclick="switchTab('evidences')">3. Доказателства и артефакти</button>
-      <button class="tab-btn" data-tab="goals" onclick="switchTab('goals')">4. Насоки и цели за развитие</button>
-      <button class="tab-btn" data-tab="report" onclick="switchTab('report')">5. Официален отчет (PDF / Word)</button>
+      <button class="tab-btn" data-tab="evidences" onclick="switchTab('evidences')">3. Доказателства</button>
+      <button class="tab-btn" data-tab="goals" onclick="switchTab('goals')">4. Насоки и цели</button>
+      <button class="tab-btn" data-tab="report" onclick="switchTab('report')">5. Отчет (Word / PDF)</button>
     </nav>
   </div>
 </header>
@@ -482,11 +482,11 @@
   <section id="tab-matrix" class="tab-panel">
     <div class="card">
       <h2>
-        <span>Карта на професионалните компетентности (Наредба № 15)</span>
+        <span>Матрица на професионалните компетентности</span>
         <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 0 / 40</span>
       </h2>
       <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1rem;">
-        Изберете ниво на владеене (от 1 до 5) за всяка област. Под всяка компетентност автоматично се визуализират прикачените към нея доказателства от портфолиото.
+        Изберете ниво на владеене (от 1 до 5) за всяка област. Под всяка компетентност се визуализират прикачените към нея доказателства.
       </p>
       <div id="competenciesContainer"></div>
     </div>
@@ -1282,7 +1282,6 @@
     renderReport();
   }
 
-  // Init
   loadState();
   populateSelects();
   renderAll();
