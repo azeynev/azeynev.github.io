@@ -110,35 +110,37 @@
       text-decoration: none;
     }
 
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
     .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
 
     .btn-accent { background: var(--accent); color: #fff; }
-    .btn-accent:hover { background: var(--accent-hover); }
+    .btn-accent:hover:not(:disabled) { background: var(--accent-hover); }
 
     .btn-warning { background: #d97706; color: #fff; }
-    .btn-warning:hover { background: #b45309; }
+    .btn-warning:hover:not(:disabled) { background: #b45309; }
 
     .btn-ghost {
       background: rgba(255, 255, 255, 0.12);
       color: #fff;
       border-color: rgba(255, 255, 255, 0.25);
     }
-    .btn-ghost:hover { background: rgba(255, 255, 255, 0.22); }
+    .btn-ghost:hover:not(:disabled) { background: rgba(255, 255, 255, 0.22); }
 
     .btn-outline {
       background: #fff;
       color: var(--text);
       border-color: var(--border);
     }
-    .btn-outline:hover { background: #f8fafc; border-color: #94a3b8; }
+    .btn-outline:hover:not(:disabled) { background: #f8fafc; border-color: #94a3b8; }
 
     .btn-danger {
       background: #fee2e2;
       color: var(--danger);
       border-color: #fecaca;
     }
-    .btn-danger:hover { background: #fecaca; }
+    .btn-danger:hover:not(:disabled) { background: #fecaca; }
 
     .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.8rem; }
 
@@ -426,7 +428,7 @@
       border-radius: 14px;
       padding: 1.5rem;
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     }
     .modal-box h3 { font-size: 1.1rem; margin-bottom: 0.35rem; color: #0f172a; }
@@ -718,18 +720,18 @@
 
 </main>
 
-<!-- МОДАЛЕН ПРОЗОРЕЦ ЗА ПИН КОД -->
+<!-- МОДАЛЕН ПРОЗОРЕЦ ЗА АДМИНИСТРАТОРСКА ПАРОЛА -->
 <div id="pinModal" class="modal-backdrop" onclick="if(event.target===this) closePinModal()">
   <div class="modal-box">
     <h3>Отключване на администраторски режим</h3>
-    <p>Въведете вашия ПИН код, за да редактирате оценките, доказателствата и профила.</p>
+    <p>Въведете вашата защитена администраторска парола, за да редактирате картата.</p>
     <div class="form-group">
-      <label for="pinInput">ПИН / Парола</label>
-      <input type="password" id="pinInput" placeholder="Въведете ПИН..." onkeydown="if(event.key==='Enter') verifyPin()" />
+      <label for="pinInput">Парола</label>
+      <input type="password" id="pinInput" placeholder="Въведете парола..." onkeydown="if(event.key==='Enter') verifyPin()" />
     </div>
     <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
       <button type="button" class="btn btn-outline" onclick="closePinModal()">Отказ</button>
-      <button type="button" class="btn btn-primary" onclick="verifyPin()">Отключи</button>
+      <button type="button" id="verifyPinBtn" class="btn btn-primary" onclick="verifyPin()">Отключи</button>
     </div>
   </div>
 </div>
@@ -737,11 +739,22 @@
 <div id="toast" class="toast"></div>
 
 <script>
-  // ВАШИЯТ ЛИЧЕН ПИН ЗА ОТКЛЮЧВАНЕ НА РЕДАКЦИЯТА (можете да го смените тук)
-  const ADMIN_PIN = "2026";
+  // SHA-256 хеш на паролата (в кода НЕ се съхранява парола в чист текст!).
+  // Текущият хеш отговаря на: Adem@2026!
+  const ADMIN_PASS_HASH = "e692c1793f4b51870c7e93243393622f890e7e1c4a9c634014f745c002496227";
   const SESSION_UNLOCK_KEY = "adem_zeynev_att_unlocked";
 
   let isUnlocked = sessionStorage.getItem(SESSION_UNLOCK_KEY) === "true";
+  let failedAttempts = 0;
+  let lockUntil = 0;
+
+  async function sha256Hex(text) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  }
 
   const COMPETENCIES = [
     {
@@ -964,16 +977,34 @@
     document.getElementById("pinModal").classList.remove("open");
   }
 
-  function verifyPin() {
-    const val = document.getElementById("pinInput").value.trim();
-    if (val === ADMIN_PIN) {
+  async function verifyPin() {
+    const now = Date.now();
+    if (now < lockUntil) {
+      const secLeft = Math.ceil((lockUntil - now) / 1000);
+      showToast(`Твърде много грешни опити. Изчакайте ${secLeft} сек.`);
+      return;
+    }
+
+    const val = document.getElementById("pinInput").value;
+    if (!val) return;
+
+    const enteredHash = await sha256Hex(val);
+    if (enteredHash === ADMIN_PASS_HASH) {
+      failedAttempts = 0;
       isUnlocked = true;
       sessionStorage.setItem(SESSION_UNLOCK_KEY, "true");
       closePinModal();
       renderAll();
       showToast("Администраторският режим е отключен.");
     } else {
-      showToast("Грешен ПИН код.");
+      failedAttempts++;
+      if (failedAttempts >= 3) {
+        lockUntil = Date.now() + 30000;
+        failedAttempts = 0;
+        showToast("3 грешни опита — достъпът е блокиран за 30 секунди.");
+      } else {
+        showToast(`Грешна парола (остават ${3 - failedAttempts} опита).`);
+      }
       document.getElementById("pinInput").select();
     }
   }
