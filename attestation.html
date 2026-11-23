@@ -142,7 +142,6 @@
 
     .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.8rem; }
 
-    /* Елементи, видими само в отключен режим */
     body.is-locked .edit-only {
       display: none !important;
     }
@@ -411,7 +410,6 @@
     th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
     th { background: #f8fafc; font-weight: 700; color: #334155; }
 
-    /* Модален прозорец за ПИН */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -524,7 +522,7 @@
       </div>
       <div class="stat-box">
         <div class="stat-label">Цели за следващ период</div>
-        <div class="stat-value" id="statGoalsCount">0</div>
+        <div class="stat-value" id="statGoalsCount">4</div>
         <div class="stat-sub">Планирани дейности за професионално израстване</div>
       </div>
     </div>
@@ -804,7 +802,7 @@
     { val: 5, label: "Ниво 5", sub: "Образцово / Новаторско" }
   ];
 
-  const STORAGE_KEY = "adem_zeynev_attestation_naredba15_v7";
+  const STORAGE_KEY = "adem_zeynev_attestation_naredba15_v8";
 
   const DEFAULT_EVIDENCES = [
     {
@@ -881,6 +879,37 @@
     }
   ];
 
+  const DEFAULT_GOALS = [
+    {
+      id: "def_g1",
+      compId: "c4",
+      title: "Интеграция на изкуствен интелект (AI) и модули по киберсигурност в обучението",
+      indicator: "Разработени и внедрени 4 интерактивни образователни симулации и дигитални ресурси за ученици",
+      deadline: "Учебна 2026/2027 г."
+    },
+    {
+      id: "def_g2",
+      compId: "c2",
+      title: "Разширяване на STEM и проектно-базираното обучение по математика и информатика",
+      indicator: "Реализирани интердисциплинарни уроци и училищни STEM проекти в СУ „Св. Паисий Хилендарски“",
+      deadline: "2026 – 2028 г."
+    },
+    {
+      id: "def_g3",
+      compId: "c8",
+      title: "Научно-методическа дейност и споделяне на иновативни педагогически практики",
+      indicator: "Публикувани минимум 3 научни статии / доклади и проведени открити практики за колеги",
+      deadline: "2026 – 2030 г."
+    },
+    {
+      id: "def_g4",
+      compId: "c5",
+      title: "Менторство и подготовка на ученици за национални олимпиади и дигитални състезания",
+      indicator: "Участие и класиране на ученици в областни и национални кръгове по информатика и математика",
+      deadline: "Ежегодно (2026 – 2030 г.)"
+    }
+  ];
+
   let state = {
     profile: {
       name: "д-р Адем Зейнев",
@@ -902,7 +931,7 @@
       c8: "Придобита образователна и научна степен „доктор“, научни публикации, доклади и авторски разработки."
     },
     evidences: JSON.parse(JSON.stringify(DEFAULT_EVIDENCES)),
-    goals: []
+    goals: JSON.parse(JSON.stringify(DEFAULT_GOALS))
   };
 
   function applyLockState() {
@@ -986,20 +1015,24 @@
 
   function loadState() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("adem_zeynev_attestation_naredba15_v6");
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("adem_zeynev_attestation_naredba15_v7");
       if (saved) {
         const parsed = JSON.parse(saved);
         const loadedProfile = { ...state.profile, ...(parsed.profile || {}) };
         if (!loadedProfile.institution) {
           loadedProfile.institution = "СУ „Св. Паисий Хилендарски“, с. Абланица";
         }
+        const loadedGoals = (Array.isArray(parsed.goals) && parsed.goals.length > 0)
+          ? parsed.goals
+          : JSON.parse(JSON.stringify(DEFAULT_GOALS));
+
         state = {
           profile: loadedProfile,
           ratings: { ...state.ratings, ...(parsed.ratings || {}) },
           manualRatings: parsed.manualRatings || {},
           notes: { ...state.notes, ...(parsed.notes || {}) },
           evidences: Array.isArray(parsed.evidences) ? parsed.evidences : state.evidences,
-          goals: Array.isArray(parsed.goals) ? parsed.goals : []
+          goals: loadedGoals
         };
       }
       saveState();
@@ -1625,8 +1658,9 @@
 
   function resetAllData() {
     if (!isUnlocked) return;
-    if (!confirm("Сигурни ли сте, че искате да възстановите началния експертен профил с 8-те доказателства?")) return;
+    if (!confirm("Сигурни ли сте, че искате да възстановите началния експертен профил с 8-те доказателства и 4-те цели?")) return;
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("adem_zeynev_attestation_naredba15_v7");
     localStorage.removeItem("adem_zeynev_attestation_naredba15_v6");
     location.reload();
   }
