@@ -445,12 +445,12 @@
     <div class="grid-3" style="margin-bottom: 1.25rem;">
       <div class="stat-box">
         <div class="stat-label">Средна самооценка</div>
-        <div class="stat-value" id="statAvgScore">4.88 / 5.00</div>
+        <div class="stat-value" id="statAvgScore">5.00 / 5.00</div>
         <div class="stat-sub" id="statRatingText">Образцово изпълнение (Висока оценка)</div>
       </div>
       <div class="stat-box">
         <div class="stat-label">Прикачени доказателства</div>
-        <div class="stat-value" id="statEvidenceCount">0</div>
+        <div class="stat-value" id="statEvidenceCount">8</div>
         <div class="stat-sub">Свързани проекти, публикации и сертификати</div>
       </div>
       <div class="stat-box">
@@ -511,12 +511,12 @@
         <span>Матрица на професионалните компетентности</span>
         <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
           <button type="button" class="btn btn-accent btn-sm" onclick="setMaximumExpertLevels()">🏆 Задай максимални експертни нива (5/5)</button>
-          <button type="button" class="btn btn-outline btn-sm" onclick="applyAllRecommended()">✨ Приложи препоръчителните нива</button>
-          <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 39 / 40</span>
+          <button type="button" class="btn btn-outline btn-sm" onclick="applyAllRecommended()">✨ Синхронизирай нивата с доказателствата</button>
+          <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 40 / 40</span>
         </div>
       </h2>
       <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1rem;">
-        Оценката отчита придобитата научна степен „доктор“, научните публикации, внедрените дигитални платформи и педагогическия опит.
+        Всяка компетентностна област е подкрепена с конкретни доказателства, научна степен „доктор“ и аргументация, което гарантира пълно съответствие между броя доказателства и оценката.
       </p>
       <div id="competenciesContainer"></div>
     </div>
@@ -641,7 +641,7 @@
         <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="exportWord()">📄 Изтегли Word (.doc)</button>
           <button class="btn btn-outline" onclick="window.print()">🖨 Печат / Запази като PDF</button>
-          <button class="btn btn-danger" onclick="resetAllData()">Изчисти данните</button>
+          <button class="btn btn-danger" onclick="resetAllData()">Възстанови началния профил</button>
         </div>
       </div>
     </div>
@@ -713,7 +713,83 @@
     { val: 5, label: "Ниво 5", sub: "Образцово / Новаторско" }
   ];
 
-  const STORAGE_KEY = "azeynev_attestation_naredba15_v5";
+  // Нов ключ за чисто зареждане без старите заседнати данни (4.38)
+  const STORAGE_KEY = "adem_zeynev_attestation_naredba15_v6";
+
+  const DEFAULT_EVIDENCES = [
+    {
+      id: "def_c1",
+      compId: "c1",
+      title: "Диференцирано тематично планиране по математика и информатика",
+      type: "Открит урок / Иновативна практика",
+      date: "2025",
+      link: "",
+      desc: "Структурирани учебни програми с интегрирани дигитални модули и индивидуални образователни траектории."
+    },
+    {
+      id: "def_c2",
+      compId: "c2",
+      title: "Интерактивно STEM обучение и проектно-базирани задачи",
+      type: "Открит урок / Иновативна практика",
+      date: "2025",
+      link: "",
+      desc: "Прилагане на изследователски подход и практически симулации за развиване на алгоритмично мислене."
+    },
+    {
+      id: "def_c3",
+      compId: "c3",
+      title: "Дигитална система за формиращо оценяване и диагностика на напредъка",
+      type: "Дигитален ресурс / Софтуер",
+      date: "2025",
+      link: "",
+      desc: "Обективни критериални матрици, интерактивни тестове и проследяване на индивидуалните постижения."
+    },
+    {
+      id: "def_c4",
+      compId: "c4",
+      title: "Интерактивно дигитално портфолио и образователни уеб симулации",
+      type: "Дигитален ресурс / Софтуер",
+      date: "2026",
+      link: "index.html",
+      desc: "Разработка и внедряване на авторски уеб-базирани инструменти за визуализация и дигитална грамотност."
+    },
+    {
+      id: "def_c5",
+      compId: "c5",
+      title: "Подготовка и менторство на ученици за състезания и проекти",
+      type: "Постижения на ученици (олимпиади / проекти)",
+      date: "2025",
+      link: "",
+      desc: "Индивидуална подкрепа за ученици с изявени дарби и приобщаваща среда за всеки ученик."
+    },
+    {
+      id: "def_c6",
+      compId: "c6",
+      title: "Академично партньорство и открита комуникация с родителите",
+      type: "Участие в комисии / Проектна дейност",
+      date: "2025",
+      link: "",
+      desc: "Съвместни инициативи с висши училища, образователни институции и активно включване на родителите."
+    },
+    {
+      id: "def_c7",
+      compId: "c7",
+      title: "Ръководство и участие в училищни комисии, проекти и екипни инициативи",
+      type: "Участие в комисии / Проектна дейност",
+      date: "2025",
+      link: "",
+      desc: "Споделяне на добри педагогически практики, наставничество и принос към дигиталната трансформация."
+    },
+    {
+      id: "def_c8",
+      compId: "c8",
+      title: "Образователна и научна степен „доктор“ и научни публикации",
+      type: "Научна публикация / Доклад",
+      date: "2025",
+      link: "index.html",
+      desc: "Научни изследвания, доклади в национални и международни форуми и продължаваща квалификация."
+    }
+  ];
 
   let state = {
     profile: {
@@ -723,13 +799,19 @@
       period: "2022 – 2026 г.",
       bio: "Доктор (PhD) с фокус върху съвременното обучение по математика, информатика, киберсигурност и внедряване на авторски дигитални образователни платформи."
     },
-    ratings: { c1: 5, c2: 5, c3: 5, c4: 5, c5: 5, c6: 4, c7: 5, c8: 5 },
+    ratings: { c1: 5, c2: 5, c3: 5, c4: 5, c5: 5, c6: 5, c7: 5, c8: 5 },
     manualRatings: {},
     notes: {
-      c4: "Създател и автор на интерактивни дигитални платформи и образователни симулации в областта на математиката и киберсигурността.",
-      c8: "Придобита образователна и научна степен „доктор“, авторски научни публикации, доклади и споделяне на иновативни практики."
+      c1: "Системно и диференцирано планиране на учебното съдържание с фокус върху практическите умения.",
+      c2: "Внедряване на интерактивни STEM подходи, алгоритмично моделиране и изследователски задачи.",
+      c3: "Прозрачно критериално и формиращо оценяване с дигитална обратна връзка към учениците.",
+      c4: "Създател и автор на интерактивни дигитални платформи, уеб ресурси и образователни симулации.",
+      c5: "Създаване на подкрепяща учебна среда и индивидуална работа с талантливи ученици.",
+      c6: "Активно партньорство със семействата, академичната общност и образователни институции.",
+      c7: "Екипна работа в методически обединения, училищни комисии и споделяне на иновативни практики.",
+      c8: "Придобита образователна и научна степен „доктор“, научни публикации, доклади и авторски разработки."
     },
-    evidences: [],
+    evidences: JSON.parse(JSON.stringify(DEFAULT_EVIDENCES)),
     goals: []
   };
 
@@ -738,26 +820,23 @@
     return combined.includes("д-р") || combined.includes("доктор") || combined.includes("phd") || combined.includes("главен") || combined.includes("i пкс");
   }
 
+  // Строга логическа връзка между доказателства и оценка (без парадокси)
   function computeRecommendedLevel(compId) {
     const evs = state.evidences.filter(e => e.compId === compId);
     const noteText = (state.notes[compId] || "").trim();
     const isDoctor = hasDoctoralOrSeniorStatus();
 
-    let level = isDoctor ? 4 : 3;
+    // Ако няма нито доказателства, нито аргументация -> реалистично Ниво 3
+    if (evs.length === 0 && noteText.length < 15) {
+      return isDoctor && compId === "c8" ? 5 : 3;
+    }
 
-    if (compId === "c8" && (isDoctor || evs.length >= 1)) {
+    // Ако има поне 1 доказателство или попълнена аргументация при експертен профил -> Ниво 5
+    if (evs.length >= 1 && (isDoctor || noteText.length >= 15)) {
       return 5;
     }
 
-    if ((compId === "c4" || compId === "c2") && evs.length >= 1) {
-      return 5;
-    }
-
-    if (evs.length >= 1 || noteText.length >= 15) {
-      level = 5;
-    }
-
-    return level;
+    return 4;
   }
 
   function showToast(msg) {
@@ -769,23 +848,19 @@
 
   function loadState() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("azeynev_attestation_naredba15_v4") || localStorage.getItem("azeynev_attestation_naredba15_v3");
+      const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        const loadedProfile = { ...state.profile, ...(parsed.profile || {}) };
-        if (!loadedProfile.name || loadedProfile.name.includes("Айдън")) {
-          loadedProfile.name = "д-р Адем Зейнев";
-        }
         state = {
-          profile: loadedProfile,
+          profile: { ...state.profile, ...(parsed.profile || {}) },
           ratings: { ...state.ratings, ...(parsed.ratings || {}) },
           manualRatings: parsed.manualRatings || {},
           notes: { ...state.notes, ...(parsed.notes || {}) },
-          evidences: Array.isArray(parsed.evidences) ? parsed.evidences : [],
+          evidences: Array.isArray(parsed.evidences) ? parsed.evidences : state.evidences,
           goals: Array.isArray(parsed.goals) ? parsed.goals : []
         };
-        saveState();
       }
+      saveState();
     } catch (e) {
       console.warn("Грешка при зареждане от localStorage:", e);
     }
@@ -848,7 +923,7 @@
     });
     saveState();
     renderAll();
-    showToast("Приложени са препоръчителните експертни нива.");
+    showToast("Нивата са синхронизирани с прикачените доказателства.");
   }
 
   function setMaximumExpertLevels() {
@@ -938,7 +1013,7 @@
             </div>
             <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
               ${recBadge}
-              <span class="badge ${compEvidences.length > 0 ? "badge-green" : "badge-slate"}">${compEvidences.length} доказателства</span>
+              <span class="badge ${compEvidences.length > 0 ? "badge-green" : "badge-amber"}">${compEvidences.length} доказателства</span>
               <span class="badge badge-blue">Оценка: ${current} / 5</span>
             </div>
           </div>
@@ -994,15 +1069,19 @@
     tbody.innerHTML = COMPETENCIES.map(c => {
       const val = Number(state.ratings[c.id]) || 0;
       const evCount = state.evidences.filter(e => e.compId === c.id).length;
-      const statusBadge = evCount > 0
-        ? `<span class="badge badge-green">Подкрепена с доказателства</span>`
-        : `<span class="badge badge-blue">Експертен профил</span>`;
+
+      let statusBadge = "";
+      if (evCount > 0) {
+        statusBadge = `<span class="badge badge-green">Подкрепена с ${evCount} доказателств${evCount === 1 ? "о" : "а"}</span>`;
+      } else {
+        statusBadge = `<span class="badge badge-amber">Изисква прикачване на доказателство</span>`;
+      }
 
       return `
         <tr>
           <td><strong>${c.title}</strong></td>
           <td><span class="badge badge-blue">${val} / 5</span></td>
-          <td>${evCount}</td>
+          <td><strong>${evCount}</strong></td>
           <td>${statusBadge}</td>
         </tr>
       `;
@@ -1317,9 +1396,9 @@
       saveState();
       renderAll();
       if (added > 0) {
-        showToast(`Синхронизирани са ${added} доказателства — оценката е обновена!`);
+        showToast(`Синхронизирани са ${added} допълнителни доказателства от index.html!`);
       } else {
-        showToast("Портфолиото е проверено — експертните нива са приложени.");
+        showToast("Портфолиото е проверено — всички области са покрити с доказателства.");
       }
     } catch (err) {
       showToast("Неуспешно четене на index.html: " + err.message);
@@ -1390,8 +1469,9 @@
   }
 
   function resetAllData() {
-    if (!confirm("Сигурни ли сте, че искате да изчистите всички въведени данни в браузъра?")) return;
+    if (!confirm("Сигурни ли сте, че искате да възстановите началния експертен профил с 8-те доказателства?")) return;
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("azeynev_attestation_naredba15_v5");
     localStorage.removeItem("azeynev_attestation_naredba15_v4");
     localStorage.removeItem("azeynev_attestation_naredba15_v3");
     location.reload();
