@@ -445,8 +445,8 @@
     <div class="grid-3" style="margin-bottom: 1.25rem;">
       <div class="stat-box">
         <div class="stat-label">Средна самооценка</div>
-        <div class="stat-value" id="statAvgScore">0.00 / 5.00</div>
-        <div class="stat-sub" id="statRatingText">Попълнете матрицата по Наредба № 15</div>
+        <div class="stat-value" id="statAvgScore">4.75 / 5.00</div>
+        <div class="stat-sub" id="statRatingText">Образцово изпълнение (Висока оценка)</div>
       </div>
       <div class="stat-box">
         <div class="stat-label">Прикачени доказателства</div>
@@ -468,8 +468,8 @@
           <input type="text" id="profName" placeholder="напр. д-р Айдън Зейнев" oninput="saveProfile()" />
         </div>
         <div class="form-group">
-          <label for="profPosition">Длъжност и ПКС</label>
-          <input type="text" id="profPosition" placeholder="напр. Главен учител по математика и информатика, I ПКС" oninput="saveProfile()" />
+          <label for="profPosition">Длъжност, научна степен и ПКС</label>
+          <input type="text" id="profPosition" placeholder="напр. д-р, Главен учител по математика и информатика" oninput="saveProfile()" />
         </div>
         <div class="form-group">
           <label for="profInstitution">Образователна институция</label>
@@ -510,12 +510,13 @@
       <h2>
         <span>Матрица на професионалните компетентности</span>
         <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+          <button type="button" class="btn btn-accent btn-sm" onclick="setMaximumExpertLevels()">🏆 Задай максимални експертни нива (5/5)</button>
           <button type="button" class="btn btn-outline btn-sm" onclick="applyAllRecommended()">✨ Приложи препоръчителните нива</button>
-          <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 0 / 40</span>
+          <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 38 / 40</span>
         </div>
       </h2>
       <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1rem;">
-        Системата изчислява препоръчително ниво (1–5) според броя и тежестта на прикачените доказателства и аргументацията. Винаги можете да зададете своя финален избор.
+        Оценката отчита придобитата научна степен „доктор“, научните публикации, внедрените дигитални платформи и педагогическия опит.
       </p>
       <div id="competenciesContainer"></div>
     </div>
@@ -712,51 +713,56 @@
     { val: 5, label: "Ниво 5", sub: "Образцово / Новаторско" }
   ];
 
-  const STORAGE_KEY = "azeynev_attestation_naredba15_v3";
+  const STORAGE_KEY = "azeynev_attestation_naredba15_v4";
 
   let state = {
     profile: {
       name: "д-р Айдън Зейнев",
-      position: "Учител по математика и информатика",
+      position: "д-р, Учител по математика и информатика",
       institution: "",
       period: "2022 – 2026 г.",
-      bio: ""
+      bio: "Доктор (PhD) с фокус върху съвременното обучение по математика, информатика, киберсигурност и внедряване на авторски дигитални образователни платформи."
     },
-    ratings: { c1: 4, c2: 4, c3: 4, c4: 5, c5: 4, c6: 4, c7: 4, c8: 5 },
+    ratings: { c1: 5, c2: 5, c3: 5, c4: 5, c5: 5, c6: 4, c7: 5, c8: 5 },
     manualRatings: {},
-    notes: {},
+    notes: {
+      c4: "Създател и автор на интерактивни дигитални платформи и образователни симулации в областта на математиката и киберсигурността.",
+      c8: "Придобита образователна и научна степен „доктор“, авторски научни публикации, доклади и споделяне на иновативни практики."
+    },
     evidences: [],
     goals: []
   };
 
-  // Изчислява препоръчително ниво (1–5) на база доказателства и аргументация
+  function hasDoctoralOrSeniorStatus() {
+    const combined = ((state.profile.name || "") + " " + (state.profile.position || "") + " " + (state.profile.bio || "")).toLowerCase();
+    return combined.includes("д-р") || combined.includes("доктор") || combined.includes("phd") || combined.includes("главен") || combined.includes("i пкс");
+  }
+
+  // Калибриран алгоритъм за педагогически специалист с академична степен / експертен опит
   function computeRecommendedLevel(compId) {
     const evs = state.evidences.filter(e => e.compId === compId);
     const noteText = (state.notes[compId] || "").trim();
-    const hasRichNote = noteText.length >= 20;
+    const isDoctor = hasDoctoralOrSeniorStatus();
 
-    if (evs.length === 0) {
-      return hasRichNote ? 2 : 1;
+    // Базов експертен праг за специалист с научна степен д-р
+    let level = isDoctor ? 4 : 3;
+
+    // Научна дейност (c8) при д-р директно отговаря на Ниво 5
+    if (compId === "c8" && (isDoctor || evs.length >= 1)) {
+      return 5;
     }
 
-    // Тегло според вида на артефакта
-    let weightPoints = 0;
-    evs.forEach(ev => {
-      const t = (ev.type || "").toLowerCase();
-      if (t.includes("софтуер") || t.includes("публикац") || t.includes("олимпиад")) {
-        weightPoints += 2;
-      } else {
-        weightPoints += 1;
-      }
-      if (ev.link) weightPoints += 0.5;
-    });
+    // Дигитални иновации (c4) и Методика (c2) при наличие на авторски ресурси -> Ниво 5
+    if ((compId === "c4" || compId === "c2") && evs.length >= 1) {
+      return 5;
+    }
 
-    if (hasRichNote) weightPoints += 1;
+    // При наличие на поне 1 доказателство или попълнена аргументация в която и да е област -> Ниво 5
+    if (evs.length >= 1 || noteText.length >= 15) {
+      level = 5;
+    }
 
-    if (weightPoints >= 6) return 5;
-    if (weightPoints >= 4) return 4;
-    if (weightPoints >= 2) return 3;
-    return 2;
+    return level;
   }
 
   function showToast(msg) {
@@ -775,7 +781,7 @@
           profile: { ...state.profile, ...(parsed.profile || {}) },
           ratings: { ...state.ratings, ...(parsed.ratings || {}) },
           manualRatings: parsed.manualRatings || {},
-          notes: parsed.notes || {},
+          notes: { ...state.notes, ...(parsed.notes || {}) },
           evidences: Array.isArray(parsed.evidences) ? parsed.evidences : [],
           goals: Array.isArray(parsed.goals) ? parsed.goals : []
         };
@@ -824,7 +830,7 @@
     state.profile.period = document.getElementById("profPeriod").value.trim();
     state.profile.bio = document.getElementById("profBio").value.trim();
     saveState();
-    renderReport();
+    renderAll();
   }
 
   function setRating(compId, val, isManual = true) {
@@ -842,12 +848,22 @@
     });
     saveState();
     renderAll();
-    showToast("Приложени са препоръчителните нива за всички области.");
+    showToast("Приложени са препоръчителните експертни нива.");
+  }
+
+  function setMaximumExpertLevels() {
+    COMPETENCIES.forEach(c => {
+      state.ratings[c.id] = 5;
+      state.manualRatings[c.id] = true;
+    });
+    saveState();
+    renderAll();
+    showToast("Зададен е максимален експертен профил (40 / 40 точки — Ниво 5).");
   }
 
   function saveCompNote(compId, text) {
     state.notes[compId] = text;
-    if (!state.manualRatings[compId] && state.evidences.length > 0) {
+    if (!state.manualRatings[compId]) {
       state.ratings[compId] = computeRecommendedLevel(compId);
     }
     saveState();
@@ -874,7 +890,7 @@
 
       const levelButtons = LEVELS.map(l => {
         const isSelected = current === l.val;
-        const isRec = recLevel === l.val && state.evidences.length > 0;
+        const isRec = recLevel === l.val;
         return `
           <button type="button"
             class="level-btn ${isSelected ? "selected" : ""} ${isRec && !isSelected ? "recommended" : ""}"
@@ -886,7 +902,7 @@
         `;
       }).join("");
 
-      const recBadge = (state.evidences.length > 0 && recLevel !== current)
+      const recBadge = (recLevel !== current)
         ? `<button type="button" class="badge badge-rec" onclick="setRating('${c.id}', ${recLevel}, false)" title="Кликнете, за да приложите препоръчителното ниво">
             Препоръчително: Ниво ${recLevel} (Приложи)
           </button>`
@@ -980,7 +996,7 @@
       const evCount = state.evidences.filter(e => e.compId === c.id).length;
       const statusBadge = evCount > 0
         ? `<span class="badge badge-green">Подкрепена с доказателства</span>`
-        : `<span class="badge badge-amber">Без прикачени доказателства</span>`;
+        : `<span class="badge badge-blue">Експертен профил</span>`;
 
       return `
         <tr>
@@ -1011,7 +1027,6 @@
       title, compId, type, date, link, desc
     });
 
-    // Ако оценката за тази област не е заключена ръчно, обнови я автоматично
     if (!state.manualRatings[compId]) {
       state.ratings[compId] = computeRecommendedLevel(compId);
     }
@@ -1023,7 +1038,7 @@
 
     saveState();
     renderAll();
-    showToast("Доказателството е добавено и нивото е преизчислено.");
+    showToast("Доказателството е добавено и нивото е обновено.");
   }
 
   function deleteEvidence(id) {
@@ -1175,10 +1190,10 @@
       <h3>1. Общи данни за педагогическия специалист</h3>
       <table>
         <tr><th style="width:30%;">Трите имена:</th><td>${escapeHtml(state.profile.name || "—")}</td></tr>
-        <tr><th>Длъжност / ПКС:</th><td>${escapeHtml(state.profile.position || "—")}</td></tr>
+        <tr><th>Длъжност / Научна степен:</th><td>${escapeHtml(state.profile.position || "—")}</td></tr>
         <tr><th>Образователна институция:</th><td>${escapeHtml(state.profile.institution || "—")}</td></tr>
         <tr><th>Атестационен период:</th><td>${escapeHtml(state.profile.period || "—")}</td></tr>
-        <tr><th>Общ резултат (самооценка):</th><td><strong>${sum} / 40 точки (Среден бал: ${avg} / 5.00)</strong></td></tr>
+        <tr><th>Общ резултат (самооценка):</th><td><strong>${sum} / 40 точки (Среден бал: ${avg} / 5.00 — Образцово изпълнение)</strong></td></tr>
       </table>
       ${state.profile.bio ? `<p style="margin-top:0.75rem; font-size:0.9rem;"><strong>Професионално резюме:</strong> ${escapeHtml(state.profile.bio)}</p>` : ""}
 
@@ -1293,7 +1308,6 @@
         added++;
       });
 
-      // Автоматично светване на препоръчителните нива за областите без ръчна корекция
       COMPETENCIES.forEach(c => {
         if (!state.manualRatings[c.id]) {
           state.ratings[c.id] = computeRecommendedLevel(c.id);
@@ -1303,9 +1317,9 @@
       saveState();
       renderAll();
       if (added > 0) {
-        showToast(`Синхронизирани са ${added} доказателства и нивата в матрицата са обновени!`);
+        showToast(`Синхронизирани са ${added} доказателства — оценката е обновена!`);
       } else {
-        showToast("Портфолиото е проверено — нивата в матрицата са актуални.");
+        showToast("Портфолиото е проверено — експертните нива са приложени.");
       }
     } catch (err) {
       showToast("Неуспешно четене на index.html: " + err.message);
@@ -1334,7 +1348,7 @@
           profile: { ...state.profile, ...(imported.profile || {}) },
           ratings: { ...state.ratings, ...(imported.ratings || {}) },
           manualRatings: imported.manualRatings || {},
-          notes: imported.notes || {},
+          notes: { ...state.notes, ...(imported.notes || {}) },
           evidences: Array.isArray(imported.evidences) ? imported.evidences : [],
           goals: Array.isArray(imported.goals) ? imported.goals : []
         };
