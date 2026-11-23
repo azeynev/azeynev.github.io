@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Атестация по Наредба № 15 | Професионално портфолио — д-р Айдън Зейнев</title>
+  <title>Атестация по Наредба № 15 | Професионално портфолио — д-р Адем Зейнев</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -445,7 +445,7 @@
     <div class="grid-3" style="margin-bottom: 1.25rem;">
       <div class="stat-box">
         <div class="stat-label">Средна самооценка</div>
-        <div class="stat-value" id="statAvgScore">4.75 / 5.00</div>
+        <div class="stat-value" id="statAvgScore">4.88 / 5.00</div>
         <div class="stat-sub" id="statRatingText">Образцово изпълнение (Висока оценка)</div>
       </div>
       <div class="stat-box">
@@ -465,11 +465,11 @@
       <div class="grid-2">
         <div class="form-group">
           <label for="profName">Трите имена</label>
-          <input type="text" id="profName" placeholder="напр. д-р Айдън Зейнев" oninput="saveProfile()" />
+          <input type="text" id="profName" placeholder="напр. д-р Адем Зейнев" oninput="saveProfile()" />
         </div>
         <div class="form-group">
           <label for="profPosition">Длъжност, научна степен и ПКС</label>
-          <input type="text" id="profPosition" placeholder="напр. д-р, Главен учител по математика и информатика" oninput="saveProfile()" />
+          <input type="text" id="profPosition" placeholder="напр. д-р, Учител по математика и информатика" oninput="saveProfile()" />
         </div>
         <div class="form-group">
           <label for="profInstitution">Образователна институция</label>
@@ -512,7 +512,7 @@
         <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
           <button type="button" class="btn btn-accent btn-sm" onclick="setMaximumExpertLevels()">🏆 Задай максимални експертни нива (5/5)</button>
           <button type="button" class="btn btn-outline btn-sm" onclick="applyAllRecommended()">✨ Приложи препоръчителните нива</button>
-          <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 38 / 40</span>
+          <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 39 / 40</span>
         </div>
       </h2>
       <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1rem;">
@@ -713,11 +713,11 @@
     { val: 5, label: "Ниво 5", sub: "Образцово / Новаторско" }
   ];
 
-  const STORAGE_KEY = "azeynev_attestation_naredba15_v4";
+  const STORAGE_KEY = "azeynev_attestation_naredba15_v5";
 
   let state = {
     profile: {
-      name: "д-р Айдън Зейнев",
+      name: "д-р Адем Зейнев",
       position: "д-р, Учител по математика и информатика",
       institution: "",
       period: "2022 – 2026 г.",
@@ -738,26 +738,21 @@
     return combined.includes("д-р") || combined.includes("доктор") || combined.includes("phd") || combined.includes("главен") || combined.includes("i пкс");
   }
 
-  // Калибриран алгоритъм за педагогически специалист с академична степен / експертен опит
   function computeRecommendedLevel(compId) {
     const evs = state.evidences.filter(e => e.compId === compId);
     const noteText = (state.notes[compId] || "").trim();
     const isDoctor = hasDoctoralOrSeniorStatus();
 
-    // Базов експертен праг за специалист с научна степен д-р
     let level = isDoctor ? 4 : 3;
 
-    // Научна дейност (c8) при д-р директно отговаря на Ниво 5
     if (compId === "c8" && (isDoctor || evs.length >= 1)) {
       return 5;
     }
 
-    // Дигитални иновации (c4) и Методика (c2) при наличие на авторски ресурси -> Ниво 5
     if ((compId === "c4" || compId === "c2") && evs.length >= 1) {
       return 5;
     }
 
-    // При наличие на поне 1 доказателство или попълнена аргументация в която и да е област -> Ниво 5
     if (evs.length >= 1 || noteText.length >= 15) {
       level = 5;
     }
@@ -774,17 +769,22 @@
 
   function loadState() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("azeynev_attestation_naredba15_v4") || localStorage.getItem("azeynev_attestation_naredba15_v3");
       if (saved) {
         const parsed = JSON.parse(saved);
+        const loadedProfile = { ...state.profile, ...(parsed.profile || {}) };
+        if (!loadedProfile.name || loadedProfile.name.includes("Айдън")) {
+          loadedProfile.name = "д-р Адем Зейнев";
+        }
         state = {
-          profile: { ...state.profile, ...(parsed.profile || {}) },
+          profile: loadedProfile,
           ratings: { ...state.ratings, ...(parsed.ratings || {}) },
           manualRatings: parsed.manualRatings || {},
           notes: { ...state.notes, ...(parsed.notes || {}) },
           evidences: Array.isArray(parsed.evidences) ? parsed.evidences : [],
           goals: Array.isArray(parsed.goals) ? parsed.goals : []
         };
+        saveState();
       }
     } catch (e) {
       console.warn("Грешка при зареждане от localStorage:", e);
@@ -1331,7 +1331,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "azeynev-attestation.json";
+    a.download = "adem-zeynev-attestation.json";
     a.click();
     URL.revokeObjectURL(url);
     showToast("JSON архивът е изтеглен.");
@@ -1367,7 +1367,7 @@
     const content = document.getElementById("reportContainer").innerHTML;
     const docHtml = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>Атестационен отчет</title>
+      <head><meta charset='utf-8'><title>Атестационен отчет — д-р Адем Зейнев</title>
       <style>
         body { font-family: "Times New Roman", serif; font-size: 12pt; }
         h1 { font-size: 15pt; text-align: center; }
@@ -1383,7 +1383,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'Atestacia-Naredba-15.doc';
+    a.download = 'Atestacia-Naredba-15-Adem-Zeynev.doc';
     a.click();
     URL.revokeObjectURL(url);
     showToast("Word документът (.doc) е изтеглен.");
@@ -1392,6 +1392,8 @@
   function resetAllData() {
     if (!confirm("Сигурни ли сте, че искате да изчистите всички въведени данни в браузъра?")) return;
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("azeynev_attestation_naredba15_v4");
+    localStorage.removeItem("azeynev_attestation_naredba15_v3");
     location.reload();
   }
 
