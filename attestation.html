@@ -1739,7 +1739,7 @@ const ADMIN_PASS_HASH = "c8d650857bb65da7ee2989e2b71da06852e28fab74b3860721e1ddc
         if (!res.ok) return;
         const remoteData = await res.json();
         const storageKey = Object.keys(localStorage).find((k) => k.startsWith("adem_zeynev_att"));
-        if (storageKey && remoteData && typeof remoteData === "object") {
+        if (storageKey && remoteData && typeof remoteData === "object" && Object.keys(remoteData).length > 0) {
           const currentRaw = localStorage.getItem(storageKey);
           const remoteRaw = JSON.stringify(remoteData);
           if (currentRaw !== remoteRaw) {
