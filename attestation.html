@@ -73,7 +73,27 @@
     .header-actions {
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: 0.5rem;
+    }
+
+    .mode-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.42rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .mode-pill.unlocked {
+      background: rgba(16, 185, 129, 0.22);
+      color: #a7f3d0;
+      border-color: rgba(16, 185, 129, 0.45);
     }
 
     .btn {
@@ -95,6 +115,9 @@
 
     .btn-accent { background: var(--accent); color: #fff; }
     .btn-accent:hover { background: var(--accent-hover); }
+
+    .btn-warning { background: #d97706; color: #fff; }
+    .btn-warning:hover { background: #b45309; }
 
     .btn-ghost {
       background: rgba(255, 255, 255, 0.12);
@@ -118,6 +141,24 @@
     .btn-danger:hover { background: #fecaca; }
 
     .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.8rem; }
+
+    /* Елементи, видими само в отключен режим */
+    body.is-locked .edit-only {
+      display: none !important;
+    }
+
+    body.is-locked input[readonly],
+    body.is-locked textarea[readonly] {
+      background: #f8fafc;
+      color: #334155;
+      border-color: #e2e8f0;
+      cursor: default;
+    }
+
+    body.is-locked .level-btn {
+      cursor: default;
+      pointer-events: none;
+    }
 
     nav.tabs {
       display: flex;
@@ -192,7 +233,7 @@
 
     label { display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 0.3rem; }
 
-    input[type="text"], input[type="date"], input[type="url"], select, textarea {
+    input[type="text"], input[type="date"], input[type="url"], input[type="password"], select, textarea {
       width: 100%;
       padding: 0.55rem 0.75rem;
       border: 1px solid var(--border);
@@ -370,6 +411,29 @@
     th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
     th { background: #f8fafc; font-weight: 700; color: #334155; }
 
+    /* Модален прозорец за ПИН */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 1rem;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: #fff;
+      border-radius: 14px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .modal-box h3 { font-size: 1.1rem; margin-bottom: 0.35rem; color: #0f172a; }
+    .modal-box p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+
     .toast {
       position: fixed;
       bottom: 1.25rem;
@@ -407,7 +471,7 @@
     }
   </style>
 </head>
-<body>
+<body class="is-locked">
 
 <header>
   <div class="container">
@@ -419,9 +483,14 @@
       </div>
       <div class="header-actions">
         <a href="index.html" class="btn btn-ghost">← Към портфолиото</a>
-        <button class="btn btn-accent" onclick="syncFromPortfolio()">🔄 Зареди от сайта (index.html)</button>
-        <button class="btn btn-ghost" onclick="exportJSON()">⬇ Експорт JSON</button>
-        <label class="btn btn-ghost" style="margin:0; cursor:pointer;">
+
+        <span id="modeBadge" class="mode-pill">🔒 Само за преглед</span>
+        <button id="unlockBtn" class="btn btn-warning" onclick="openPinModal()">🔓 Отключи за редакция</button>
+        <button id="lockBtn" class="btn btn-ghost edit-only" onclick="lockEditor()">🔒 Заключи</button>
+
+        <button class="btn btn-accent edit-only" onclick="syncFromPortfolio()">🔄 Зареди от сайта (index.html)</button>
+        <button class="btn btn-ghost edit-only" onclick="exportJSON()">⬇ Експорт JSON</button>
+        <label class="btn btn-ghost edit-only" style="margin:0; cursor:pointer;">
           ⬆ Импорт JSON
           <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)" />
         </label>
@@ -510,13 +579,13 @@
       <h2>
         <span>Матрица на професионалните компетентности</span>
         <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
-          <button type="button" class="btn btn-accent btn-sm" onclick="setMaximumExpertLevels()">🏆 Задай максимални експертни нива (5/5)</button>
-          <button type="button" class="btn btn-outline btn-sm" onclick="applyAllRecommended()">✨ Синхронизирай нивата с доказателствата</button>
+          <button type="button" class="btn btn-accent btn-sm edit-only" onclick="setMaximumExpertLevels()">🏆 Задай максимални експертни нива (5/5)</button>
+          <button type="button" class="btn btn-outline btn-sm edit-only" onclick="applyAllRecommended()">✨ Синхронизирай нивата с доказателствата</button>
           <span class="badge badge-blue" id="matrixTotalBadge">Общ бал: 40 / 40</span>
         </div>
       </h2>
       <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1rem;">
-        Всяка компетентностна област е подкрепена с конкретни доказателства, научна степен „доктор“ и аргументация, което гарантира пълно съответствие между броя доказателства и оценката.
+        Всяка компетентностна област е подкрепена с конкретни доказателства, научна степен „доктор“ и аргументация. В режим „Само за преглед“ данните са защитени от случайни промени.
       </p>
       <div id="competenciesContainer"></div>
     </div>
@@ -524,7 +593,7 @@
 
   <!-- TAB 3: EVIDENCES -->
   <section id="tab-evidences" class="tab-panel">
-    <div class="card">
+    <div class="card edit-only">
       <h2>Добавяне на ново доказателство / артефакт</h2>
       <div class="grid-2">
         <div class="form-group">
@@ -567,7 +636,7 @@
     <div class="card">
       <h2>
         <span>Списък с прикачени доказателства</span>
-        <button class="btn btn-outline btn-sm" onclick="syncFromPortfolio()">🔄 Синхронизирай с index.html</button>
+        <button class="btn btn-outline btn-sm edit-only" onclick="syncFromPortfolio()">🔄 Синхронизирай с index.html</button>
       </h2>
       <div class="table-wrap">
         <table>
@@ -577,7 +646,7 @@
               <th>Вид</th>
               <th>Компетентност</th>
               <th>Година</th>
-              <th>Действие</th>
+              <th class="edit-only">Действие</th>
             </tr>
           </thead>
           <tbody id="evidencesTableBody"></tbody>
@@ -588,7 +657,7 @@
 
   <!-- TAB 4: GOALS -->
   <section id="tab-goals" class="tab-panel">
-    <div class="card">
+    <div class="card edit-only">
       <h2>Планиране на насоки и цели за следващия атестационен период</h2>
       <div class="grid-2">
         <div class="form-group">
@@ -621,7 +690,7 @@
               <th>Компетентност</th>
               <th>Индикатор за успех</th>
               <th>Срок</th>
-              <th>Действие</th>
+              <th class="edit-only">Действие</th>
             </tr>
           </thead>
           <tbody id="goalsTableBody"></tbody>
@@ -641,7 +710,7 @@
         <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="exportWord()">📄 Изтегли Word (.doc)</button>
           <button class="btn btn-outline" onclick="window.print()">🖨 Печат / Запази като PDF</button>
-          <button class="btn btn-danger" onclick="resetAllData()">Възстанови началния профил</button>
+          <button class="btn btn-danger edit-only" onclick="resetAllData()">Възстанови началния профил</button>
         </div>
       </div>
     </div>
@@ -651,9 +720,31 @@
 
 </main>
 
+<!-- МОДАЛЕН ПРОЗОРЕЦ ЗА ПИН КОД -->
+<div id="pinModal" class="modal-backdrop" onclick="if(event.target===this) closePinModal()">
+  <div class="modal-box">
+    <h3>Отключване на администраторски режим</h3>
+    <p>Въведете вашия ПИН код, за да редактирате оценките, доказателствата и профила.</p>
+    <div class="form-group">
+      <label for="pinInput">ПИН / Парола</label>
+      <input type="password" id="pinInput" placeholder="Въведете ПИН..." onkeydown="if(event.key==='Enter') verifyPin()" />
+    </div>
+    <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+      <button type="button" class="btn btn-outline" onclick="closePinModal()">Отказ</button>
+      <button type="button" class="btn btn-primary" onclick="verifyPin()">Отключи</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
+  // ВАШИЯТ ЛИЧЕН ПИН ЗА ОТКЛЮЧВАНЕ НА РЕДАКЦИЯТА (можете да го смените тук)
+  const ADMIN_PIN = "2026";
+  const SESSION_UNLOCK_KEY = "adem_zeynev_att_unlocked";
+
+  let isUnlocked = sessionStorage.getItem(SESSION_UNLOCK_KEY) === "true";
+
   const COMPETENCIES = [
     {
       id: "c1",
@@ -713,7 +804,6 @@
     { val: 5, label: "Ниво 5", sub: "Образцово / Новаторско" }
   ];
 
-  // Нов ключ за чисто зареждане без старите заседнати данни (4.38)
   const STORAGE_KEY = "adem_zeynev_attestation_naredba15_v6";
 
   const DEFAULT_EVIDENCES = [
@@ -815,23 +905,71 @@
     goals: []
   };
 
+  function applyLockState() {
+    document.body.classList.toggle("is-locked", !isUnlocked);
+    const badge = document.getElementById("modeBadge");
+    const unlockBtn = document.getElementById("unlockBtn");
+
+    if (isUnlocked) {
+      badge.textContent = "🔓 Режим: Редактиране";
+      badge.classList.add("unlocked");
+      unlockBtn.style.display = "none";
+    } else {
+      badge.textContent = "🔒 Само за преглед";
+      badge.classList.remove("unlocked");
+      unlockBtn.style.display = "inline-flex";
+    }
+
+    document.querySelectorAll("#tab-overview input, #tab-overview textarea, #competenciesContainer input").forEach(el => {
+      el.readOnly = !isUnlocked;
+    });
+  }
+
+  function openPinModal() {
+    document.getElementById("pinInput").value = "";
+    document.getElementById("pinModal").classList.add("open");
+    setTimeout(() => document.getElementById("pinInput").focus(), 50);
+  }
+
+  function closePinModal() {
+    document.getElementById("pinModal").classList.remove("open");
+  }
+
+  function verifyPin() {
+    const val = document.getElementById("pinInput").value.trim();
+    if (val === ADMIN_PIN) {
+      isUnlocked = true;
+      sessionStorage.setItem(SESSION_UNLOCK_KEY, "true");
+      closePinModal();
+      renderAll();
+      showToast("Администраторският режим е отключен.");
+    } else {
+      showToast("Грешен ПИН код.");
+      document.getElementById("pinInput").select();
+    }
+  }
+
+  function lockEditor() {
+    isUnlocked = false;
+    sessionStorage.removeItem(SESSION_UNLOCK_KEY);
+    renderAll();
+    showToast("Модулът е заключен в режим „Само за преглед“.");
+  }
+
   function hasDoctoralOrSeniorStatus() {
     const combined = ((state.profile.name || "") + " " + (state.profile.position || "") + " " + (state.profile.bio || "")).toLowerCase();
     return combined.includes("д-р") || combined.includes("доктор") || combined.includes("phd") || combined.includes("главен") || combined.includes("i пкс");
   }
 
-  // Строга логическа връзка между доказателства и оценка (без парадокси)
   function computeRecommendedLevel(compId) {
     const evs = state.evidences.filter(e => e.compId === compId);
     const noteText = (state.notes[compId] || "").trim();
     const isDoctor = hasDoctoralOrSeniorStatus();
 
-    // Ако няма нито доказателства, нито аргументация -> реалистично Ниво 3
     if (evs.length === 0 && noteText.length < 15) {
       return isDoctor && compId === "c8" ? 5 : 3;
     }
 
-    // Ако има поне 1 доказателство или попълнена аргументация при експертен профил -> Ниво 5
     if (evs.length >= 1 && (isDoctor || noteText.length >= 15)) {
       return 5;
     }
@@ -899,6 +1037,7 @@
   }
 
   function saveProfile() {
+    if (!isUnlocked) return;
     state.profile.name = document.getElementById("profName").value.trim();
     state.profile.position = document.getElementById("profPosition").value.trim();
     state.profile.institution = document.getElementById("profInstitution").value.trim();
@@ -909,6 +1048,7 @@
   }
 
   function setRating(compId, val, isManual = true) {
+    if (!isUnlocked) return;
     state.ratings[compId] = val;
     if (isManual) state.manualRatings[compId] = true;
     saveState();
@@ -917,6 +1057,7 @@
   }
 
   function applyAllRecommended() {
+    if (!isUnlocked) return;
     COMPETENCIES.forEach(c => {
       state.ratings[c.id] = computeRecommendedLevel(c.id);
       state.manualRatings[c.id] = false;
@@ -927,6 +1068,7 @@
   }
 
   function setMaximumExpertLevels() {
+    if (!isUnlocked) return;
     COMPETENCIES.forEach(c => {
       state.ratings[c.id] = 5;
       state.manualRatings[c.id] = true;
@@ -937,6 +1079,7 @@
   }
 
   function saveCompNote(compId, text) {
+    if (!isUnlocked) return;
     state.notes[compId] = text;
     if (!state.manualRatings[compId]) {
       state.ratings[compId] = computeRecommendedLevel(compId);
@@ -972,12 +1115,12 @@
             onclick="setRating('${c.id}', ${l.val}, true)">
             <strong>${l.label}</strong>
             <span>${l.sub}</span>
-            ${isRec ? `<div class="rec-tag">Препоръчано</div>` : ""}
+            ${isRec && isUnlocked ? `<div class="rec-tag">Препоръчано</div>` : ""}
           </button>
         `;
       }).join("");
 
-      const recBadge = (recLevel !== current)
+      const recBadge = (isUnlocked && recLevel !== current)
         ? `<button type="button" class="badge badge-rec" onclick="setRating('${c.id}', ${recLevel}, false)" title="Кликнете, за да приложите препоръчителното ниво">
             Препоръчително: Ниво ${recLevel} (Приложи)
           </button>`
@@ -1001,7 +1144,7 @@
             }).join("")}
           </div>`
         : `<div class="no-evidence-hint">
-            Няма прикачени доказателства към тази област — <a onclick="preselectEvidenceComp('${c.id}')">+ добави доказателство</a>.
+            Няма прикачени доказателства към тази област.
           </div>`;
 
       return `
@@ -1023,7 +1166,7 @@
           <div class="comp-evidences-box">
             <div class="comp-evidences-label">
               <span>Прикачени доказателства по тази компетентност:</span>
-              <a style="color:var(--primary); cursor:pointer; font-weight:600;" onclick="preselectEvidenceComp('${c.id}')">+ Добави</a>
+              <a class="edit-only" style="color:var(--primary); cursor:pointer; font-weight:600;" onclick="preselectEvidenceComp('${c.id}')">+ Добави</a>
             </div>
             ${evidencesHtml}
           </div>
@@ -1042,6 +1185,7 @@
   }
 
   function preselectEvidenceComp(compId) {
+    if (!isUnlocked) return;
     switchTab("evidences");
     const sel = document.getElementById("evComp");
     if (sel) sel.value = compId;
@@ -1074,7 +1218,7 @@
       if (evCount > 0) {
         statusBadge = `<span class="badge badge-green">Подкрепена с ${evCount} доказателств${evCount === 1 ? "о" : "а"}</span>`;
       } else {
-        statusBadge = `<span class="badge badge-amber">Изисква прикачване на доказателство</span>`;
+        statusBadge = `<span class="badge badge-amber">Без прикачени доказателства</span>`;
       }
 
       return `
@@ -1089,6 +1233,7 @@
   }
 
   function addEvidence() {
+    if (!isUnlocked) return;
     const title = document.getElementById("evTitle").value.trim();
     const compId = document.getElementById("evComp").value;
     const type = document.getElementById("evType").value;
@@ -1121,6 +1266,7 @@
   }
 
   function deleteEvidence(id) {
+    if (!isUnlocked) return;
     const target = state.evidences.find(e => e.id === id);
     state.evidences = state.evidences.filter(e => e.id !== id);
     if (target && !state.manualRatings[target.compId]) {
@@ -1135,7 +1281,7 @@
     const tbody = document.getElementById("evidencesTableBody");
     if (state.evidences.length === 0) {
       tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--muted); padding:1.5rem;">
-        Все още няма добавени доказателства. Натиснете „Зареди от сайта (index.html)“ или добавете ръчно по-горе.
+        Няма добавени доказателства.
       </td></tr>`;
       return;
     }
@@ -1150,13 +1296,14 @@
           <td>${escapeHtml(ev.type)}</td>
           <td><span class="badge badge-slate">${comp ? comp.code : ev.compId}</span></td>
           <td>${escapeHtml(ev.date || "—")}</td>
-          <td><button class="btn btn-danger btn-sm" onclick="deleteEvidence('${ev.id}')">Изтрий</button></td>
+          <td class="edit-only"><button class="btn btn-danger btn-sm" onclick="deleteEvidence('${ev.id}')">Изтрий</button></td>
         </tr>
       `;
     }).join("");
   }
 
   function addGoal() {
+    if (!isUnlocked) return;
     const title = document.getElementById("goalTitle").value.trim();
     const compId = document.getElementById("goalComp").value;
     const indicator = document.getElementById("goalIndicator").value.trim();
@@ -1182,6 +1329,7 @@
   }
 
   function deleteGoal(id) {
+    if (!isUnlocked) return;
     state.goals = state.goals.filter(g => g.id !== id);
     saveState();
     renderAll();
@@ -1204,7 +1352,7 @@
           <td><span class="badge badge-slate">${comp ? comp.code : g.compId}</span></td>
           <td>${escapeHtml(g.indicator || "—")}</td>
           <td>${escapeHtml(g.deadline || "—")}</td>
-          <td><button class="btn btn-danger btn-sm" onclick="deleteGoal('${g.id}')">Изтрий</button></td>
+          <td class="edit-only"><button class="btn btn-danger btn-sm" onclick="deleteGoal('${g.id}')">Изтрий</button></td>
         </tr>
       `;
     }).join("");
@@ -1345,6 +1493,7 @@
   }
 
   async function syncFromPortfolio() {
+    if (!isUnlocked) return;
     try {
       const resp = await fetch("index.html?nocache=" + Date.now());
       if (!resp.ok) throw new Error("Файлът index.html не беше открит.");
@@ -1406,6 +1555,7 @@
   }
 
   function exportJSON() {
+    if (!isUnlocked) return;
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -1417,6 +1567,7 @@
   }
 
   function importJSON(event) {
+    if (!isUnlocked) return;
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
@@ -1469,11 +1620,9 @@
   }
 
   function resetAllData() {
+    if (!isUnlocked) return;
     if (!confirm("Сигурни ли сте, че искате да възстановите началния експертен профил с 8-те доказателства?")) return;
     localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem("azeynev_attestation_naredba15_v5");
-    localStorage.removeItem("azeynev_attestation_naredba15_v4");
-    localStorage.removeItem("azeynev_attestation_naredba15_v3");
     location.reload();
   }
 
@@ -1484,6 +1633,7 @@
     renderEvidences();
     renderGoals();
     renderReport();
+    applyLockState();
   }
 
   loadState();
