@@ -45,17 +45,23 @@
     <!-- Matrix Rain Background -->
     <canvas id="matrix-bg" class="fixed inset-0 pointer-events-none opacity-15 z-0"></canvas>
 
-    <!-- Top Command Header with TryHackMe Rank & XP -->
+   <!-- Top Command Header with TryHackMe Rank & XP -->
     <header class="sticky top-0 z-30 border-b border-slate-800/90 bg-slate-950/95 backdrop-blur-xl shrink-0">
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
+                <a href="index.html" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 hover:bg-emerald-500/20 border border-slate-700 hover:border-emerald-500/60 text-slate-200 hover:text-emerald-300 text-xs font-mono font-bold transition shadow-sm" title="Върни се в основния сайт">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Към сайта</span>
+                </a>
+                <div class="h-6 w-px bg-slate-800 hidden sm:block"></div>
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 via-emerald-500 to-cyan-500 flex items-center justify-center text-slate-950 font-black shadow-lg">
                     <i class="fa-solid fa-terminal text-lg"></i>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="font-black text-lg tracking-tight text-white">CyberMath <span class="text-emerald-400">OPS</span></span>
-                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">THM ROOM EDITION</span>
+                        <span class="px-2 py-0.5 te
+    xt-[10px] font-bold uppercase tracking-widest rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">THM ROOM EDITION</span>
                     </div>
                     <p class="text-[11px] text-slate-400 hidden sm:block">
                         Ранг: <strong id="user-rank" class="text-cyan-400">[0x1] Script Kiddie</strong> • XP: <strong id="user-xp" class="text-emerald-400">0 XP</strong> • Задачи: <strong id="global-score-pill" class="text-amber-400">0 / 11</strong>
@@ -1237,4 +1243,5 @@
         renderFinalExam();
     </script>
 </body>
+
 </html>
