@@ -569,6 +569,28 @@ setInterval(()=>{
                 serverLabel.textContent = val || 'Централен сървър';
             }
         }
+  function updateServerText(val) {
+            const serverLabel = document.getElementById('serverText') 
+                             || document.getElementById('serverLabel') 
+                             || document.getElementById('serverName');
+            if (serverLabel) {
+                serverLabel.textContent = val || 'Централен сървър';
+            }
+        }
+
+        function updateNetworkSpeed(val) {
+            const speed = parseFloat(val) || 1;
+            if (typeof simulationSpeed !== 'undefined') simulationSpeed = speed;
+            if (typeof networkSpeed !== 'undefined') networkSpeed = speed;
+            if (typeof speedMultiplier !== 'undefined') speedMultiplier = speed;
+
+            const speedLabel = document.getElementById('speedText') 
+                            || document.getElementById('networkSpeedText') 
+                            || document.getElementById('speedValue');
+            if (speedLabel) {
+                speedLabel.textContent = speed + 'x';
+            }
+        }
 </script>
 </body>
 </html>
