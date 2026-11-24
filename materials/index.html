@@ -1432,9 +1432,65 @@
             if (e.key === 'Escape') closeMaterialModal();
         });
 
-        // Initialize counters and grid
+        // =========================================================================
+        // АВТОМАТИЧНО СИНХРОНИЗИРАНЕ С GITHUB API (ЗА ВСИЧКИ БЪДЕЩИ РЕПОЗИТОРИТА)
+        // =========================================================================
+        async function syncGitHubRepositories() {
+            try {
+                const response = await fetch('https://api.github.com/users/azeynev/repos?sort=updated&per_page=100');
+                if (!response.ok) return;
+                const repos = await response.json();
+
+                // Списък със служебни или вече ръчно добавени хранилища, за да не се дублират
+                const excludedRepos = ['azeynev.github.io', 'azeynev', 'hybrid-ai-cybershield'];
+                let addedNew = false;
+
+                repos.forEach(repo => {
+                    if (repo.fork || excludedRepos.includes(repo.name)) return;
+
+                    // Ако репото има зададен GitHub Pages линк в Website (homepage), ползва него; иначе стандартния Pages адрес
+                    const liveUrl = (repo.homepage && repo.homepage.trim() !== "")
+                        ? repo.homepage.trim()
+                        : `https://azeynev.github.io/${repo.name}/`;
+
+                    // Проверка дали вече не съществува в MATERIALS_DATA
+                    const alreadyExists = MATERIALS_DATA.some(item => item.file === liveUrl);
+                    if (alreadyExists) return;
+
+                    const formattedTitle = repo.name
+                        .replace(/[-_]/g, ' ')
+                        .replace(/\b\w/g, l => l.toUpperCase());
+
+                    MATERIALS_DATA.push({
+                        file: liveUrl,
+                        cat: "informatics",
+                        grade: "11-12",
+                        gradeLabel: "11. – 12. клас / ВУЗ",
+                        subjectBg: "GitHub · Нов проект",
+                        subjectEn: "GitHub · New Project",
+                        titleBg: formattedTitle,
+                        titleEn: formattedTitle,
+                        descBg: repo.description || "Интерактивен проект и софтуерна разработка с отворен код от GitHub профила на д-р Адем Зейнев.",
+                        descEn: repo.description || "Interactive open-source project and software development from Dr. Adem Zeinev's GitHub repository.",
+                        demoType: "cyber"
+                    });
+                    addedNew = true;
+                });
+
+                // Ако са открити нови хранилища, обновяваме броячите и преначертаваме картите
+                if (addedNew) {
+                    updateCategoryCounts();
+                    renderMaterials();
+                }
+            } catch (error) {
+                console.warn("GitHub API офлайн режим – заредени са само локалните материали.", error);
+            }
+        }
+
+        // Initialize counters, grid, and auto-sync new GitHub repositories
         updateCategoryCounts();
         renderMaterials();
+        syncGitHubRepositories();
     </script>
 </body>
 </html>
