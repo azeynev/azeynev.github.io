@@ -9,57 +9,68 @@
     --bg:#071025; --panel:#0b1b2a; --accent:#29a3ff; --danger:#ff6b6b; --good:#4ae39a;
     --muted:#9db6d9; --card:#071a2b; --warn:#ffbf00;
   }
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;color:#e6eef8;background:linear-gradient(180deg,#041020,#071025);-webkit-font-smoothing:antialiased}
-  .wrap{display:grid;grid-template-columns:380px 1fr;gap:12px;padding:12px;height:100vh;box-sizing:border-box}
-  .left{background:var(--panel);padding:12px;border-radius:10px;overflow:auto}
-  .right{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:12px;border-radius:10px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
-  h1{margin:0 0 8px;font-size:18px}
-  label{font-size:13px;color:var(--muted);display:block;margin-top:8px}
-  .row{display:flex;gap:8px;align-items:center}
-  input[type=range]{width:100%}
-  input[type=number]{width:76px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8}
-  select,button{padding:8px;border-radius:6px;border:none;background:var(--accent);color:#072033;font-weight:700;cursor:pointer}
-  button:hover{filter:brightness(1.1)}
-  .small{font-size:13px;color:var(--muted)}
-  .panel{background:rgba(255,255,255,0.018);padding:10px;border-radius:8px;margin-bottom:8px}
-  .network{position:relative;height:100%;min-height:520px;border-radius:8px;background:linear-gradient(180deg,#051427,#071025);padding:12px;overflow:hidden}
-  .device{position:absolute;text-align:center;border-radius:8px;padding:8px;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;z-index:2}
-  .server{width:240px;height:140px;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#0b3a66,#07324f);box-shadow:0 8px 30px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;z-index:2}
-  .client{width:76px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;position:absolute;font-size:12px;font-weight:600;z-index:2}
-  .client.legit{background:linear-gradient(180deg,#1db954,#11914e)}
-  .client.bot{background:linear-gradient(180deg,#ff6b6b,#cc4a4a);cursor:pointer;width:28px;height:28px;border-radius:50%;font-size:10px}
-  .packet{position:fixed;pointer-events:none;z-index:999}
-  .meter{width:80%;height:12px;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden;margin:6px 0}
-  .meterFill{height:100%;width:0%;background:linear-gradient(90deg,#4ae39a,#ffd54d);transition:width 0.3s}
-  .controls{display:flex;flex-direction:column;gap:8px}
-  .log{height:180px;overflow:auto;background:rgba(0,0,0,0.12);padding:8px;border-radius:8px;font-family:monospace;font-size:12px}
-  .statGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-  .stat{background:rgba(255,255,255,0.02);padding:8px;border-radius:6px;text-align:center}
-  canvas{background:rgba(4,16,32,0.85);border:1px solid rgba(255,255,255,0.06);border-radius:6px}
-  .muted{color:var(--muted);font-size:12px}
-  .presetRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-  .pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.05);cursor:pointer;font-size:12px}
-  .pill:hover{background:rgba(41,163,255,0.25)}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#e6eef8;background:linear-gradient(180deg,#041020,#071025);-webkit-font-smoothing:antialiased}
+  .wrap{display:grid;grid-template-columns:370px 1fr;gap:12px;padding:12px;height:100vh}
+  .left{background:var(--panel);padding:12px;border-radius:10px;overflow-y:auto;border:1px solid rgba(255,255,255,0.06)}
+  .right{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:12px;border-radius:10px;display:flex;flex-direction:column;gap:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
+  h1{margin:0 0 6px;font-size:18px;letter-spacing:-0.2px}
+  label{font-size:12.5px;color:var(--muted);display:block;margin-top:8px}
+  input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+  select,button{padding:8px 10px;border-radius:6px;border:none;background:var(--accent);color:#072033;font-weight:700;cursor:pointer;font-size:13px;transition:filter 0.15s}
+  select{background:#102942;color:#e6eef8;border:1px solid rgba(255,255,255,0.12);font-weight:600}
+  button:hover{filter:brightness(1.12)}
+  .small{font-size:12.5px;color:var(--muted)}
+  .panel{background:rgba(255,255,255,0.022);padding:10px;border-radius:8px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.04)}
+  .network{position:relative;flex:1;min-height:300px;border-radius:8px;background:radial-gradient(circle at 50% 50%, #091e3a 0%, #051122 100%);border:1px solid rgba(41,163,255,0.15);overflow:hidden}
+  .topo-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+  .device{position:absolute;text-align:center;border-radius:8px;padding:6px 10px;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:13px;z-index:2;box-shadow:0 4px 16px rgba(0,0,0,0.45)}
+  .server{width:230px;height:130px;left:55%;top:56%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#0e4578,#083152);border:1px solid rgba(74,227,154,0.35);box-shadow:0 8px 30px rgba(0,0,0,0.65);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;z-index:2;padding:10px}
+  .client{width:78px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;position:absolute;font-size:12px;font-weight:700;z-index:2;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
+  .client.legit{background:linear-gradient(180deg,#1db954,#11914e);border:1px solid rgba(255,255,255,0.2)}
+  .client.bot{background:linear-gradient(180deg,#ff6b6b,#c93b3b);cursor:pointer;width:28px;height:28px;border-radius:50%;font-size:9.5px;border:1px solid rgba(255,255,255,0.25);transition:transform 0.15s, opacity 0.2s}
+  .client.bot:hover{transform:scale(1.2);z-index:5}
+  .packet{position:fixed;pointer-events:none;z-index:999;box-shadow:0 0 6px currentColor}
+  .meter{width:88%;height:11px;background:rgba(0,0,0,0.35);border-radius:8px;overflow:hidden;margin:8px 0;border:1px solid rgba(255,255,255,0.08)}
+  .meterFill{height:100%;width:0%;background:linear-gradient(90deg,#4ae39a,#ffd54d);transition:width 0.25s ease}
+  .controls{display:flex;flex-direction:column;gap:6px}
+  .mitigations label{display:flex;align-items:center;gap:8px;margin-top:4px;cursor:pointer;color:#d6e4f7}
+  .log{height:150px;overflow-y:auto;background:rgba(0,0,0,0.25);padding:8px;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;line-height:1.45}
+  .statGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+  .stat{background:rgba(255,255,255,0.03);padding:7px 4px;border-radius:6px;text-align:center;border:1px solid rgba(255,255,255,0.04);font-size:11.5px;color:var(--muted)}
+  .stat div{color:#ffffff;font-weight:700;margin-top:2px}
+  .chartsRow{display:grid;grid-template-columns:1fr 1fr;gap:12px;height:155px;flex-shrink:0}
+  .chartBox{position:relative;width:100%;height:100%;background:rgba(4,16,32,0.9);border:1px solid rgba(255,255,255,0.08);border-radius:8px;overflow:hidden}
+  canvas{display:block;width:100%;height:100%}
+  .muted{color:var(--muted);font-size:11.5px;text-align:center}
+  .presetRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+  .pill{padding:5px 10px;border-radius:999px;background:rgba(255,255,255,0.07);cursor:pointer;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,0.08);transition:background 0.15s}
+  .pill:hover{background:rgba(41,163,255,0.3);border-color:var(--accent)}
   .explain{background:var(--warn);color:#072033;flex:1}
   .download{background:linear-gradient(90deg,#4ae39a,#29a3ff);color:#072033;flex:1}
+  @media (max-width: 900px){
+    .wrap{grid-template-columns:1fr;height:auto;min-height:100vh}
+    .network{min-height:360px}
+    .chartsRow{grid-template-columns:1fr;height:280px}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="left">
     <h1>DDoS Simulator — PRO (educational)</h1>
-    <div class="small" style="margin-bottom:8px">Цел: учебна, визуална и защитна симулация. Без реални мрежови действия.</div>
+    <div class="small" style="margin-bottom:10px">Цел: учебна, визуална и защитна симулация. Без реални мрежови действия.</div>
 
     <div class="panel">
       <div class="controls">
-        <label>Attack type</label>
+        <label>Тип атака (Attack type)</label>
         <select id="attackType">
           <option value="http">HTTP GET flood</option>
           <option value="syn">SYN flood (simulated)</option>
           <option value="udp">UDP flood</option>
         </select>
 
-        <label>Presets</label>
+        <label>Бързи сценарии (Presets)</label>
         <div class="presetRow">
           <div class="pill" data-bots="50" data-rate="2" data-legit="1" data-cap="300">Small</div>
           <div class="pill" data-bots="300" data-rate="4" data-legit="1" data-cap="500">Medium</div>
@@ -67,23 +78,23 @@
           <div class="pill" data-bots="4000" data-rate="8" data-legit="1" data-cap="1200">Massive</div>
         </div>
 
-        <label>Брой ботове: <span id="botCountLabel">200</span></label>
+        <label>Брой ботове: <strong id="botCountLabel" style="color:#fff">200</strong></label>
         <input id="botCount" type="range" min="0" max="5000" value="200"/>
 
-        <label>Честота заявки/бот (req/sec): <span id="botRateLabel">2</span></label>
+        <label>Честота заявки/бот (req/sec): <strong id="botRateLabel" style="color:#fff">2</strong></label>
         <input id="botRate" type="range" min="0" max="20" value="2"/>
 
-        <label>Легитимни заявки/сек: <span id="legitRateLabel">1</span></label>
+        <label>Легитимни заявки/сек: <strong id="legitRateLabel" style="color:#fff">1</strong></label>
         <input id="legitRate" type="range" min="0" max="50" value="1"/>
 
-        <label>Сървър капацитет (req/sec): <span id="srvCapacityLabel">500</span></label>
+        <label>Сървър капацитет (req/sec): <strong id="srvCapacityLabel" style="color:#fff">500</strong></label>
         <input id="srvCapacity" type="range" min="50" max="5000" value="500"/>
       </div>
     </div>
 
     <div class="panel">
-      <div class="small">Mitigations</div>
-      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+      <div class="small" style="font-weight:700;color:#fff;margin-bottom:4px">Защитни механизми (Mitigations)</div>
+      <div class="mitigations">
         <label><input type="checkbox" id="rateLimit" checked/> Rate limit per IP (simulated)</label>
         <label><input type="checkbox" id="blacklist"/> Auto blacklist top talkers</label>
         <label><input type="checkbox" id="autoscale"/> Autoscale (add capacity)</label>
@@ -91,68 +102,59 @@
         <label><input type="checkbox" id="challenge"/> Challenge (CAPTCHA simulate)</label>
       </div>
 
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button id="startBtn" style="flex:1">Start</button>
-        <button id="pauseBtn" style="flex:1">Pause</button>
-        <button id="stopBtn" style="flex:1">Stop</button>
-        <button id="resetBtn" style="flex:1">Reset</button>
+      <div style="display:flex;gap:6px;margin-top:12px">
+        <button id="startBtn" style="flex:1;background:#4ae39a">Start</button>
+        <button id="pauseBtn" style="flex:1;background:#ffbf00">Pause</button>
+        <button id="stopBtn" style="flex:1;background:#ff6b6b">Stop</button>
+        <button id="resetBtn" style="flex:1;background:#9db6d9">Reset</button>
       </div>
 
-      <div style="display:flex;gap:8px;margin-top:8px">
+      <div style="display:flex;gap:6px;margin-top:8px">
         <button id="explainBtn" class="explain">Explain (step)</button>
         <button id="downloadBtn" class="download">Download report</button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="small">Live stats</div>
+      <div class="small" style="font-weight:700;color:#fff">Статистика в реално време (Live stats)</div>
       <div class="statGrid">
-        <div class="stat">RPS <div id="rps" style="font-size:20px">0</div></div>
-        <div class="stat">Avg latency ms <div id="lat" style="font-size:20px">0</div></div>
-        <div class="stat">Queue <div id="queue" style="font-size:20px">0</div></div>
-        <div class="stat">Blocked <div id="blocked" style="font-size:20px">0</div></div>
-        <div class="stat">Capacity <div id="cap" style="font-size:20px">500</div></div>
-        <div class="stat">Top talker <div id="toptalker" style="font-size:13px">-</div></div>
+        <div class="stat">RPS <div id="rps" style="font-size:17px">0</div></div>
+        <div class="stat">Latency ms <div id="lat" style="font-size:17px">0</div></div>
+        <div class="stat">Queue <div id="queue" style="font-size:17px">0</div></div>
+        <div class="stat">Blocked <div id="blocked" style="font-size:17px">0</div></div>
+        <div class="stat">Capacity <div id="cap" style="font-size:17px">500</div></div>
+        <div class="stat">Top talker <div id="toptalker" style="font-size:12px">-</div></div>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="small">Log</div>
+    <div class="panel" style="margin-bottom:0">
+      <div class="small" style="font-weight:700;color:#fff;margin-bottom:6px">Системен дневник (Log)</div>
       <div id="log" class="log"></div>
     </div>
   </div>
 
   <div class="right">
-    <div class="network">
-      <!-- visual elements -->
-      <div id="clientLegit" class="client legit" style="left:18px;top:220px">Client</div>
-      <div id="switch" class="device" style="left:220px;top:40px;width:120px;height:64px;background:#225e9e">Switch</div>
-      <div id="router" class="device" style="left:420px;top:40px;width:120px;height:64px;background:#f08b1a">Router</div>
+    <div class="network" id="networkArea">
+      <svg class="topo-lines" id="topoLines"></svg>
+      <div id="clientLegit" class="client legit" style="left:22px;top:52%;transform:translateY(-50%)">Client</div>
+      <div id="switch" class="device" style="left:28%;top:22px;width:110px;height:48px;background:#225e9e">Switch</div>
+      <div id="router" class="device" style="left:55%;top:22px;transform:translateX(-50%);width:110px;height:48px;background:#f08b1a">Router</div>
       <div id="server" class="server">
-        <h3 style="margin:0 0 6px">Учебен сървър</h3>
+        <h3 style="margin:0;font-size:15px">Учебен сървър</h3>
         <div class="meter"><div id="cpuFill" class="meterFill"></div></div>
         <div id="serverQueueText" class="muted">Обработва: 0 / Капацитет: 500 req/s</div>
       </div>
-
-      <!-- dynamic bots container -->
       <div id="botsContainer"></div>
+    </div>
 
-      <!-- canvas charts overlay -->
-      <div style="position:absolute;right:12px;bottom:12px;width:420px;z-index:3">
-        <canvas id="chartRps" width="420" height="120"></canvas>
-        <canvas id="chartLat" width="420" height="120" style="margin-top:6px"></canvas>
-      </div>
+    <div class="chartsRow">
+      <div class="chartBox"><canvas id="chartRps"></canvas></div>
+      <div class="chartBox"><canvas id="chartLat"></canvas></div>
     </div>
   </div>
 </div>
 
 <script>
-/* DDoS Simulator PRO — single-file educational simulation
-- no network calls
-- purely client-side visual & statistical simulation
-*/
-
-// --- state & elements
 const botCountEl = document.getElementById('botCount');
 const botRateEl = document.getElementById('botRate');
 const legitRateEl = document.getElementById('legitRate');
@@ -189,7 +191,8 @@ const topTalkerEl = document.getElementById('toptalker');
 const cpuFill = document.getElementById('cpuFill');
 const serverQueueText = document.getElementById('serverQueueText');
 const botsContainer = document.getElementById('botsContainer');
-const topo = document.querySelector('.network');
+const topo = document.getElementById('networkArea');
+const topoLines = document.getElementById('topoLines');
 const clientLegit = document.getElementById('clientLegit');
 const switchEl = document.getElementById('switch');
 const routerEl = document.getElementById('router');
@@ -197,11 +200,9 @@ const serverEl = document.getElementById('server');
 
 const chartRps = document.getElementById('chartRps');
 const chartLat = document.getElementById('chartLat');
-const ctxRps = chartRps.getContext('2d');
-const ctxLat = chartLat.getContext('2d');
 
 let simulationInterval = null;
-let tickMs = 1000;
+let tickMs = 900;
 let running = false;
 let paused = false;
 let bots = [];
@@ -210,7 +211,6 @@ let blacklist = new Set();
 let report = {events:[],samples:[]};
 let timeSeries = {rps:[],lat:[],queue:[]};
 
-// server state
 let serverState = {
   capacity: parseInt(srvCapacityEl.value,10),
   queue: 0,
@@ -229,7 +229,6 @@ function updateServerText() {
   }
 }
 
-// init labels and layout
 function syncLabels(){
   botCountLabel.textContent = botCountEl.value;
   botRateLabel.textContent = botRateEl.value;
@@ -255,7 +254,6 @@ srvCapacityEl.addEventListener('input', () => {
 syncLabels();
 updateServerText();
 
-// preset clicks
 presetPills.forEach(p=>{
   p.addEventListener('click', ()=> {
     botCountEl.value = p.dataset.bots;
@@ -269,69 +267,104 @@ presetPills.forEach(p=>{
   });
 });
 
-// layout bots (ограничаваме визуалните DOM елементи до 150 за висока производителност, като изчисленията ползват пълния брой)
+function drawTopologyConnections() {
+  const base = topo.getBoundingClientRect();
+  if (!base.width || !base.height) return;
+  const center = (el) => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left - base.left + r.width / 2, y: r.top - base.top + r.height / 2 };
+  };
+  const cLegit = center(clientLegit);
+  const cSwitch = center(switchEl);
+  const cRouter = center(routerEl);
+  const cServer = center(serverEl);
+
+  topoLines.innerHTML = `
+    <line x1="${cLegit.x}" y1="${cLegit.y}" x2="${cSwitch.x}" y2="${cSwitch.y}" stroke="rgba(74,227,154,0.35)" stroke-width="2" stroke-dasharray="5,5"/>
+    <line x1="${cSwitch.x}" y1="${cSwitch.y}" x2="${cRouter.x}" y2="${cRouter.y}" stroke="rgba(41,163,255,0.45)" stroke-width="2.5"/>
+    <line x1="${cRouter.x}" y1="${cRouter.y}" x2="${cServer.x}" y2="${cServer.y}" stroke="rgba(255,191,0,0.45)" stroke-width="2.5"/>
+  `;
+}
+
 function createBotElements(n){
   botsContainer.innerHTML = '';
   bots = [];
   ipStats = {};
   blacklist = new Set();
-  const visualCount = Math.min(n, 150);
+  const visualCount = Math.min(n, 90);
   const rect = topo.getBoundingClientRect();
-  const w = rect.width || 800;
-  const h = rect.height || 520;
+  const w = rect.width || 760;
+  const h = rect.height || 360;
 
   for(let i=0;i<visualCount;i++){
     const b = document.createElement('div');
     b.className = 'client bot';
     b.textContent = 'Bot';
+    b.title = 'Кликнете за ръчно блокиране / отблокиране (Blacklist)';
     const zone = Math.random();
     let x, y;
-    if(zone<0.4){ x = 10 + Math.random()*80; y = 30 + Math.random()*(h-70); }
-    else if(zone<0.8){ x = w-110 + Math.random()*40; y = 30 + Math.random()*(h-70); }
-    else { x = 80 + Math.random()*(w-160); y = Math.random()<0.5?10:h-60; }
+    if(zone < 0.35){ x = 14 + Math.random()*85; y = 20 + Math.random()*(h-55); }
+    else if(zone < 0.75){ x = w - 115 + Math.random()*75; y = 20 + Math.random()*(h-55); }
+    else { x = 110 + Math.random()*(w-230); y = h - 46 + Math.random()*12; }
     b.style.left = `${x}px`; b.style.top = `${y}px`;
-    b.dataset.ip = `10.0.${Math.floor(i/256)}.${i%256}`;
+    b.dataset.ip = `10.0.${Math.floor(i/256)}.${(i%254)+1}`;
     b.dataset.id = i;
-    b.dataset.requests = 0;
     b.addEventListener('click', ()=> {
       const ip = b.dataset.ip;
       if(blacklist.has(ip)){ blacklist.delete(ip); log(`Removed ${ip} from blacklist`, '#ffd54d'); b.style.opacity='1'; }
-      else { blacklist.add(ip); log(`Manually blacklisted ${ip}`, '#ff6b6b'); b.style.opacity='0.35'; }
+      else { blacklist.add(ip); log(`Manually blacklisted ${ip}`, '#ff6b6b'); b.style.opacity='0.3'; }
       updateTopTalker();
     });
     botsContainer.appendChild(b);
     bots.push(b);
   }
   updateTopTalker();
+  drawTopologyConnections();
 }
 
-// helper log
 function log(msg, color){
-  const d=document.createElement('div'); d.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
+  const d=document.createElement('div');
+  d.textContent = `${new Date().toLocaleTimeString()} — ${msg}`;
   if(color) d.style.color=color;
   logBox.prepend(d);
   report.events.push({t:Date.now(),msg});
-  if(logBox.children.length>800) logBox.removeChild(logBox.lastChild);
+  if(logBox.children.length>500) logBox.removeChild(logBox.lastChild);
 }
 
-// visual animate small dot
-function animateDot(fromEl,toEl,color,fast=false){
+function animateRoute(points, color, stepDur){
+  if(points.length < 2) return;
   const dot = document.createElement('div');
-  dot.className='packet';
-  dot.style.width='8px'; dot.style.height='8px'; dot.style.borderRadius='50%';
-  dot.style.background = color; dot.style.opacity='0.95';
+  dot.className = 'packet';
+  dot.style.width = '7px'; dot.style.height = '7px'; dot.style.borderRadius = '50%';
+  dot.style.background = color; dot.style.color = color;
   document.body.appendChild(dot);
-  const f = fromEl.getBoundingClientRect(); const t = toEl.getBoundingClientRect();
-  dot.style.left = (f.left + f.width/2) + 'px'; dot.style.top = (f.top + f.height/2) + 'px';
-  void dot.offsetWidth;
-  const dur = fast? 300 : (500 + Math.random()*500);
-  dot.style.transition = `left ${dur}ms linear, top ${dur}ms linear, opacity 200ms`;
-  dot.style.left = (t.left + t.width/2) + 'px'; dot.style.top = (t.top + t.height/2) + 'px';
-  setTimeout(()=> dot.style.opacity='0', dur-80);
-  setTimeout(()=> dot.remove(), dur+200);
+
+  const getPos = (el) => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width/2 - 3.5, y: r.top + r.height/2 - 3.5 };
+  };
+
+  let idx = 0;
+  const start = getPos(points[0]);
+  dot.style.left = start.x + 'px';
+  dot.style.top = start.y + 'px';
+
+  function nextHop(){
+    idx++;
+    if(idx >= points.length){
+      dot.remove();
+      return;
+    }
+    const dest = getPos(points[idx]);
+    dot.style.transition = `left ${stepDur}ms linear, top ${stepDur}ms linear`;
+    void dot.offsetWidth;
+    dot.style.left = dest.x + 'px';
+    dot.style.top = dest.y + 'px';
+    setTimeout(nextHop, stepDur);
+  }
+  requestAnimationFrame(nextHop);
 }
 
-// main tick (approx 1s)
 function tick(){
   if(!running || paused) return;
   const attackType = attackTypeEl.value;
@@ -344,20 +377,17 @@ function tick(){
   const isCDN = cdnChk.checked;
   const isChallenge = challengeChk.checked;
 
-  // autoscale logic
   if(isAutoscale && serverState.queue > serverState.capacity * 0.75){
     const add = Math.round(serverState.capacity * 0.35);
     serverState.capacity = Math.min(5000, serverState.capacity + add);
     log(`Autoscale: added capacity +${add}, total ${serverState.capacity}`, '#ffd54d');
   }
 
-  // compute requests
   let effectiveBotRateFactor = isCDN ? 0.35 : 1.0;
   if(isChallenge) effectiveBotRateFactor *= 0.4;
   let botReq = Math.round(botCount * botRate * effectiveBotRateFactor);
   let legitReq = Math.round(legitRate);
 
-  // rate limit simulation
   if(isRateLimit){
     const perIpCap = attackType==='syn' ? 8 : 6;
     const maxAllowed = botCount * perIpCap;
@@ -368,9 +398,8 @@ function tick(){
     }
   }
 
-  // blacklist auto
   if(isBlacklistAuto && bots.length > 0){
-    for(let i=0;i<Math.min(bots.length, 50); i++){
+    for(let i=0;i<Math.min(bots.length, 40); i++){
       const b = bots[Math.floor(Math.random()*bots.length)];
       const ip = b.dataset.ip;
       ipStats[ip] = ipStats[ip] || {count:0,ip};
@@ -381,12 +410,11 @@ function tick(){
       if(s.count > 100 && !blacklist.has(s.ip)){
         blacklist.add(s.ip);
         log(`Auto-blacklist ${s.ip} (high volume)`, '#ff6b6b');
-        bots.forEach(b=>{ if(b.dataset.ip===s.ip) b.style.opacity='0.35'; });
+        bots.forEach(b=>{ if(b.dataset.ip===s.ip) b.style.opacity='0.3'; });
       }
     });
   }
 
-  // clip botReq based on blacklist
   if(blacklist.size>0){
     const approxBlocked = Math.round(botReq * Math.min(0.6, blacklist.size / Math.max(1, bots.length)));
     botReq = Math.max(0, botReq - approxBlocked);
@@ -395,32 +423,29 @@ function tick(){
 
   const incoming = botReq + legitReq;
 
-  // animate sample traffic
-  const sample = Math.min(40, incoming);
+  const sample = Math.min(28, incoming);
   for(let i=0;i<sample;i++){
     const isBot = Math.random() < (botReq/(incoming||1));
     if(isBot && bots.length>0){
       const b = bots[Math.floor(Math.random()*bots.length)];
       if(blacklist.has(b.dataset.ip)) continue;
-      const color = attackType==='udp' ? 'rgba(160,74,255,0.95)' : (attackType==='syn' ? 'rgba(255,140,30,0.95)' : 'rgba(255,100,100,0.95)');
-      animateDot(b, switchEl, color, attackType==='syn');
+      const color = attackType==='udp' ? '#b366ff' : (attackType==='syn' ? '#ff9933' : '#ff5c5c');
+      const route = isCDN ? [b, switchEl, routerEl] : [b, switchEl, routerEl, serverEl];
+      animateRoute(route, color, attackType==='syn' ? 190 : 250);
     } else {
-      animateDot(clientLegit, switchEl, 'rgba(75,220,140,0.95)', true);
+      animateRoute([clientLegit, switchEl, routerEl, serverEl], '#4ae39a', 240);
     }
   }
 
-  // server queue & processing
   serverState.queue += incoming;
   serverState.processedLastSec = Math.min(serverState.capacity, serverState.queue);
   serverState.queue -= serverState.processedLastSec;
   serverState.totalProcessed += serverState.processedLastSec;
 
-  // latency calc
   const baseline = 20;
   const qFactor = Math.min(1, serverState.queue / Math.max(1, serverState.capacity));
-  const latency = Math.round(baseline + qFactor*800 + Math.random()*60);
+  const latency = Math.round(baseline + qFactor*800 + Math.random()*50);
 
-  // update stats UI
   rpsEl.textContent = incoming;
   latEl.textContent = latency;
   queueEl.textContent = serverState.queue;
@@ -431,7 +456,6 @@ function tick(){
   cpuFill.style.width = `${Math.round(util*100)}%`;
   cpuFill.style.background = util>0.9 ? "linear-gradient(90deg,#ff6b6b,#ffb09a)" : "linear-gradient(90deg,#4ae39a,#ffd54d)";
 
-  // record time series
   timeSeries.rps.push(incoming); timeSeries.lat.push(latency); timeSeries.queue.push(serverState.queue);
   if(timeSeries.rps.length>60){ timeSeries.rps.shift(); timeSeries.lat.shift(); timeSeries.queue.shift(); }
 
@@ -444,47 +468,74 @@ function tick(){
   if(incoming > serverState.capacity*2 && Math.random()<0.25) log(`Traffic >> capacity (${incoming} req/s)`, '#ff6b6b');
 }
 
-// chart drawing
+function setupHiDPICanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const w = Math.max(100, Math.round(rect.width));
+  const h = Math.max(80, Math.round(rect.height));
+  if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+  }
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h };
+}
+
+function drawGrid(ctx, w, h) {
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1;
+  for (let y = 28; y < h; y += 30) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+  }
+}
+
 function drawCharts(){
-  ctxRps.clearRect(0,0,chartRps.width,chartRps.height);
-  ctxLat.clearRect(0,0,chartLat.width,chartLat.height);
-  ctxRps.fillStyle = 'rgba(255,255,255,0.03)'; ctxRps.fillRect(0,0,chartRps.width,chartRps.height);
-  ctxLat.fillStyle = 'rgba(255,255,255,0.03)'; ctxLat.fillRect(0,0,chartLat.width,chartLat.height);
+  const rpsSetup = setupHiDPICanvas(chartRps);
+  const latSetup = setupHiDPICanvas(chartLat);
+  const c1 = rpsSetup.ctx, w1 = rpsSetup.w, h1 = rpsSetup.h;
+  const c2 = latSetup.ctx, w2 = latSetup.w, h2 = latSetup.h;
+
+  c1.clearRect(0,0,w1,h1);
+  c2.clearRect(0,0,w2,h2);
+  drawGrid(c1, w1, h1);
+  drawGrid(c2, w2, h2);
 
   const arr = timeSeries.rps;
   if(arr.length>1){
-    const maxv = Math.max(...arr, 1);
-    ctxRps.beginPath(); ctxRps.strokeStyle='#29a3ff'; ctxRps.lineWidth=2;
-    arr.forEach((v,i)=>{ const x = i*(chartRps.width/(arr.length-1)); const y = chartRps.height - (v/maxv)*(chartRps.height-12) - 6; if(i===0) ctxRps.moveTo(x,y); else ctxRps.lineTo(x,y); });
-    ctxRps.stroke();
+    const maxv = Math.max(...arr, 10);
+    c1.beginPath(); c1.strokeStyle='#29a3ff'; c1.lineWidth=2.2;
+    arr.forEach((v,i)=>{ const x = 10 + i*((w1-20)/(arr.length-1)); const y = h1 - 10 - (v/maxv)*(h1-36); if(i===0) c1.moveTo(x,y); else c1.lineTo(x,y); });
+    c1.stroke();
   }
 
   const la = timeSeries.lat;
   if(la.length>1){
-    const maxv2 = Math.max(...la,1);
-    ctxLat.beginPath(); ctxLat.strokeStyle='#ffd54d'; ctxLat.lineWidth=2;
-    la.forEach((v,i)=>{ const x = i*(chartLat.width/(la.length-1)); const y = chartLat.height - (v/maxv2)*(chartLat.height-12) - 6; if(i===0) ctxLat.moveTo(x,y); else ctxLat.lineTo(x,y); });
-    ctxLat.stroke();
+    const maxv2 = Math.max(...la, 50);
+    c2.beginPath(); c2.strokeStyle='#ffd54d'; c2.lineWidth=2.2;
+    la.forEach((v,i)=>{ const x = 10 + i*((w2-20)/(la.length-1)); const y = h2 - 10 - (v/maxv2)*(h2-36); if(i===0) c2.moveTo(x,y); else c2.lineTo(x,y); });
+    c2.stroke();
   }
 
-  ctxRps.fillStyle='rgba(255,255,255,0.75)'; ctxRps.font='12px sans-serif'; ctxRps.fillText('RPS (last samples)',8,16);
-  ctxLat.fillStyle='rgba(255,255,255,0.75)'; ctxLat.font='12px sans-serif'; ctxLat.fillText('Latency ms (last samples)',8,16);
+  const curRps = arr.length ? arr[arr.length-1] : 0;
+  const curLat = la.length ? la[la.length-1] : 0;
+  c1.fillStyle='#e6eef8'; c1.font='bold 12px Inter, sans-serif'; c1.fillText(`RPS (Заявки/сек): ${curRps}`, 10, 18);
+  c2.fillStyle='#e6eef8'; c2.font='bold 12px Inter, sans-serif'; c2.fillText(`Latency (Закъснение): ${curLat} ms`, 10, 18);
 }
 
-// update top talker UI
 function updateTopTalker(){
   const arr = Object.values(ipStats).sort((a,b)=>b.count-a.count).slice(0,5);
   if(arr.length===0){ topTalkerEl.textContent = '-'; return; }
   topTalkerEl.textContent = `${arr[0].ip} (${arr[0].count})`;
 }
 
-// create initial bots
-function layout() { createBotElements(parseInt(botCountEl.value,10)); }
-window.addEventListener('resize', ()=> layout());
+function layout() {
+  createBotElements(parseInt(botCountEl.value,10));
+  drawCharts();
+}
+window.addEventListener('resize', layout);
 layout();
-drawCharts();
 
-// start/pause/stop/reset logic
 startBtn.addEventListener('click', ()=> {
   if(running && !paused) return;
   if(paused){ paused = false; log('Simulation resumed', '#ffd54d'); return; }
@@ -525,7 +576,6 @@ resetBtn.addEventListener('click', ()=> {
   log('Simulation reset','#4ae39a');
 });
 
-// explain mode (stepwise)
 explainBtn.addEventListener('click', async ()=>{
   clearInterval(simulationInterval);
   running = true; paused = false;
@@ -566,7 +616,6 @@ explainBtn.addEventListener('click', async ()=>{
   syncLabels(); updateServerText(); createBotElements(parseInt(botCountEl.value,10));
 });
 
-// download report
 downloadBtn.addEventListener('click', ()=>{
   const data = {
     meta: {time: new Date().toISOString(), attack: attackTypeEl.value, bots: botCountEl.value, botRate: botRateEl.value},
@@ -579,7 +628,6 @@ downloadBtn.addEventListener('click', ()=>{
   URL.revokeObjectURL(url);
 });
 
-// simple top talker simulation updater
 setInterval(()=>{
   if(!running || paused) return;
   for(let i=0;i<5;i++){
