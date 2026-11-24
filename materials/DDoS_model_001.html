@@ -555,9 +555,20 @@ setInterval(()=>{
   updateTopTalker();
 }, 2000);
 
-// safety note
-log('Ready. This is an educational, offline simulator. No real network traffic.', '#ffd54d');
+// Инициализация при зареждане
+        window.addEventListener('load', () => {
+            updateNetworkSpeed(1);
+            resetSimulation();
+        });
 
+        function updateServerText(val) {
+            const serverLabel = document.getElementById('serverText') 
+                             || document.getElementById('serverLabel') 
+                             || document.getElementById('serverName');
+            if (serverLabel) {
+                serverLabel.textContent = val || 'Централен сървър';
+            }
+        }
 </script>
 </body>
 </html>
