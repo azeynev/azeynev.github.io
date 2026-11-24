@@ -19,33 +19,36 @@
   input[type=range]{width:100%}
   input[type=number]{width:76px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8}
   select,button{padding:8px;border-radius:6px;border:none;background:var(--accent);color:#072033;font-weight:700;cursor:pointer}
+  button:hover{filter:brightness(1.1)}
   .small{font-size:13px;color:var(--muted)}
-  .panel{background:rgba(255,255,255,0.018);padding:10px;border-radius:8px}
-  .network{position:relative;height:520px;border-radius:8px;background:linear-gradient(180deg,#051427,#071025);padding:12px;overflow:hidden}
-  .device{position:absolute;text-align:center;border-radius:8px;padding:8px;color:white}
-  .server{width:220px;height:140px;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#0b3a66,#07324f);box-shadow:0 8px 30px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .client{width:84px;height:46px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;position:absolute}
+  .panel{background:rgba(255,255,255,0.018);padding:10px;border-radius:8px;margin-bottom:8px}
+  .network{position:relative;height:100%;min-height:520px;border-radius:8px;background:linear-gradient(180deg,#051427,#071025);padding:12px;overflow:hidden}
+  .device{position:absolute;text-align:center;border-radius:8px;padding:8px;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;z-index:2}
+  .server{width:240px;height:140px;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#0b3a66,#07324f);box-shadow:0 8px 30px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;z-index:2}
+  .client{width:76px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;position:absolute;font-size:12px;font-weight:600;z-index:2}
   .client.legit{background:linear-gradient(180deg,#1db954,#11914e)}
-  .client.bot{background:linear-gradient(180deg,#ff6b6b,#cc4a4a)}
+  .client.bot{background:linear-gradient(180deg,#ff6b6b,#cc4a4a);cursor:pointer;width:28px;height:28px;border-radius:50%;font-size:10px}
+  .packet{position:fixed;pointer-events:none;z-index:999}
   .meter{width:80%;height:12px;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden;margin:6px 0}
-  .meterFill{height:100%;width:0%;background:linear-gradient(90deg,#4ae39a,#ffd54d)}
+  .meterFill{height:100%;width:0%;background:linear-gradient(90deg,#4ae39a,#ffd54d);transition:width 0.3s}
   .controls{display:flex;flex-direction:column;gap:8px}
   .log{height:180px;overflow:auto;background:rgba(0,0,0,0.12);padding:8px;border-radius:8px;font-family:monospace;font-size:12px}
   .statGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
   .stat{background:rgba(255,255,255,0.02);padding:8px;border-radius:6px;text-align:center}
-  canvas{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.02));border-radius:6px}
-  .muted{color:var(--muted);font-size:13px}
+  canvas{background:rgba(4,16,32,0.85);border:1px solid rgba(255,255,255,0.06);border-radius:6px}
+  .muted{color:var(--muted);font-size:12px}
   .presetRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-  .pill{padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.03);cursor:pointer}
-  .explain{background:var(--warn);color:#072033}
-  .download{background:linear-gradient(90deg,#4ae39a,#29a3ff);color:#072033}
+  .pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.05);cursor:pointer;font-size:12px}
+  .pill:hover{background:rgba(41,163,255,0.25)}
+  .explain{background:var(--warn);color:#072033;flex:1}
+  .download{background:linear-gradient(90deg,#4ae39a,#29a3ff);color:#072033;flex:1}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="left">
     <h1>DDoS Simulator — PRO (educational)</h1>
-    <div class="small">Цел: учебна, визуална и защитна симулация. Без реални мрежови действия.</div>
+    <div class="small" style="margin-bottom:8px">Цел: учебна, визуална и защитна симулация. Без реални мрежови действия.</div>
 
     <div class="panel">
       <div class="controls">
@@ -89,10 +92,10 @@
       </div>
 
       <div style="display:flex;gap:8px;margin-top:10px">
-        <button id="startBtn">Start</button>
-        <button id="pauseBtn">Pause</button>
-        <button id="stopBtn">Stop</button>
-        <button id="resetBtn">Reset</button>
+        <button id="startBtn" style="flex:1">Start</button>
+        <button id="pauseBtn" style="flex:1">Pause</button>
+        <button id="stopBtn" style="flex:1">Stop</button>
+        <button id="resetBtn" style="flex:1">Reset</button>
       </div>
 
       <div style="display:flex;gap:8px;margin-top:8px">
@@ -108,8 +111,8 @@
         <div class="stat">Avg latency ms <div id="lat" style="font-size:20px">0</div></div>
         <div class="stat">Queue <div id="queue" style="font-size:20px">0</div></div>
         <div class="stat">Blocked <div id="blocked" style="font-size:20px">0</div></div>
-        <div class="stat">Capacity <div id="cap" style="font-size:20px">0</div></div>
-        <div class="stat">Top talker <div id="toptalker" style="font-size:14px">-</div></div>
+        <div class="stat">Capacity <div id="cap" style="font-size:20px">500</div></div>
+        <div class="stat">Top talker <div id="toptalker" style="font-size:13px">-</div></div>
       </div>
     </div>
 
@@ -126,7 +129,7 @@
       <div id="switch" class="device" style="left:220px;top:40px;width:120px;height:64px;background:#225e9e">Switch</div>
       <div id="router" class="device" style="left:420px;top:40px;width:120px;height:64px;background:#f08b1a">Router</div>
       <div id="server" class="server">
-        <h3>Учебен сървър</h3>
+        <h3 style="margin:0 0 6px">Учебен сървър</h3>
         <div class="meter"><div id="cpuFill" class="meterFill"></div></div>
         <div id="serverQueueText" class="muted">Обработва: 0 / Капацитет: 500 req/s</div>
       </div>
@@ -135,7 +138,7 @@
       <div id="botsContainer"></div>
 
       <!-- canvas charts overlay -->
-      <div style="position:absolute;right:12px;bottom:12px;width:420px">
+      <div style="position:absolute;right:12px;bottom:12px;width:420px;z-index:3">
         <canvas id="chartRps" width="420" height="120"></canvas>
         <canvas id="chartLat" width="420" height="120" style="margin-top:6px"></canvas>
       </div>
@@ -145,8 +148,8 @@
 
 <script>
 /* DDoS Simulator PRO — single-file educational simulation
-   - no network calls
-   - purely client-side visual & statistical simulation
+- no network calls
+- purely client-side visual & statistical simulation
 */
 
 // --- state & elements
@@ -198,37 +201,14 @@ const ctxRps = chartRps.getContext('2d');
 const ctxLat = chartLat.getContext('2d');
 
 let simulationInterval = null;
-let tickMs = 1000; // base tick
+let tickMs = 1000;
 let running = false;
 let paused = false;
-let bots = []; // DOM elements for bots
-let ipStats = {}; // ip -> {count, lastSeen}
+let bots = [];
+let ipStats = {};
 let blacklist = new Set();
 let report = {events:[],samples:[]};
 let timeSeries = {rps:[],lat:[],queue:[]};
-
-// init labels and layout
-function syncLabels(){
-  botCountLabel.textContent = botCountEl.value;
-  botRateLabel.textContent = botRateEl.value;
-  legitRateLabel.textContent = legitRateEl.value;
-  srvCapacityLabel.textContent = srvCapacityEl.value;
-}
-[botCountEl,botRateEl,legitRateEl,srvCapacityEl].forEach(el=>{
-  el.addEventListener('input',()=>{ syncLabels(); serverState.capacity = parseInt(srvCapacityEl.value,10); updateServerText(); });
-});
-syncLabels();
-
-// preset clicks
-presetPills.forEach(p=>{
-  p.addEventListener('click', ()=> {
-    botCountEl.value=p.dataset.bots;
-    botRateEl.value=p.dataset.rate;
-    legitRateEl.value=p.dataset.legit;
-    srvCapacityEl.value=p.dataset.cap;
-    syncLabels();
-  });
-});
 
 // server state
 let serverState = {
@@ -240,28 +220,80 @@ let serverState = {
   totalProcessed: 0
 };
 
-// layout bots
+function updateServerText() {
+  if (serverQueueText) {
+    serverQueueText.textContent = `Обработва: ${serverState.processedLastSec} / Капацитет: ${serverState.capacity} req/s`;
+  }
+  if (capEl) {
+    capEl.textContent = serverState.capacity;
+  }
+}
+
+// init labels and layout
+function syncLabels(){
+  botCountLabel.textContent = botCountEl.value;
+  botRateLabel.textContent = botRateEl.value;
+  legitRateLabel.textContent = legitRateEl.value;
+  srvCapacityLabel.textContent = srvCapacityEl.value;
+}
+
+botCountEl.addEventListener('input', () => {
+  syncLabels();
+  createBotElements(parseInt(botCountEl.value, 10));
+});
+
+[botRateEl, legitRateEl].forEach(el => {
+  el.addEventListener('input', syncLabels);
+});
+
+srvCapacityEl.addEventListener('input', () => {
+  syncLabels();
+  serverState.capacity = parseInt(srvCapacityEl.value, 10);
+  updateServerText();
+});
+
+syncLabels();
+updateServerText();
+
+// preset clicks
+presetPills.forEach(p=>{
+  p.addEventListener('click', ()=> {
+    botCountEl.value = p.dataset.bots;
+    botRateEl.value = p.dataset.rate;
+    legitRateEl.value = p.dataset.legit;
+    srvCapacityEl.value = p.dataset.cap;
+    serverState.capacity = parseInt(p.dataset.cap, 10);
+    syncLabels();
+    updateServerText();
+    createBotElements(parseInt(p.dataset.bots, 10));
+  });
+});
+
+// layout bots (ограничаваме визуалните DOM елементи до 150 за висока производителност, като изчисленията ползват пълния брой)
 function createBotElements(n){
   botsContainer.innerHTML = '';
   bots = [];
   ipStats = {};
   blacklist = new Set();
-  for(let i=0;i<n;i++){
+  const visualCount = Math.min(n, 150);
+  const rect = topo.getBoundingClientRect();
+  const w = rect.width || 800;
+  const h = rect.height || 520;
+
+  for(let i=0;i<visualCount;i++){
     const b = document.createElement('div');
     b.className = 'client bot';
-    const rect = topo.getBoundingClientRect();
-    // randomly position around edges (left/right/top)
+    b.textContent = 'Bot';
     const zone = Math.random();
     let x, y;
-    if(zone<0.4){ x = 10 + Math.random()*80; y = 30 + Math.random()*(rect.height-60); } // left
-    else if(zone<0.8){ x = rect.width-110 + Math.random()*40; y = 30 + Math.random()*(rect.height-60); } // right
-    else { x = 80 + Math.random()*(rect.width-160); y = Math.random()<0.5?10:rect.height-60; } // top/bottom
+    if(zone<0.4){ x = 10 + Math.random()*80; y = 30 + Math.random()*(h-70); }
+    else if(zone<0.8){ x = w-110 + Math.random()*40; y = 30 + Math.random()*(h-70); }
+    else { x = 80 + Math.random()*(w-160); y = Math.random()<0.5?10:h-60; }
     b.style.left = `${x}px`; b.style.top = `${y}px`;
     b.dataset.ip = `10.0.${Math.floor(i/256)}.${i%256}`;
     b.dataset.id = i;
     b.dataset.requests = 0;
     b.addEventListener('click', ()=> {
-      // manual blacklist toggle
       const ip = b.dataset.ip;
       if(blacklist.has(ip)){ blacklist.delete(ip); log(`Removed ${ip} from blacklist`, '#ffd54d'); b.style.opacity='1'; }
       else { blacklist.add(ip); log(`Manually blacklisted ${ip}`, '#ff6b6b'); b.style.opacity='0.35'; }
@@ -286,14 +318,13 @@ function log(msg, color){
 function animateDot(fromEl,toEl,color,fast=false){
   const dot = document.createElement('div');
   dot.className='packet';
-  dot.style.width='10px'; dot.style.height='10px'; dot.style.borderRadius='6px';
+  dot.style.width='8px'; dot.style.height='8px'; dot.style.borderRadius='50%';
   dot.style.background = color; dot.style.opacity='0.95';
   document.body.appendChild(dot);
   const f = fromEl.getBoundingClientRect(); const t = toEl.getBoundingClientRect();
   dot.style.left = (f.left + f.width/2) + 'px'; dot.style.top = (f.top + f.height/2) + 'px';
-  // force reflow
   void dot.offsetWidth;
-  const dur = fast? 300 : (500 + Math.random()*600);
+  const dur = fast? 300 : (500 + Math.random()*500);
   dot.style.transition = `left ${dur}ms linear, top ${dur}ms linear, opacity 200ms`;
   dot.style.left = (t.left + t.width/2) + 'px'; dot.style.top = (t.top + t.height/2) + 'px';
   setTimeout(()=> dot.style.opacity='0', dur-80);
@@ -313,46 +344,43 @@ function tick(){
   const isCDN = cdnChk.checked;
   const isChallenge = challengeChk.checked;
 
-  // autoscale logic (adds capacity when queue large)
+  // autoscale logic
   if(isAutoscale && serverState.queue > serverState.capacity * 0.75){
     const add = Math.round(serverState.capacity * 0.35);
     serverState.capacity = Math.min(5000, serverState.capacity + add);
-    log(`Autoscale: added capacity ${add}, total ${serverState.capacity}`, '#ffd54d');
+    log(`Autoscale: added capacity +${add}, total ${serverState.capacity}`, '#ffd54d');
   }
 
   // compute requests
-  // bot requests approx botCount * botRate (Poisson approx)
-  let effectiveBotRateFactor = isCDN ? 0.35 : 1.0; // CDN offloads
+  let effectiveBotRateFactor = isCDN ? 0.35 : 1.0;
+  if(isChallenge) effectiveBotRateFactor *= 0.4;
   let botReq = Math.round(botCount * botRate * effectiveBotRateFactor);
   let legitReq = Math.round(legitRate);
 
-  // rate limit simulation: per-IP cap
+  // rate limit simulation
   if(isRateLimit){
-    const perIpCap = attackType==='syn' ? 8 : 6; // stricter for SYN maybe
+    const perIpCap = attackType==='syn' ? 8 : 6;
     const maxAllowed = botCount * perIpCap;
     if(botReq > maxAllowed){
       const dropped = botReq - maxAllowed;
-      botReq = maxAllowed + Math.round(dropped * 0.25); // some still get through
+      botReq = maxAllowed + Math.round(dropped * 0.25);
       serverState.blocked += Math.round(dropped*0.75);
     }
   }
 
-  // blacklist auto: find top talkers and blacklist some
-  if(isBlacklistAuto){
-    // aggregate counts: randomly simulate larger counts for some bots
+  // blacklist auto
+  if(isBlacklistAuto && bots.length > 0){
     for(let i=0;i<Math.min(bots.length, 50); i++){
       const b = bots[Math.floor(Math.random()*bots.length)];
       const ip = b.dataset.ip;
       ipStats[ip] = ipStats[ip] || {count:0,ip};
       ipStats[ip].count += Math.round(Math.random()*5*botRate);
     }
-    // find top
     const arr = Object.values(ipStats).sort((a,b)=>b.count-a.count).slice(0,5);
     arr.forEach(s=>{
       if(s.count > 100 && !blacklist.has(s.ip)){
         blacklist.add(s.ip);
         log(`Auto-blacklist ${s.ip} (high volume)`, '#ff6b6b');
-        // visually dim bots with that ip
         bots.forEach(b=>{ if(b.dataset.ip===s.ip) b.style.opacity='0.35'; });
       }
     });
@@ -360,7 +388,7 @@ function tick(){
 
   // clip botReq based on blacklist
   if(blacklist.size>0){
-    const approxBlocked = Math.round(botReq * Math.min(0.6, blacklist.size / Math.max(1, botCount)));
+    const approxBlocked = Math.round(botReq * Math.min(0.6, blacklist.size / Math.max(1, bots.length)));
     botReq = Math.max(0, botReq - approxBlocked);
     serverState.blocked += approxBlocked;
   }
@@ -368,12 +396,11 @@ function tick(){
   const incoming = botReq + legitReq;
 
   // animate sample traffic
-  const sample = Math.min(60, incoming);
+  const sample = Math.min(40, incoming);
   for(let i=0;i<sample;i++){
     const isBot = Math.random() < (botReq/(incoming||1));
     if(isBot && bots.length>0){
       const b = bots[Math.floor(Math.random()*bots.length)];
-      // skip if blacklisted
       if(blacklist.has(b.dataset.ip)) continue;
       const color = attackType==='udp' ? 'rgba(160,74,255,0.95)' : (attackType==='syn' ? 'rgba(255,140,30,0.95)' : 'rgba(255,100,100,0.95)');
       animateDot(b, switchEl, color, attackType==='syn');
@@ -388,7 +415,7 @@ function tick(){
   serverState.queue -= serverState.processedLastSec;
   serverState.totalProcessed += serverState.processedLastSec;
 
-  // latency calc (baseline + queue factor + randomness)
+  // latency calc
   const baseline = 20;
   const qFactor = Math.min(1, serverState.queue / Math.max(1, serverState.capacity));
   const latency = Math.round(baseline + qFactor*800 + Math.random()*60);
@@ -398,8 +425,8 @@ function tick(){
   latEl.textContent = latency;
   queueEl.textContent = serverState.queue;
   blockedEl.textContent = serverState.blocked;
-  capEl.textContent = serverState.capacity;
-  serverQueueText.textContent = `Обработва: ${serverState.processedLastSec} / Капацитет: ${serverState.capacity} req/s`;
+  updateServerText();
+
   const util = Math.min(1, serverState.processedLastSec / Math.max(1, serverState.capacity));
   cpuFill.style.width = `${Math.round(util*100)}%`;
   cpuFill.style.background = util>0.9 ? "linear-gradient(90deg,#ff6b6b,#ffb09a)" : "linear-gradient(90deg,#4ae39a,#ffd54d)";
@@ -408,52 +435,44 @@ function tick(){
   timeSeries.rps.push(incoming); timeSeries.lat.push(latency); timeSeries.queue.push(serverState.queue);
   if(timeSeries.rps.length>60){ timeSeries.rps.shift(); timeSeries.lat.shift(); timeSeries.queue.shift(); }
 
-  // update charts
   drawCharts();
-
-  // sample top talker for UI
   updateTopTalker();
 
-  // save sample to report
   report.samples.push({t:Date.now(), incoming, latency, queue:serverState.queue, capacity:serverState.capacity});
 
-  // some conditional logs
   if(qFactor>0.7 && Math.random()<0.4) log(`High queue: ${serverState.queue}`, '#ffb86b');
   if(incoming > serverState.capacity*2 && Math.random()<0.25) log(`Traffic >> capacity (${incoming} req/s)`, '#ff6b6b');
 }
 
-// chart drawing (simple)
+// chart drawing
 function drawCharts(){
-  // clear
   ctxRps.clearRect(0,0,chartRps.width,chartRps.height);
   ctxLat.clearRect(0,0,chartLat.width,chartLat.height);
-  // draw axes
-  ctxRps.fillStyle = 'rgba(255,255,255,0.06)'; ctxRps.fillRect(0,0,chartRps.width,chartRps.height);
-  ctxLat.fillStyle = 'rgba(255,255,255,0.06)'; ctxLat.fillRect(0,0,chartLat.width,chartLat.height);
-  // rps line
+  ctxRps.fillStyle = 'rgba(255,255,255,0.03)'; ctxRps.fillRect(0,0,chartRps.width,chartRps.height);
+  ctxLat.fillStyle = 'rgba(255,255,255,0.03)'; ctxLat.fillRect(0,0,chartLat.width,chartLat.height);
+
   const arr = timeSeries.rps;
   if(arr.length>1){
     const maxv = Math.max(...arr, 1);
     ctxRps.beginPath(); ctxRps.strokeStyle='#29a3ff'; ctxRps.lineWidth=2;
-    arr.forEach((v,i)=>{ const x = i*(chartRps.width/(arr.length-1)); const y = chartRps.height - (v/maxv)*(chartRps.height-8) -4; if(i===0) ctxRps.moveTo(x,y); else ctxRps.lineTo(x,y); });
+    arr.forEach((v,i)=>{ const x = i*(chartRps.width/(arr.length-1)); const y = chartRps.height - (v/maxv)*(chartRps.height-12) - 6; if(i===0) ctxRps.moveTo(x,y); else ctxRps.lineTo(x,y); });
     ctxRps.stroke();
   }
-  // latency
+
   const la = timeSeries.lat;
   if(la.length>1){
     const maxv2 = Math.max(...la,1);
     ctxLat.beginPath(); ctxLat.strokeStyle='#ffd54d'; ctxLat.lineWidth=2;
-    la.forEach((v,i)=>{ const x = i*(chartLat.width/(la.length-1)); const y = chartLat.height - (v/maxv2)*(chartLat.height-8) -4; if(i===0) ctxLat.moveTo(x,y); else ctxLat.lineTo(x,y); });
+    la.forEach((v,i)=>{ const x = i*(chartLat.width/(la.length-1)); const y = chartLat.height - (v/maxv2)*(chartLat.height-12) - 6; if(i===0) ctxLat.moveTo(x,y); else ctxLat.lineTo(x,y); });
     ctxLat.stroke();
   }
-  // labels
-  ctxRps.fillStyle='rgba(255,255,255,0.6)'; ctxRps.font='12px sans-serif'; ctxRps.fillText('RPS (last samples)',6,14);
-  ctxLat.fillStyle='rgba(255,255,255,0.6)'; ctxLat.font='12px sans-serif'; ctxLat.fillText('Latency ms (last samples)',6,14);
+
+  ctxRps.fillStyle='rgba(255,255,255,0.75)'; ctxRps.font='12px sans-serif'; ctxRps.fillText('RPS (last samples)',8,16);
+  ctxLat.fillStyle='rgba(255,255,255,0.75)'; ctxLat.font='12px sans-serif'; ctxLat.fillText('Latency ms (last samples)',8,16);
 }
 
 // update top talker UI
 function updateTopTalker(){
-  // pick top from ipStats
   const arr = Object.values(ipStats).sort((a,b)=>b.count-a.count).slice(0,5);
   if(arr.length===0){ topTalkerEl.textContent = '-'; return; }
   topTalkerEl.textContent = `${arr[0].ip} (${arr[0].count})`;
@@ -463,70 +482,88 @@ function updateTopTalker(){
 function layout() { createBotElements(parseInt(botCountEl.value,10)); }
 window.addEventListener('resize', ()=> layout());
 layout();
+drawCharts();
 
 // start/pause/stop/reset logic
 startBtn.addEventListener('click', ()=> {
-  if(running) return;
+  if(running && !paused) return;
+  if(paused){ paused = false; log('Simulation resumed', '#ffd54d'); return; }
   running = true; paused = false;
   serverState.capacity = parseInt(srvCapacityEl.value,10);
+  updateServerText();
   report = {events:[],samples:[]};
-  log('Simulation started',' #29a3ff');
+  log('Simulation started','#29a3ff');
   simulationInterval = setInterval(tick, tickMs);
 });
+
 pauseBtn.addEventListener('click', ()=> {
-  paused = !paused; log(paused? 'Simulation paused':'Simulation resumed', '#ffd54d');
+  if(!running) return;
+  paused = !paused;
+  log(paused ? 'Simulation paused' : 'Simulation resumed', '#ffd54d');
 });
+
 stopBtn.addEventListener('click', ()=> {
-  clearInterval(simulationInterval); running=false; paused=false; log('Simulation stopped', '#ff6b6b');
+  clearInterval(simulationInterval);
+  running=false; paused=false;
+  log('Simulation stopped', '#ff6b6b');
 });
+
 resetBtn.addEventListener('click', ()=> {
-  clearInterval(simulationInterval); running=false; paused=false;
-  serverState = {capacity: parseInt(srvCapacityEl.value,10), queue:0, processedLastSec:0, avgLatency:20, blocked:0, totalProcessed:0};
+  clearInterval(simulationInterval);
+  running=false; paused=false;
+  serverState = {
+    capacity: parseInt(srvCapacityEl.value,10),
+    queue:0, processedLastSec:0, avgLatency:20, blocked:0, totalProcessed:0
+  };
   timeSeries = {rps:[],lat:[],queue:[]};
   ipStats = {}; blacklist = new Set(); report = {events:[],samples:[]};
-  rpsEl.textContent='0'; latEl.textContent='0'; queueEl.textContent='0'; blockedEl.textContent='0'; capEl.textContent=serverState.capacity;
-  cpuFill.style.width='0%'; serverQueueText.textContent=`Обработва: 0 / Капацитет: ${serverState.capacity} req/s`;
+  rpsEl.textContent='0'; latEl.textContent='0'; queueEl.textContent='0'; blockedEl.textContent='0';
+  cpuFill.style.width='0%';
+  updateServerText();
+  drawCharts();
   createBotElements(parseInt(botCountEl.value,10));
-  log('Simulation reset',' #4ae39a');
+  log('Simulation reset','#4ae39a');
 });
 
 // explain mode (stepwise)
-let explainStep = 0;
 explainBtn.addEventListener('click', async ()=>{
-  // step through a small scripted scenario
-  clearInterval(simulationInterval); running=false;
-  // small controlled scenario
+  clearInterval(simulationInterval);
+  running = true; paused = false;
   const saved = {
     bots: botCountEl.value, rate: botRateEl.value, legit: legitRateEl.value, cap: srvCapacityEl.value
   };
-  botCountEl.value = 200; botRateEl.value = 6; legitRateEl.value = 1; srvCapacityEl.value = 300; syncLabels(); createBotElements(200);
+  botCountEl.value = 200; botRateEl.value = 6; legitRateEl.value = 1; srvCapacityEl.value = 300;
+  serverState.capacity = 300;
+  syncLabels(); updateServerText(); createBotElements(200);
   log('Explain: Stepwise demo started', '#ffd54d');
-  // steps:
+
   const steps = [
     {msg:'Normal traffic — server healthy', bots:50, rate:1, sec:2, highlight:'#4ae39a'},
-    {msg:'Attacker bots ramp up — increased RPS', bots:800, rate:6, sec:4, highlight:'#ffb86b'},
-    {msg:'Rate limiting enabled: per-IP cap applied', action:()=>{ rateLimitChk.checked=true; }, sec:3, highlight:'#ffd54d'},
-    {msg:'Top talkers auto-blacklisted', action:()=>{ blacklistChk.checked=true; }, sec:3, highlight:'#ff6b6b'},
-    {msg:'CDN offload engaged — traffic reduced', action:()=>{ cdnChk.checked=true; }, sec:3, highlight:'#4ae39a'},
-    {msg:'Autoscale added capacity to absorb bursts', action:()=>{ autoscaleChk.checked=true; }, sec:3, highlight:'#4ae39a'},
-    {msg:'Result: legitimate traffic served again — mitigation success', sec:3, highlight:'#4ae39a'}
+    {msg:'Attacker bots ramp up — increased RPS', bots:800, rate:6, sec:3, highlight:'#ffb86b'},
+    {msg:'Rate limiting enabled: per-IP cap applied', action:()=>{ rateLimitChk.checked=true; }, sec:2, highlight:'#ffd54d'},
+    {msg:'Top talkers auto-blacklisted', action:()=>{ blacklistChk.checked=true; }, sec:2, highlight:'#ff6b6b'},
+    {msg:'CDN offload engaged — traffic reduced', action:()=>{ cdnChk.checked=true; }, sec:2, highlight:'#4ae39a'},
+    {msg:'Autoscale added capacity to absorb bursts', action:()=>{ autoscaleChk.checked=true; }, sec:2, highlight:'#4ae39a'},
+    {msg:'Result: legitimate traffic served again — mitigation success', sec:2, highlight:'#4ae39a'}
   ];
+
   for(let s of steps){
+    if(!running) break;
     log(`Explain: ${s.msg}`, s.highlight);
+    if(s.bots !== undefined){ botCountEl.value = s.bots; syncLabels(); }
+    if(s.rate !== undefined){ botRateEl.value = s.rate; syncLabels(); }
     if(s.action) s.action();
-    // run this scenario for s.sec seconds
     const end = Date.now() + (s.sec*1000);
-    while(Date.now()<end){
-      // simulate one tick with current parameters
-      await new Promise(r=>setTimeout(r, 400));
-      // small internal tick: call tick logic but without starting interval
-      if(!running){ tick(); }
+    while(Date.now()<end && running){
+      await new Promise(r=>setTimeout(r, 450));
+      tick();
     }
   }
+  running = false;
   log('Explain demo finished — restoring settings', '#29a3ff');
-  // restore saved
   botCountEl.value = saved.bots; botRateEl.value = saved.rate; legitRateEl.value = saved.legit; srvCapacityEl.value = saved.cap;
-  syncLabels(); createBotElements(parseInt(botCountEl.value,10));
+  serverState.capacity = parseInt(saved.cap, 10);
+  syncLabels(); updateServerText(); createBotElements(parseInt(botCountEl.value,10));
 });
 
 // download report
@@ -544,7 +581,7 @@ downloadBtn.addEventListener('click', ()=>{
 
 // simple top talker simulation updater
 setInterval(()=>{
-  // randomly bump ipStats to simulate activity
+  if(!running || paused) return;
   for(let i=0;i<5;i++){
     if(bots.length===0) break;
     const b = bots[Math.floor(Math.random()*bots.length)];
@@ -554,43 +591,6 @@ setInterval(()=>{
   }
   updateTopTalker();
 }, 2000);
-
-// Инициализация при зареждане
-        window.addEventListener('load', () => {
-            updateNetworkSpeed(1);
-            resetSimulation();
-        });
-
-        function updateServerText(val) {
-            const serverLabel = document.getElementById('serverText') 
-                             || document.getElementById('serverLabel') 
-                             || document.getElementById('serverName');
-            if (serverLabel) {
-                serverLabel.textContent = val || 'Централен сървър';
-            }
-        }
-  function updateServerText(val) {
-            const serverLabel = document.getElementById('serverText') 
-                             || document.getElementById('serverLabel') 
-                             || document.getElementById('serverName');
-            if (serverLabel) {
-                serverLabel.textContent = val || 'Централен сървър';
-            }
-        }
-
-        function updateNetworkSpeed(val) {
-            const speed = parseFloat(val) || 1;
-            if (typeof simulationSpeed !== 'undefined') simulationSpeed = speed;
-            if (typeof networkSpeed !== 'undefined') networkSpeed = speed;
-            if (typeof speedMultiplier !== 'undefined') speedMultiplier = speed;
-
-            const speedLabel = document.getElementById('speedText') 
-                            || document.getElementById('networkSpeedText') 
-                            || document.getElementById('speedValue');
-            if (speedLabel) {
-                speedLabel.textContent = speed + 'x';
-            }
-        }
 </script>
 </body>
 </html>
