@@ -1458,21 +1458,9 @@
             <div id="modal-body" class="text-sm text-slate-700 dark:text-slate-200 overflow-y-auto"></div>
         </div>
     </div>
-
-    <!-- FOOTER -->
-    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-8 text-center text-xs text-slate-500">
-        <p class="font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            © 2026 д-р Адем Ибушев Зейнев / Adem ZEINEV, PhD
-        </p>
-        <p>
-            <span class="lang-inline-bg">СУ „Св. Паисий Хилендарски“ – с. Абланица · ХТМУ – София, Катедра „Математика“ · Актуализирано: Ноември 2026</span>
-            <span class="lang-inline-en">St. Paisii Hilendarski Secondary School – Ablanitsa · UCTM Sofia, Department of Mathematics · Updated: November 2026</span>
-        </p>
-        </p>
-            </p>
-
-        <!-- Единна визитка за споделяне и QR код -->
-        <div style="margin: 28px auto 0 auto; max-width: 520px; padding: 24px; border-radius: 16px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(148, 163, 184, 0.25); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); text-align: center;">
+<footer ...>
+        <!-- 1. ПЪРВО ПОСТАВЯТЕ ВИЗИТКАТА ТУК (над авторските права) -->
+        <div style="margin: 0 auto 24px auto; max-width: 520px; padding: 24px; border-radius: 16px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(148, 163, 184, 0.25); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); text-align: center;">
           
           <!-- Социални бутони -->
           <div style="display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid rgba(148, 163, 184, 0.2);">
@@ -1526,7 +1514,26 @@
           </div>
 
         </div>
-    </footer>    <!-- SCROLL TO TOP BUTTON -->
+
+        <!-- 2. ТУК ОСТАВАТ ВАШИТЕ АВТОРСКИ ПРАВА (© 2026 д-р Адем Ибушев Зейнев...) -->
+        <p ...>© 2026 д-р Адем Ибушев Зейнев...</p>
+        <p ...>СУ „Св. Паисий Хилендарски“...</p>
+
+        <!-- 3. И НАКРАЯ ФУТЪРЪТ ПРОСТО СЕ ЗАТВАРЯ С: -->
+    </footer>
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-8 text-center text-xs text-slate-500">
+        <p class="font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            © 2026 д-р Адем Ибушев Зейнев / Adem ZEINEV, PhD
+        </p>
+        <p>
+            <span class="lang-inline-bg">СУ „Св. Паисий Хилендарски“ – с. Абланица · ХТМУ – София, Катедра „Математика“ · Актуализирано: Ноември 2026</span>
+            <span class="lang-inline-en">St. Paisii Hilendarski Secondary School – Ablanitsa · UCTM Sofia, Department of Mathematics · Updated: November 2026</span>
+        </p>
+        </p>
+            </p>
+
+           </footer>    <!-- SCROLL TO TOP BUTTON -->
     <button id="scroll-top-btn" class="fixed bottom-6 right-6 w-11 h-11 bg-brand-600 hover:bg-brand-700 text-white rounded-full shadow-xl flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 z-50 hover:scale-110 no-print" aria-label="Върни се най-горе">
         <i class="fa-solid fa-arrow-up"></i>
     </button>
