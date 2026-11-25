@@ -1883,12 +1883,11 @@
                     }).join('');
                 }
 
-                const confListEl = document.getElementById('conf-list');
+              const confListEl = document.getElementById('conf-list');
                 if (confListEl) {
                     confListEl.innerHTML = confs.map(c =>
-                        `<li class="p-2.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 flex items-start gap-2.5">
-                            <i class="fa-solid fa-award text-purple-500 mt-1 shrink-0"></i>
-                            <div><strong class="text-slate-800 dark:text-slate-100">${c.badge}:</strong> ${c.text}</div>
+                        `<li class="p-2.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40">
+                            <i class="fa-solid fa-award text-purple-500 mr-1.5"></i><strong class="text-slate-800 dark:text-slate-100">${c.badge}:</strong> ${c.text}
                         </li>`
                     ).join('');
                 }
