@@ -1,0 +1,111 @@
+{
+  "publications": [
+    {
+      "authors": "A. Ahmad, K. Haidar, N. Javad, A. Zeinev",
+      "title": "A criterion to uniform stability for functional perturbed differential equations",
+      "details": "International Journal of Pure and Applied Mathematics, Volume 108, №1, (2016), 107–122.",
+      "category": "de",
+      "url": ""
+    },
+    {
+      "authors": "A. Zeinev, N. Kitanov",
+      "title": "Estimates for Functional Partial Differential Equations",
+      "details": "The Journal of Macro Trends in Technology and Innovation, Volume 2, Issue 1, (2014), 17–29.",
+      "category": "de",
+      "url": ""
+    },
+    {
+      "authors": "A. Ahmad, N. Javaid, M. Rafaqat, A. Zeinev",
+      "title": "On the stability of the solutions for a delay differential equations with discontinuity",
+      "details": "International Journal of Pure and Applied Mathematics, (2017).",
+      "category": "de",
+      "url": ""
+    },
+    {
+      "authors": "A. Zeinev, V. Radeva, D. Kolev, V. Todorov, N. Kitanov",
+      "title": "A class of functional differential equations with \"maxima\"",
+      "details": "",
+      "category": "de",
+      "url": ""
+    },
+    {
+      "authors": "T. Donchev, D. Kolev, A. Lazi, A. Nosheen, M. Rafaqat, A. Zeinev",
+      "title": "Numerical methods for delayed differential equations with discontinuities",
+      "details": "",
+      "category": "de",
+      "url": ""
+    },
+    {
+      "authors": "V. Radeva, V. Todorov, D. Kolev, A. Zeinev, N. Kitanov",
+      "title": "Integrability of Fluid Dynamics Models",
+      "details": "Metallurgy (UCTM), (2013).",
+      "category": "physics",
+      "url": ""
+    },
+    {
+      "authors": "D. Kolev, V. Todorov, A. Zeinev",
+      "title": "Charged Particles Through Electromagnetic Fields",
+      "details": "",
+      "category": "physics",
+      "url": ""
+    },
+    {
+      "authors": "T. Donchev, D. Kolev, A. Lazi, A. Nosheen, M. Rafaqat, A. Zeinev",
+      "title": "Caratheodory Differential Equations On Cones",
+      "details": "",
+      "category": "de",
+      "url": ""
+    },
+    {
+      "authors": "R. Ivanov, A. Zeinev",
+      "title": "Elementary Proof of the John's Theorem for Nonsmooth Functions",
+      "details": "",
+      "category": "de",
+      "url": ""
+    },
+    {
+      "authors": "L. Peychev, K. Panovska, A. Tatsis, A. Zeinev",
+      "title": "Understanding educational quality in informatics in secondary school",
+      "details": "",
+      "category": "edu",
+      "url": ""
+    },
+    {
+      "authors": "S. Bilal, T. Donchev, A. Raza, A. Zeinev, N. Kitanov",
+      "title": "Reachable Set for Functional Differential Inclusions",
+      "details": "",
+      "category": "de",
+      "url": ""
+    }
+  ],
+  "conferences": [
+    {
+      "badge": "Presentation",
+      "text": "Scientific Conference with International Participation on the occasion of 60 years UCTM (Sofia)."
+    },
+    {
+      "badge": "Presentation",
+      "text": "International Conference on Business and Social Science Research / The Macro Journals Conference on Medicine, Science, and Technology – Dubrovnik."
+    },
+    {
+      "badge": "Presentation",
+      "text": "International Conference \"New Trends in the Applications of Differential Equations in Sciences\", Bulgarian Academy of Sciences (BAS), Sofia."
+    },
+    {
+      "badge": "Poster Session (May 2012)",
+      "text": "\"Charged particles through electromagnetic fields\" — Dimitar Kolev, Valeri Todorov, Adem Zeinev."
+    },
+    {
+      "badge": "UCTM Poster Session (May 2013)",
+      "text": "\"Parabolic partial differential equations with maxima\" & \"Geometry of simple states to a model of gas-dynamics\"."
+    },
+    {
+      "badge": "7th International Academic Macro Thematic Conference (Dubrovnik 2018)",
+      "text": "\"On the solution set of evolution inclusions\"."
+    },
+    {
+      "badge": "7th International Academic Macro Thematic Conference (Dubrovnik 2018)",
+      "text": "\"Some Scheme for Averaging of Impulsive Optimal Control Problems\"."
+    }
+  ]
+}
