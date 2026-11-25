@@ -1468,6 +1468,26 @@
             <span class="lang-inline-bg">СУ „Св. Паисий Хилендарски“ – с. Абланица · ХТМУ – София, Катедра „Математика“ · Актуализирано: Ноември 2026</span>
             <span class="lang-inline-en">St. Paisii Hilendarski Secondary School – Ablanitsa · UCTM Sofia, Department of Mathematics · Updated: November 2026</span>
         </p>
+        </p>
+
+        <!-- Визитка за бързо споделяне и QR код -->
+        <div style="margin: 24px auto 0 auto; padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(148, 163, 184, 0.3); display: inline-flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=https://azeynev.github.io/&color=0f172a&bgcolor=ffffff" 
+               alt="QR код към портфолиото на д-р Адем Зейнев" 
+               style="width: 120px; height: 120px; border-radius: 8px; padding: 6px; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.12);">
+          
+          <div style="text-align: left; max-width: 280px;">
+            <strong style="display: block; font-size: 1.05rem; margin-bottom: 6px;">Бърз достъп и споделяне</strong>
+            <p style="font-size: 0.9rem; margin: 0 0 12px 0; opacity: 0.9;">
+              Сканирайте QR кода с телефон или копирайте директния адрес на портфолиото:
+            </p>
+            <button onclick="navigator.clipboard.writeText('https://azeynev.github.io/'); this.innerText='✓ Линкът е копиран!'; setTimeout(() => this.innerText='Копирай линка', 2500);" 
+                    style="padding: 8px 16px; border: none; border-radius: 6px; background: #2563eb; color: #ffffff; font-weight: 600; cursor: pointer;">
+              Копирай линка
+            </button>
+          </div>
+        </div>
+    </footer>
     </footer>
 
     <!-- SCROLL TO TOP BUTTON -->
