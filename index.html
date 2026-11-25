@@ -1866,7 +1866,69 @@
             }
         }
 
-        renderCertificates();
+       renderCertificates();
+
+        // ==========================================
+        // ДИНАМИЧНО ЗАРЕЖДАНЕ НА ПУБЛИКАЦИИ И ДОКЛАДИ
+        // ==========================================
+        async function loadResearchData() {
+            try {
+                const response = await fetch('publications.json?v=' + Date.now());
+                if (!response.ok) return;
+                const data = await response.json();
+
+                const pubs = data.publications || [];
+                const confs = data.conferences || [];
+
+                const pubListEl = document.getElementById('pub-list');
+                if (pubListEl) {
+                    pubListEl.innerHTML = pubs.map(p => {
+                        const detailsPart = p.details ? `, ${p.details}` : '.';
+                        const linkPart = p.url
+                            ? ` <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 ml-1.5 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline no-print"><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> DOI / PDF</a>`
+                            : '';
+                        return `<li data-cat="${p.category || 'de'}" class="pub-item p-2.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-900/70 transition"><strong>${p.authors}</strong>, <em>${p.title}</em>${detailsPart}${linkPart}</li>`;
+                    }).join('');
+                }
+
+                const confListEl = document.getElementById('conf-list');
+                if (confListEl) {
+                    confListEl.innerHTML = confs.map(c =>
+                        `<li class="p-2.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 flex items-start gap-2.5">
+                            <i class="fa-solid fa-award text-purple-500 mt-1 shrink-0"></i>
+                            <div><strong class="text-slate-800 dark:text-slate-100">${c.badge}:</strong> ${c.text}</div>
+                        </li>`
+                    ).join('');
+                }
+
+                const totalPubs = pubs.length;
+                const totalConfs = confs.length;
+
+                document.querySelectorAll('a[href="#sec-research"] span:last-child').forEach(el => {
+                    if (/^\d+$/.test(el.textContent.trim())) el.textContent = totalPubs;
+                });
+
+                const pubHeadingBg = document.querySelector('#sec-research h3 .lang-inline-bg');
+                const pubHeadingEn = document.querySelector('#sec-research h3 .lang-inline-en');
+                if (pubHeadingBg) pubHeadingBg.textContent = `Научни публикации в реферирани издания (${totalPubs}):`;
+                if (pubHeadingEn) pubHeadingEn.textContent = `Peer-Reviewed Scientific Publications (${totalPubs}):`;
+
+                const allFilterBg = document.querySelector('#pub-filters button:first-child .lang-inline-bg');
+                const allFilterEn = document.querySelector('#pub-filters button:first-child .lang-inline-en');
+                if (allFilterBg) allFilterBg.textContent = `Всички (${totalPubs})`;
+                if (allFilterEn) allFilterEn.textContent = `All (${totalPubs})`;
+
+                const confBg = document.getElementById('conf-count-heading');
+                const confEn = document.getElementById('conf-count-heading-en');
+                if (confBg) confBg.textContent = totalConfs;
+                if (confEn) confEn.textContent = totalConfs;
+
+            } catch (err) {
+                console.error('Грешка при зареждане на publications.json:', err);
+            }
+        }
+
+        loadResearchData();
     </script>
 </body>
 </html>
