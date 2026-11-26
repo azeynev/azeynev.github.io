@@ -1433,7 +1433,7 @@
         });
 
         // =========================================================================
-        // АВТОМАТИЧНО СИНХРОНИЗИРАНЕ С GITHUB API (ЗА ВСИЧКИ БЪДЕЩИ РЕПОЗИТОРИТА)
+        // ИНТЕЛИГЕНТНО СИНХРОНИЗИРАНЕ С GITHUB API (ПО ПРЕДМЕТИ И КЛАСОВЕ)
         // =========================================================================
         async function syncGitHubRepositories() {
             try {
@@ -1441,43 +1441,75 @@
                 if (!response.ok) return;
                 const repos = await response.json();
 
-                // Списък със служебни или вече ръчно добавени хранилища, за да не се дублират
-                const excludedRepos = ['azeynev.github.io', 'azeynev', 'hybrid-ai-cybershield'];
+                // Служебни или вече ръчно описани хранилища (за да не се дублират)
+                const excludedRepos = ['azeynev.github.io', 'azeynev', 'hybrid-ai-cybershield', 'math'];
                 let addedNew = false;
+
+                // Речник за автоматично разпознаване на предмет по GitHub Topics или ключови думи
+                const categoryRules = [
+                    { cat: 'biology', subjectBg: 'Биология · STEM', subjectEn: 'Biology · STEM', demoType: 'biology', keys: ['biology', 'ear', 'hearing', 'cell', 'dna', 'anatomy', 'chemistry', 'биология', 'химия', 'ухо', 'слух'] },
+                    { cat: 'physics', subjectBg: 'Физика · STEM', subjectEn: 'Physics · STEM', demoType: 'physics', keys: ['physics', 'optics', 'mechanics', 'wave', 'electric', 'физика', 'оптика', 'механика', 'електричество'] },
+                    { cat: 'math', subjectBg: 'Математика · STEM', subjectEn: 'Mathematics · STEM', demoType: 'math', keys: ['math', 'geometry', 'algebra', 'fractal', 'calculus', 'математика', 'геометрия', 'алгебра', 'нво'] },
+                    { cat: 'exams', subjectBg: 'Изпити и Тестове', subjectEn: 'Exams & Tests', demoType: 'exams', keys: ['exam', 'test', 'quiz', 'nvo', 'изпит', 'тест'] },
+                    { cat: 'tools', subjectBg: 'Училищни инструменти', subjectEn: 'School Tools', demoType: 'tools', keys: ['tool', 'school', 'schedule', 'училище', 'инструмент'] }
+                ];
 
                 repos.forEach(repo => {
                     if (repo.fork || excludedRepos.includes(repo.name)) return;
 
-                    // Ако репото има зададен GitHub Pages линк в Website (homepage), ползва него; иначе стандартния Pages адрес
+                    // Използва полето Website (homepage), ако е зададено, иначе стандартния Pages адрес
                     const liveUrl = (repo.homepage && repo.homepage.trim() !== "")
                         ? repo.homepage.trim()
                         : `https://azeynev.github.io/${repo.name}/`;
 
                     // Проверка дали вече не съществува в MATERIALS_DATA
-                    const alreadyExists = MATERIALS_DATA.some(item => item.file === liveUrl);
+                    const alreadyExists = MATERIALS_DATA.some(item => item.file === liveUrl || item.file.includes(repo.name));
                     if (alreadyExists) return;
+
+                    // Обединяваме GitHub Topics, името и описанието за търсене на съвпадения
+                    const topics = Array.isArray(repo.topics) ? repo.topics.map(t => t.toLowerCase()) : [];
+                    const searchText = `${topics.join(' ')} ${repo.name} ${repo.description || ''}`.toLowerCase();
+
+                    // Определяне на категория (по подразбиране: informatics)
+                    let matched = { cat: 'informatics', subjectBg: 'Информатика · STEM', subjectEn: 'Informatics · STEM', demoType: 'cyber' };
+                    for (const rule of categoryRules) {
+                        if (rule.keys.some(k => searchText.includes(k))) {
+                            matched = rule;
+                            break;
+                        }
+                    }
+
+                    // Определяне на клас по GitHub Topic (напр. grade-5-7, grade-8-10, grade-11-12)
+                    let grade = '8-10';
+                    let gradeLabel = '8. – 12. клас';
+                    if (topics.includes('grade-5-7') || searchText.includes('5-7')) {
+                        grade = '5-7';
+                        gradeLabel = '5. – 7. клас';
+                    } else if (topics.includes('grade-11-12') || searchText.includes('11-12')) {
+                        grade = '11-12';
+                        gradeLabel = '11. – 12. клас / ВУЗ';
+                    }
 
                     const formattedTitle = repo.name
                         .replace(/[-_]/g, ' ')
                         .replace(/\b\w/g, l => l.toUpperCase());
 
-                    MATERIALS_DATA.push({
+                    MATERIALS_DATA.unshift({
                         file: liveUrl,
-                        cat: "informatics",
-                        grade: "11-12",
-                        gradeLabel: "11. – 12. клас / ВУЗ",
-                        subjectBg: "GitHub · Нов проект",
-                        subjectEn: "GitHub · New Project",
+                        cat: matched.cat,
+                        grade: grade,
+                        gradeLabel: gradeLabel,
+                        subjectBg: matched.subjectBg,
+                        subjectEn: matched.subjectEn,
                         titleBg: formattedTitle,
                         titleEn: formattedTitle,
-                        descBg: repo.description || "Интерактивен проект и софтуерна разработка с отворен код от GitHub профила на д-р Адем Зейнев.",
-                        descEn: repo.description || "Interactive open-source project and software development from Dr. Adem Zeinev's GitHub repository.",
-                        demoType: "cyber"
+                        descBg: repo.description || "Интерактивна HTML5 учебна симулация и STEM лаборатория — д-р Адем Зейнев.",
+                        descEn: repo.description || "Interactive HTML5 educational simulation and STEM laboratory — Dr. Adem Zeinev.",
+                        demoType: matched.demoType
                     });
                     addedNew = true;
                 });
 
-                // Ако са открити нови хранилища, обновяваме броячите и преначертаваме картите
                 if (addedNew) {
                     updateCategoryCounts();
                     renderMaterials();
