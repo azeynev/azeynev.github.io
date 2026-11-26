@@ -1523,6 +1523,83 @@
         updateCategoryCounts();
         renderMaterials();
         syncGitHubRepositories();
+
+        
+// =========================================================================
+        // АВТОМАТИЧНО СКАНИРАНЕ НА НОВИ .HTML ФАЙЛОВЕ В ПАПКА MATERIALS/
+        // =========================================================================
+        async function syncMaterialsFolder() {
+            try {
+                const response = await fetch('https://api.github.com/repos/azeynev/azeynev.github.io/contents/materials');
+                if (!response.ok) return;
+                const files = await response.json();
+
+                // Файлове, които не са учебни симулации
+                const ignoredFiles = ['index.html', '404.html', 'template.html'];
+                let addedNew = false;
+
+                const categoryRules = [
+                    { cat: 'biology', subjectBg: 'Биология · Химия', subjectEn: 'Biology · Chemistry', demoType: 'biology', keys: ['bio', 'sluh', 'ear', 'cell', 'dna', 'chem', 'himia', 'anatom'] },
+                    { cat: 'physics', subjectBg: 'Физика · Техника', subjectEn: 'Physics · Tech', demoType: 'physics', keys: ['phys', 'optic', 'mech', 'wave', 'electr', 'fizik', 'tok', 'lupa', 'lens'] },
+                    { cat: 'math', subjectBg: 'Математика', subjectEn: 'Mathematics', demoType: 'math', keys: ['math', 'geom', 'alg', 'pitagor', 'fractal', 'golden', 'dde', 'matemat'] },
+                    { cat: 'exams', subjectBg: 'Изпити и Тестове', subjectEn: 'Exams & Tests', demoType: 'exams', keys: ['exam', 'test', 'quiz', 'nvo', 'izpit'] },
+                    { cat: 'tools', subjectBg: 'Училищни инструменти', subjectEn: 'School Tools', demoType: 'tools', keys: ['tool', 'school', 'schedule', 'klas'] }
+                ];
+
+                files.forEach(item => {
+                    if (item.type !== 'file' || !item.name.endsWith('.html')) return;
+                    if (ignoredFiles.includes(item.name.toLowerCase())) return;
+
+                    // Проверка дали файлът вече не е описан в MATERIALS_DATA
+                    const alreadyExists = MATERIALS_DATA.some(m => m.file === item.name || m.file.endsWith('/' + item.name));
+                    if (alreadyExists) return;
+
+                    const lowerName = item.name.toLowerCase();
+                    let matched = { cat: 'informatics', subjectBg: 'Информатика · Симулатор', subjectEn: 'Informatics · Simulator', demoType: 'cyber' };
+
+                    for (const rule of categoryRules) {
+                        if (rule.keys.some(k => lowerName.includes(k))) {
+                            matched = rule;
+                            break;
+                        }
+                    }
+
+                    // Превръща името на файла в четливо заглавие (напр. "Optics_Lens_Lab.html" -> "Optics Lens Lab")
+                    const cleanTitle = item.name
+                        .replace(/\.html$/i, '')
+                        .replace(/[_-]+/g, ' ')
+                        .replace(/\b\w/g, l => l.toUpperCase());
+
+                    MATERIALS_DATA.unshift({
+                        file: item.name,
+                        cat: matched.cat,
+                        grade: '8-10',
+                        gradeLabel: '8. – 12. клас',
+                        subjectBg: matched.subjectBg,
+                        subjectEn: matched.subjectEn,
+                        titleBg: cleanTitle,
+                        titleEn: cleanTitle,
+                        descBg: "Интерактивна авторска HTML5 симулация от дигиталната учебна библиотека — д-р Адем Зейнев.",
+                        descEn: "Interactive HTML5 educational simulation from the Digital Educational Library — Dr. Adem Zeinev.",
+                        demoType: matched.demoType
+                    });
+                    addedNew = true;
+                });
+
+                if (addedNew) {
+                    updateCategoryCounts();
+                    renderMaterials();
+                }
+            } catch (error) {
+                console.warn("GitHub Contents API офлайн режим:", error);
+            }
+        }
+
+        // Initialize counters, grid, and auto-sync both folders and separate repositories
+        updateCategoryCounts();
+        renderMaterials();
+        syncMaterialsFolder();
+        syncGitHubRepositories();
     </script>
 </body>
 </html>
