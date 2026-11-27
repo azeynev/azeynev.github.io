@@ -2017,9 +2017,9 @@
     <p style="text-align: center; font-size: 0.85rem; opacity: 0.8; margin-top: 1.5rem;">
     &copy; 2026 д-р Адем Зейнев · Всички права запазени · Лиценз: <a href="https://github.com/azeynev/azeynev.github.io/blob/main/LICENSE" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">CC BY-NC 4.0</a>
 </p>
-        <script>
-async function updateProfileStats() {
-  // Тук задавате актуалния брой на публикациите и сертификатите (или оставяте скрипта да ги преброи, ако имате списъци в страницата)
+    <script>
+(async function syncPortfolioStats() {
+  // 1. Актуални стойности за публикации и сертификати
   const MANUAL_STATS = {
     publications: 11,
     certificates: 55
@@ -2029,42 +2029,62 @@ async function updateProfileStats() {
   const certEl = document.getElementById('stat-certs');
   const simEl = document.getElementById('stat-sims');
 
-  if (pubEl) pubEl.textContent = MANUAL_STATS.publications;
-  if (certEl) certEl.textContent = MANUAL_STATS.certificates;
+  // Ако в страницата има списък с публикации (<ol> в секция 4), преброява ги автоматично
+  const pubListItems = document.querySelectorAll('#research ol li, section[id*="pub"] ol li');
+  if (pubEl) {
+    pubEl.textContent = pubListItems.length > 0 ? pubListItems.length : MANUAL_STATS.publications;
+  }
+  if (certEl) {
+    certEl.textContent = MANUAL_STATS.certificates;
+  }
 
-  // Автоматично преброяване на всички HTML5 симулации и тестове от GitHub
+  // 2. Проверка в кеша (за да не блокира GitHub API при често презареждане)
+  const CACHE_KEY = 'azeynev_sim_count_v1';
+  const cached = sessionStorage.getItem(CACHE_KEY);
+  if (cached && simEl) {
+    simEl.textContent = cached;
+    return;
+  }
+
+  // 3. Извличане на актуалния брой проекти от GitHub API
   try {
     const res = await fetch('https://api.github.com/users/azeynev/repos?per_page=100');
     if (!res.ok) return;
     const repos = await res.json();
 
-    const simRepos = repos.filter(r =>
+    const activeRepos = repos.filter(r =>
       r.has_pages &&
       r.name.toLowerCase() !== 'azeynev.github.io'
     );
 
-    let totalSimulations = 0;
-    for (const repo of simRepos) {
-      const treeRes = await fetch(`https://api.github.com/repos/azeynev/${repo.name}/git/trees/${repo.default_branch}?recursive=1`);
-      if (!treeRes.ok) continue;
-      const treeData = await treeRes.json();
-      if (treeData.tree) {
-        totalSimulations += treeData.tree.filter(item =>
-          item.type === 'blob' && item.path.endsWith('.html')
+    let totalHtml = 0;
+    const trees = await Promise.all(
+      activeRepos.map(repo =>
+        fetch(`https://api.github.com/repos/azeynev/${repo.name}/git/trees/${repo.default_branch}?recursive=1`)
+          .then(r => r.ok ? r.json() : null)
+          .catch(() => null)
+      )
+    );
+
+    trees.forEach(treeData => {
+      if (treeData && Array.isArray(treeData.tree)) {
+        totalHtml += treeData.tree.filter(f =>
+          f.type === 'blob' &&
+          f.path.endsWith('.html') &&
+          !f.path.includes('404.html')
         ).length;
       }
-    }
+    });
 
-    if (simEl && totalSimulations > 0) {
-      simEl.textContent = totalSimulations;
+    if (simEl && totalHtml > 0) {
+      simEl.textContent = totalHtml;
+      sessionStorage.setItem(CACHE_KEY, String(totalHtml));
     }
-  } catch (err) {
+  } catch (e) {
     // При офлайн режим остава числото по подразбиране от HTML
   }
-}
-
-updateProfileStats();
+})();
 </script>
-</body>
+    </body>
 
     </html>
