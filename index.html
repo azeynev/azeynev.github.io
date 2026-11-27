@@ -2018,5 +2018,52 @@
     &copy; 2026 д-р Адем Зейнев · Всички права запазени · Лиценз: <a href="https://github.com/azeynev/azeynev.github.io/blob/main/LICENSE" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">CC BY-NC 4.0</a>
 </p>
 </body>
-    
-</html>
+    <script>
+async function updateProfileStats() {
+  // Тук задавате актуалния брой на публикациите и сертификатите (или оставяте скрипта да ги преброи, ако имате списъци в страницата)
+  const MANUAL_STATS = {
+    publications: 11,
+    certificates: 55
+  };
+
+  const pubEl = document.getElementById('stat-pubs');
+  const certEl = document.getElementById('stat-certs');
+  const simEl = document.getElementById('stat-sims');
+
+  if (pubEl) pubEl.textContent = MANUAL_STATS.publications;
+  if (certEl) certEl.textContent = MANUAL_STATS.certificates;
+
+  // Автоматично преброяване на всички HTML5 симулации и тестове от GitHub
+  try {
+    const res = await fetch('https://api.github.com/users/azeynev/repos?per_page=100');
+    if (!res.ok) return;
+    const repos = await res.json();
+
+    const simRepos = repos.filter(r =>
+      r.has_pages &&
+      r.name.toLowerCase() !== 'azeynev.github.io'
+    );
+
+    let totalSimulations = 0;
+    for (const repo of simRepos) {
+      const treeRes = await fetch(`https://api.github.com/repos/azeynev/${repo.name}/git/trees/${repo.default_branch}?recursive=1`);
+      if (!treeRes.ok) continue;
+      const treeData = await treeRes.json();
+      if (treeData.tree) {
+        totalSimulations += treeData.tree.filter(item =>
+          item.type === 'blob' && item.path.endsWith('.html')
+        ).length;
+      }
+    }
+
+    if (simEl && totalSimulations > 0) {
+      simEl.textContent = totalSimulations;
+    }
+  } catch (err) {
+    // При офлайн режим остава числото по подразбиране от HTML
+  }
+}
+
+updateProfileStats();
+</script>
+    </html>
