@@ -1580,14 +1580,31 @@
         </div>
 
         <!-- Авторски права и институции -->
-        <div class="space-y-1 text-xs text-slate-500 dark:text-slate-400">
+       <!-- Авторски права, институции, лиценз и навигация -->
+        <div class="mx-auto max-w-5xl pt-6 border-t border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-slate-600 dark:text-slate-400 text-center sm:text-left">
+          <div class="space-y-1">
             <p class="font-semibold text-slate-700 dark:text-slate-200">
-                © 2026 д-р Адем Ибушев Зейнев / Adem ZEINEV, PhD
+              &copy; 2026 <span class="lang-inline-bg">д-р Адем Ибушев Зейнев</span><span class="lang-inline-en">Adem Ibushev Zeynev, PhD</span>
+              · <span class="lang-inline-bg">Всички права запазени</span><span class="lang-inline-en">All rights reserved</span>
+              · <span class="lang-inline-bg">Лиценз:</span><span class="lang-inline-en">License:</span>
+              <a href="https://github.com/azeynev/azeynev.github.io/blob/main/LICENSE" target="_blank" rel="noopener" class="underline hover:text-sky-600 dark:hover:text-sky-400 transition">CC BY-NC 4.0</a>
             </p>
-            <p>
-                <span class="lang-inline-bg">СУ „Св. Паисий Хилендарски“ – с. Абланица · ХТМУ – София, Катедра „Математика“ · Актуализирано: Ноември 2026</span>
-                <span class="lang-inline-en">St. Paisii Hilendarski Secondary School – Ablanitsa · UCTM Sofia, Department of Mathematics · Updated: November 2026</span>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              <span class="lang-inline-bg">СУ „Св. Паисий Хилендарски“ – с. Абланица · ХТМУ – София, Катедра „Математика“ · Актуализирано: Ноември 2026</span>
+              <span class="lang-inline-en">St. Paisii Hilendarski Secondary School – Ablanitsa · UCTM Sofia, Department of Mathematics · Updated: November 2026</span>
             </p>
+          </div>
+
+          <div class="flex items-center gap-3 shrink-0">
+            <a href="https://github.com/azeynev" target="_blank" rel="noopener" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-sky-600 dark:hover:text-sky-400 transition" aria-label="GitHub">
+              <i class="fa-brands fa-github text-base"></i>
+            </a>
+            <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/80 hover:bg-sky-100 dark:hover:bg-sky-900/40 text-slate-700 dark:text-slate-300 transition font-medium">
+              <i class="fa-solid fa-arrow-up text-xs"></i>
+              <span class="lang-inline-bg">Нагоре</span>
+              <span class="lang-inline-en">Back to top</span>
+            </a>
+          </div>
         </div>
 
     </footer>
