@@ -2063,9 +2063,26 @@
 
         loadResearchData();
     </script>
-    <p style="text-align: center; font-size: 0.85rem; opacity: 0.8; margin-top: 1.5rem;">
-    &copy; 2026 д-р Адем Зейнев · Всички права запазени · Лиценз: <a href="https://github.com/azeynev/azeynev.github.io/blob/main/LICENSE" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">CC BY-NC 4.0</a>
-</p>
+    <footer class="mt-12 pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800 text-center text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+  <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <p>
+      &copy; 2026 <span class="lang-inline-bg">д-р Адем Зейнев · Всички права запазени</span><span class="lang-inline-en">Adem Zeynev, PhD · All rights reserved</span>
+      · <span class="lang-inline-bg">Лиценз:</span><span class="lang-inline-en">License:</span>
+      <a href="https://github.com/azeynev/azeynev.github.io/blob/main/LICENSE" target="_blank" rel="noopener" class="underline hover:text-sky-600 dark:hover:text-sky-400 transition">CC BY-NC 4.0</a>
+    </p>
+
+    <div class="flex items-center gap-4">
+      <a href="https://github.com/azeynev" target="_blank" rel="noopener" class="hover:text-sky-600 dark:hover:text-sky-400 transition" aria-label="GitHub">
+        <i class="fa-brands fa-github text-base"></i>
+      </a>
+      <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 hover:bg-sky-100 dark:hover:bg-sky-900/40 text-slate-700 dark:text-slate-300 transition font-medium">
+        <i class="fa-solid fa-arrow-up text-xs"></i>
+        <span class="lang-inline-bg">Нагоре</span>
+        <span class="lang-inline-en">Back to top</span>
+      </a>
+    </div>
+  </div>
+</footer>
     <script>
 (async function syncPortfolioStats() {
   // 1. Сертификати (променяте само това число при нов сертификат)
