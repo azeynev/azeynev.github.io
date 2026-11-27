@@ -1988,6 +1988,10 @@
                 const totalPubs = pubs.length;
                 const totalConfs = confs.length;
 
+                const statPubsCard = document.getElementById('stat-pubs');
+                if (statPubsCard) statPubsCard.textContent = totalPubs;
+                
+
                 document.querySelectorAll('a[href="#sec-research"] span:last-child').forEach(el => {
                     if (/^\d+$/.test(el.textContent.trim())) el.textContent = totalPubs;
                 });
