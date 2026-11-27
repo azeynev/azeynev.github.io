@@ -2019,34 +2019,21 @@
 </p>
     <script>
 (async function syncPortfolioStats() {
-  // 1. Актуални стойности за публикации и сертификати
-  const MANUAL_STATS = {
-    publications: 11,
-    certificates: 55
-  };
-
-  const pubEl = document.getElementById('stat-pubs');
+  // 1. Сертификати (променяте само това число при нов сертификат)
+  const CERTIFICATES_COUNT = 55;
   const certEl = document.getElementById('stat-certs');
+  if (certEl) certEl.textContent = CERTIFICATES_COUNT;
+
+  // 2. Проверка в кеша за симулациите (1 час валидност, за да не блокира GitHub API)
   const simEl = document.getElementById('stat-sims');
-
-  // Ако в страницата има списък с публикации (<ol> в секция 4), преброява ги автоматично
-  const pubListItems = document.querySelectorAll('#research ol li, section[id*="pub"] ol li');
-  if (pubEl) {
-    pubEl.textContent = pubListItems.length > 0 ? pubListItems.length : MANUAL_STATS.publications;
-  }
-  if (certEl) {
-    certEl.textContent = MANUAL_STATS.certificates;
-  }
-
-  // 2. Проверка в кеша (за да не блокира GitHub API при често презареждане)
-  const CACHE_KEY = 'azeynev_sim_count_v1';
+  const CACHE_KEY = 'azeynev_sim_count_v2';
   const cached = sessionStorage.getItem(CACHE_KEY);
   if (cached && simEl) {
     simEl.textContent = cached;
     return;
   }
 
-  // 3. Извличане на актуалния брой проекти от GitHub API
+  // 3. Автоматично преброяване на всички HTML5 симулации и тестове от GitHub
   try {
     const res = await fetch('https://api.github.com/users/azeynev/repos?per_page=100');
     if (!res.ok) return;
@@ -2081,10 +2068,10 @@
       sessionStorage.setItem(CACHE_KEY, String(totalHtml));
     }
   } catch (e) {
-    // При офлайн режим остава числото по подразбиране от HTML
+    // При офлайн режим остава числото по подразбиране
   }
 })();
 </script>
-    </body>
+</body>
 
     </html>
