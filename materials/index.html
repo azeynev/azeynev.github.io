@@ -248,17 +248,39 @@
     </div>
 
     <!-- FOOTER -->
-    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-7 text-center text-xs text-slate-500">
-        <p class="font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            © 2026 д-р Адем Ибушев Зейнев / Adem ZEINEV, PhD
-        </p>
-        <p>
+    <footer class="mt-12 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-7 px-4 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+      <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+        <div class="space-y-1">
+          <p class="font-semibold text-slate-700 dark:text-slate-200">
+            &copy; 2026 <span class="lang-inline-bg">д-р Адем Ибушев Зейнев</span><span class="lang-inline-en">Adem Ibushev Zeynev, PhD</span>
+            · <span class="lang-inline-bg">Всички права запазени</span><span class="lang-inline-en">All rights reserved</span>
+            · <span class="lang-inline-bg">Лиценз:</span><span class="lang-inline-en">License:</span>
+            <a href="https://github.com/azeynev/azeynev.github.io/blob/main/LICENSE" target="_blank" rel="noopener" class="underline hover:text-sky-600 dark:hover:text-sky-400 transition">CC BY-NC 4.0</a>
+          </p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
             <span class="lang-inline-bg">Дигитална учебна библиотека · СУ „Св. Паисий Хилендарски“ – с. Абланица</span>
             <span class="lang-inline-en">Digital Educational Library · St. Paisii Hilendarski Secondary School – Ablanitsa</span>
-        </p>
-    </footer>
+          </p>
+        </div>
 
-    <script>
+        <div class="flex items-center gap-2.5 shrink-0">
+          <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 hover:border-sky-400 hover:text-sky-600 dark:hover:text-sky-400 transition font-medium">
+            <i class="fa-solid fa-house text-xs"></i>
+            <span class="lang-inline-bg">Начало</span>
+            <span class="lang-inline-en">Home</span>
+          </a>
+          <a href="https://github.com/azeynev" target="_blank" rel="noopener" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-sky-600 dark:hover:text-sky-400 transition" aria-label="GitHub">
+            <i class="fa-brands fa-github text-base"></i>
+          </a>
+          <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/80 hover:bg-sky-100 dark:hover:bg-sky-900/40 text-slate-700 dark:text-slate-300 transition font-medium">
+            <i class="fa-solid fa-arrow-up text-xs"></i>
+            <span class="lang-inline-bg">Нагоре</span>
+            <span class="lang-inline-en">Back to top</span>
+          </a>
+        </div>
+      </div>
+    </footer>
+       <script>
         // =========================================================================
         // ПЪЛЕН КАТАЛОГ С ВСИЧКИ 51 АВТОРСКИ HTML5 УЧЕБНИ РЕСУРСА
         // =========================================================================
@@ -1613,8 +1635,5 @@
         syncMaterialsFolder();
         syncGitHubRepositories();
     </script>
-    <p style="text-align: center; font-size: 0.85rem; opacity: 0.8; margin-top: 1.5rem;">
-    &copy; 2026 д-р Адем Зейнев · Всички права запазени · Лиценз: <a href="https://github.com/azeynev/azeynev.github.io/blob/main/LICENSE" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">CC BY-NC 4.0</a>
-    </p>
-</body>
+    </body>
 </html>
